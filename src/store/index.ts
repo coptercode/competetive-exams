@@ -278,6 +278,7 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
   logout: () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("lms_user_profile");
+    window.location.hash = "/landing";
     set({
       auth: {
         isAuthenticated: false,
@@ -288,6 +289,7 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
       },
       profile: defaultProfile,
       activeView: "landing",
+      notifications: defaultNotifications,
     });
   },
 
@@ -448,7 +450,10 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
       });
       if (res.ok) {
         const data = await res.json();
-        set({ notifications: data.notifications || [] });
+        const incoming = data.notifications || [];
+        const currentNotifications = get().notifications;
+        const localOnly = currentNotifications.filter((n) => n.id.startsWith("notif-"));
+        set({ notifications: [...localOnly, ...incoming] });
       }
     } catch (err) {
       console.warn("Failed to fetch notifications:", err);

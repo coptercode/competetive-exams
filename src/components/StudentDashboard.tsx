@@ -253,13 +253,6 @@ export const StudentDashboard: React.FC = () => {
             <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
               Active Core Subjects
             </h3>
-            <button
-              onClick={() => setView("course-view")}
-              className="text-xs text-brand-violet hover:underline flex items-center gap-1 font-semibold"
-            >
-              <span>Explore Lectures</span>
-              <ChevronRight className="w-3 h-3" />
-            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

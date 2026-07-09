@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     "assignment-view": "Assignments Center",
     "profile-view": "Academic Profile",
     "teacher-dash": "Educator Dashboard",
-    "content-upload": "Content Upload Studio",
+    "admin-upload": "Content Upload Studio",
     "quiz-builder": "Assessment Constructor",
     "admin-structure": "SaaS Registry & Structure",
     "admin-analytics": "Platform Core Analytics",

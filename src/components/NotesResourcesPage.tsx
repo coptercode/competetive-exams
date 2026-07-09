@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useLmsStore } from "../store/index";
-import { BookOpen, ArrowRight, Search, Sparkles } from "lucide-react";
+import { BookOpen, ArrowRight, ArrowLeft, Search, Sparkles } from "lucide-react";
 
 const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
-  const titleLower = subjectTitle.toLowerCase();
+  const titleLower = (subjectTitle || "").toLowerCase();
   
   let imageUrl = "";
   let bgColor = "bg-white";
@@ -66,8 +66,8 @@ const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
 };
 
 const ChapterCover: React.FC<{ subjectTitle: string; chapterTitle: string }> = ({ subjectTitle, chapterTitle }) => {
-  const sTitleLower = subjectTitle.toLowerCase();
-  const cTitleLower = chapterTitle.toLowerCase();
+  const sTitleLower = (subjectTitle || "").toLowerCase();
+  const cTitleLower = (chapterTitle || "").toLowerCase();
   
   let imageUrl = "";
   let bgColor = "bg-white";
@@ -139,6 +139,7 @@ const ChapterCover: React.FC<{ subjectTitle: string; chapterTitle: string }> = (
 export const NotesResourcesPage: React.FC = () => {
   const { boards, profile, setActiveCourseContext, setView } = useLmsStore();
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState<string>("all");
+  const [selectedChapterFilter, setSelectedChapterFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const activeBoard = boards.find((b) => b.id === profile.selectedBoardId) || boards[0];
@@ -156,12 +157,12 @@ export const NotesResourcesPage: React.FC = () => {
 
   // Filter subjects for the "All Subjects" view
   const filteredSubjects = subjects.filter((sub) => {
-    return sub.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return (sub.title || "").toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   // Filter chapters for the selected subject view
   const selectedSubject = subjects.find((s) => s.id === selectedSubjectFilter);
-  const chaptersOfSubject = selectedSubject
+  const chaptersOfSubject = selectedSubject && selectedSubject.chapters
     ? selectedSubject.chapters.map((chap) => ({
         ...chap,
         subjectId: selectedSubject.id,
@@ -171,21 +172,37 @@ export const NotesResourcesPage: React.FC = () => {
     : [];
 
   const filteredChapters = chaptersOfSubject.filter((chap) => {
-    return chap.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return (chap.title || "").toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  const selectedChapter = selectedSubject?.chapters?.find((c) => c.id === selectedChapterFilter);
+  const topicsOfChapter = selectedChapter ? selectedChapter.topics : [];
+  const filteredTopics = topicsOfChapter.filter((topic) => {
+    return (topic.title || "").toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const handleOpenSubjectNotes = (subId: string) => {
     const subject = subjects.find((s) => s.id === subId);
-    const firstChapter = subject?.chapters[0];
-    const firstTopic = firstChapter?.topics[0];
+    const firstChapter = subject?.chapters?.[0];
+    const firstTopic = firstChapter?.topics?.[0];
     setActiveCourseContext(subId, firstChapter?.id || null, firstTopic?.id || null);
-    setView("course-view");
+    setView("secure-note-preview");
   };
 
   const handleOpenNotes = (subjectId: string, chapterId: string, topics: any[]) => {
     const firstTopicId = topics?.[0]?.id || null;
     setActiveCourseContext(subjectId, chapterId, firstTopicId);
-    setView("course-view");
+    setView("secure-note-preview");
+  };
+
+  const handleChapterClick = (chap: any) => {
+    const isScience = (chap.subjectTitle || "").toLowerCase().includes("science") || (selectedSubject && (selectedSubject.title || "").toLowerCase().includes("science"));
+    if (isScience) {
+      setSelectedChapterFilter(chap.id);
+      setSearchQuery("");
+    } else {
+      handleOpenNotes(chap.subjectId, chap.id, chap.topics);
+    }
   };
 
   const getSubTagColor = (title: string) => {
@@ -220,7 +237,13 @@ export const NotesResourcesPage: React.FC = () => {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder={selectedSubjectFilter === "all" ? "Search subjects..." : "Search chapters..."}
+            placeholder={
+              selectedSubjectFilter === "all"
+                ? "Search subjects..."
+                : selectedChapterFilter === null
+                ? "Search chapters..."
+                : "Search topics..."
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-xs focus:outline-none focus:border-brand-royal transition-colors"
@@ -229,11 +252,28 @@ export const NotesResourcesPage: React.FC = () => {
       </div>
 
       <div className="space-y-6">
+        {/* Breadcrumb Back Button for Sub-chapters */}
+        {selectedChapterFilter && (
+          <div className="flex items-center text-left">
+            <button
+              onClick={() => {
+                setSelectedChapterFilter(null);
+                setSearchQuery("");
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-650 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm animate-fade-in"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to {selectedSubject?.title} Chapters</span>
+            </button>
+          </div>
+        )}
+
         {/* Subject Filter Tabs */}
         <div className="glass-card p-4 border-slate-200 dark:border-white/5 flex flex-wrap gap-2">
           <button
             onClick={() => {
               setSelectedSubjectFilter("all");
+              setSelectedChapterFilter(null);
               setSearchQuery("");
             }}
             className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${
@@ -249,10 +289,11 @@ export const NotesResourcesPage: React.FC = () => {
               key={sub.id}
               onClick={() => {
                 setSelectedSubjectFilter(sub.id);
+                setSelectedChapterFilter(null);
                 setSearchQuery("");
               }}
               className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${
-                selectedSubjectFilter === sub.id
+                selectedSubjectFilter === sub.id && selectedChapterFilter === null
                   ? "bg-brand-royal border-brand-royal text-white shadow-md"
                   : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
               }`}
@@ -286,17 +327,20 @@ export const NotesResourcesPage: React.FC = () => {
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getSubTagColor(sub.title)} inline-block`}>
                           {sub.title}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-semibold">
+                        <span className="text-[10px] text-slate-550 font-semibold">
                           {sub.chapters.length} Chapters
                         </span>
                       </div>
                     </div>
 
                     <button
-                      onClick={() => handleOpenSubjectNotes(sub.id)}
+                      onClick={() => {
+                        setSelectedSubjectFilter(sub.id);
+                        setSearchQuery("");
+                      }}
                       className="mt-4 w-full py-2.5 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-royal/10"
                     >
-                      <span>Open Notes</span>
+                      <span>Open</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
@@ -304,7 +348,7 @@ export const NotesResourcesPage: React.FC = () => {
               ))}
             </div>
           )
-        ) : (
+        ) : selectedChapterFilter === null ? (
           filteredChapters.length === 0 ? (
             <div className="glass-card p-12 text-center border-slate-200 dark:border-white/5">
               <BookOpen className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
@@ -332,10 +376,49 @@ export const NotesResourcesPage: React.FC = () => {
                     </div>
 
                     <button
-                      onClick={() => handleOpenNotes(chap.subjectId, chap.id, chap.topics)}
+                      onClick={() => handleChapterClick(chap)}
                       className="mt-3 w-full py-2 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-royal/10"
                     >
-                      <span>Open Notes</span>
+                      <span>Open</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        ) : (
+          filteredTopics.length === 0 ? (
+            <div className="glass-card p-12 text-center border-slate-200 dark:border-white/5">
+              <BookOpen className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
+              <p className="text-xs text-slate-500">No topics found matching your criteria in this chapter.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in">
+              {filteredTopics.map((topic) => (
+                <div
+                  key={topic.id}
+                  className="glass-card border-slate-200 dark:border-white/5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg hover:border-brand-royal/30 transition-all duration-300 group overflow-hidden"
+                >
+                  <div className="overflow-hidden rounded-t-xl">
+                    <ChapterCover subjectTitle={selectedSubject?.title || ""} chapterTitle={topic.title} />
+                  </div>
+
+                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                    <div className="space-y-1.5 text-left">
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getSubTagColor(selectedSubject?.title || "")} inline-block`}>
+                        {selectedSubject?.title}
+                      </span>
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                        {topic.title}
+                      </h4>
+                    </div>
+
+                    <button
+                      onClick={() => handleOpenNotes(selectedSubject?.id || "", selectedChapterFilter || "", [topic])}
+                      className="mt-3 w-full py-2 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-royal/10"
+                    >
+                      <span>Open</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>

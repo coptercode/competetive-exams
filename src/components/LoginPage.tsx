@@ -407,28 +407,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
           </button>
         </form>
 
-        {mode !== "educator" && (
-          <div className="text-center mt-5 pt-5 border-t border-slate-100 text-xs text-slate-600 flex flex-col items-center gap-2">
-            <div>
-              Not yet registered?{" "}
-              <button
-                onClick={() => setView("signup")}
-                className="text-brand-violet font-semibold hover:underline"
-              >
-                Create an Account
-              </button>
-            </div>
-            <div className="text-[11px] text-slate-400 mt-1">
-              Are you an educator?{" "}
-              <button
-                onClick={() => setView("login-educator")}
-                className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-semibold hover:underline"
-              >
-                Educator Sign In
-              </button>
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );

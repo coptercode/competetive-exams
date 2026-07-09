@@ -54,8 +54,8 @@ export const SecureNotesPreview: React.FC = () => {
   }
 
   // Helper to resolve the correct PDF path for preview
-  const getTopicPdfInfo = (chapterTitle: string, topicPdfUrl?: string) => {
-    const title = chapterTitle.toLowerCase();
+  const getTopicPdfInfo = (chapterTitle: string = "", topicPdfUrl?: string) => {
+    const title = (chapterTitle || "").toLowerCase();
     const chId = activeChapter?.id || "";
     const subId = activeSubject?.id || "";
     const clId = activeClass?.id || "";

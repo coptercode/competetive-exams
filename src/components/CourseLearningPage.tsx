@@ -209,8 +209,8 @@ export const CourseLearningPage: React.FC = () => {
 
 
 
-  const getTopicPdfInfo = (chapterTitle: string, topicPdfUrl?: string) => {
-    const title = chapterTitle.toLowerCase();
+  const getTopicPdfInfo = (chapterTitle: string = "", topicPdfUrl?: string) => {
+    const title = (chapterTitle || "").toLowerCase();
     const chId = activeChapter?.id || "";
     const subId = activeSubject?.id || "";
     const clId = activeClass?.id || "";

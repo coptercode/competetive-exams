@@ -22,7 +22,6 @@ import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { LandingPage } from "./components/LandingPage";
 import { LoginPage } from "./components/LoginPage";
-import { SignupPage } from "./components/SignupPage";
 import { StudentDashboard } from "./components/StudentDashboard";
 import { CourseLearningPage } from "./components/CourseLearningPage";
 import { QuizInterface } from "./components/QuizInterface";
@@ -37,7 +36,6 @@ import { RoomContainer } from "./components/LiveClass/RoomContainer";
 import { getApiBaseUrl } from "./utils/apiBase";
 import { NotesResourcesPage } from "./components/NotesResourcesPage";
 import { ParentPortal } from "./components/ParentPortal";
-import { GetCredentialsPage } from "./components/GetCredentialsPage";
 import { ForgotPasswordPage } from "./components/ForgotPasswordPage";
 import { ResetPasswordPage } from "./components/ResetPasswordPage";
 import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
@@ -899,10 +897,8 @@ function App() {
       "login",
       "login-student",
       "login-educator",
-      "signup",
       "ai-tutor",
       "quiz-view",
-      "get-credentials",
       "forgot-password",
       "reset-password",
       "privacy-policy",
@@ -922,7 +918,7 @@ function App() {
     if (!isAuthenticated && !publicViews.includes(initialHash)) {
       setView("login-student");
       window.location.hash = "/login-student";
-    } else if (isAuthenticated && (initialHash === "login" || initialHash === "login-student" || initialHash === "login-educator" || initialHash === "signup" || initialHash === "landing")) {
+    } else if (isAuthenticated && (initialHash === "login" || initialHash === "login-student" || initialHash === "login-educator" || initialHash === "landing")) {
       const dash = getDashboardView();
       setView(dash);
       window.location.hash = "/" + dash;
@@ -937,7 +933,7 @@ function App() {
       if (!isAuthenticated && !publicViews.includes(hash)) {
         setView("login-student");
         window.location.hash = "/login-student";
-      } else if (isAuthenticated && (hash === "login" || hash === "login-student" || hash === "login-educator" || hash === "signup" || hash === "landing")) {
+      } else if (isAuthenticated && (hash === "login" || hash === "login-student" || hash === "login-educator" || hash === "landing")) {
         const dash = getDashboardView();
         setView(dash);
         window.location.hash = "/" + dash;
@@ -1013,10 +1009,8 @@ function App() {
     activeView === "login" ||
     activeView === "login-student" ||
     activeView === "login-educator" ||
-    activeView === "signup" ||
     activeView === "ai-tutor" ||
     activeView === "quiz-view" ||
-    activeView === "get-credentials" ||
     activeView === "forgot-password" ||
     activeView === "reset-password" ||
     activeView === "privacy-policy" ||
@@ -1049,20 +1043,18 @@ function App() {
         // Public / Full-page screens do not require standard Sidebar/Header shells
         <>
           {activeView === "landing" && <LandingPage />}
-          {activeView === "login" && <LoginPage mode="student" />}
-          {activeView === "login-student" && <LoginPage mode="student" />}
-          {activeView === "login-educator" && <LoginPage mode="educator" />}
-          {activeView === "signup" && <SignupPage />}
+          {activeView === "login" && <LoginPage mode="all" />}
+          {activeView === "login-student" && <LoginPage mode="all" />}
+          {activeView === "login-educator" && <LoginPage mode="all" />}
           {activeView === "ai-tutor" && <AITutor />}
           {activeView === "quiz-view" && <QuizInterface />}
-          {activeView === "get-credentials" && <GetCredentialsPage />}
           {activeView === "forgot-password" && <ForgotPasswordPage />}
           {activeView === "reset-password" && <ResetPasswordPage />}
           {activeView === "privacy-policy" && <PrivacyPolicyPage />}
           {activeView === "terms-of-service" && <TermsOfServicePage />}
           {activeView === "contact-support" && <ContactSupportPage />}
           {activeView === "secure-note-preview" && auth.isAuthenticated && <SecureNotesPreview />}
-          {!isPublicPage && !auth.isAuthenticated && <LoginPage mode="student" />}
+          {!isPublicPage && !auth.isAuthenticated && <LoginPage mode="all" />}
         </>
       )}
     </div>

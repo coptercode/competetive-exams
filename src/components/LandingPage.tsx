@@ -32,6 +32,10 @@ export const LandingPage: React.FC = () => {
   ];
 
   useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentHeroImage((prev) => (prev + 1) % heroImages.length);
     }, 5000);
@@ -81,6 +85,9 @@ export const LandingPage: React.FC = () => {
       <div className="absolute rounded-full blur-[120px] opacity-[0.08] pointer-events-none w-[500px] h-[500px] bg-brand-royal top-[-100px] left-[-100px]" />
       <div className="absolute rounded-full blur-[120px] opacity-[0.08] pointer-events-none w-[600px] h-[600px] bg-brand-violet bottom-0 right-[-100px]" />
       <div className="absolute rounded-full blur-[120px] opacity-[0.05] pointer-events-none w-[400px] h-[400px] bg-cyan-500 top-[40%] right-[10%]" />
+
+      {/* Subtle Premium Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none z-0" />
 
       {/* Floating Educational Background Doodles relative to centered content layout to prevent overlap */}
       <div className="absolute inset-0 max-w-6xl mx-auto px-6 pointer-events-none z-0">
@@ -137,7 +144,10 @@ export const LandingPage: React.FC = () => {
       {/* Modern Luxury Navbar */}
       <nav className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-row items-center justify-between gap-4">
         <div
-          onClick={() => setView("landing")}
+          onClick={() => {
+            setView("landing");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
           className="flex items-center gap-2 group cursor-pointer"
         >
           <PlanetLogo className="w-9 h-9 sm:w-12 sm:h-12 group-hover:scale-105 transition-transform" />
@@ -146,18 +156,40 @@ export const LandingPage: React.FC = () => {
           </span>
         </div>
 
+        {/* Center Desktop Navigation Links */}
+        <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-wider">
+          <button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="hover:text-brand-royal text-slate-650 transition-colors bg-transparent border-none p-0 cursor-pointer"
+          >
+            Home
+          </button>
+          <button
+            onClick={() => {
+              document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="hover:text-brand-royal text-slate-650 transition-colors bg-transparent border-none p-0 cursor-pointer"
+          >
+            Features
+          </button>
+          <button
+            onClick={() => {
+              document.getElementById("testimonials")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="hover:text-brand-royal text-slate-650 transition-colors bg-transparent border-none p-0 cursor-pointer"
+          >
+            Testimonials
+          </button>
+        </div>
+
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <button
             onClick={() => setView("login-student")}
-            className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-650 hover:text-slate-900 px-3 sm:px-5 py-2 sm:py-2.5 border border-slate-200 hover:bg-slate-50 rounded-none transition-all duration-200"
+            className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-655 hover:text-slate-900 px-3 sm:px-5 py-2 sm:py-2.5 border border-slate-200 hover:bg-slate-50 rounded-none transition-all duration-200"
           >
             Sign In
-          </button>
-          <button
-            onClick={() => setView("signup")}
-            className="px-4 sm:px-6 py-2 sm:py-2.5 text-[10px] sm:text-xs rounded-none bg-brand-royal hover:bg-blue-650 text-white font-bold uppercase tracking-wider border border-brand-royal hover:border-blue-650 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-          >
-            Enroll Now
           </button>
         </div>
       </nav>
@@ -168,48 +200,95 @@ export const LandingPage: React.FC = () => {
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center w-full">
           {/* Left Column: Headline and CTAs */}
-          <div className="lg:col-span-5 text-center lg:text-left flex flex-col items-center lg:items-start">
+          <div className="lg:col-span-6 text-center lg:text-left flex flex-col items-center lg:items-start">
             
+            {/* Sparkle Badge */}
+            <div 
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-slate-50 border border-slate-200/80 text-slate-650 text-[10px] font-bold uppercase tracking-wider mb-6 hover:bg-slate-100 transition-colors duration-200"
+              style={{ borderRadius: "20px" }}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-royal opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-royal" />
+              </span>
+              <span>Contextual AI &amp; Interactive Classrooms</span>
+            </div>
+
             <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold font-display text-slate-900 tracking-tight leading-[1.1] mb-6">
-              The Ultimate Academic Platform for <br className="hidden sm:inline" />
-              <span className="text-brand-royal">
-                Class 9–12 Scholars
+              The AI-Powered Workspace <br className="hidden lg:inline" />
+              <span className="bg-gradient-to-r from-brand-royal via-indigo-600 to-brand-violet bg-clip-text text-transparent">
+                Built for Academic Excellence.
               </span>
             </h1>
             
-            <p className="text-base sm:text-lg text-slate-600 mb-10 max-w-xl leading-relaxed">
-              Master your curriculum with our contextual AI Tutor, interactive WebRTC classrooms, and board-mapped physical kits built for elite performance.
+            <p className="text-base sm:text-[17px] text-slate-500 mb-8 max-w-xl leading-relaxed">
+              Nexora combines high-fidelity WebRTC classrooms, personal 24/7 AI tutor guidance, and board-mapped curriculum resources into a seamless, modern workspace. Designed to help Grade 9–12 scholars achieve conceptual mastery and score higher in their final exams.
             </p>
 
-            <div className="flex flex-col sm:flex-row justify-center lg:justify-start items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-10 justify-center lg:justify-start">
               <button
                 onClick={() => setView("login-student")}
-                className="w-full sm:w-auto px-8 py-3.5 bg-brand-royal hover:bg-blue-650 text-white font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 group transform hover:-translate-y-0.5 active:translate-y-0"
+                className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white hover:bg-slate-955 font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(15,23,42,0.15)] hover:shadow-[0_8px_30px_rgba(15,23,42,0.25)] transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group cursor-pointer"
+                style={{ borderRadius: "10px" }}
               >
-                <span>Enter Student Workspace</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={() => setView("login-educator")}
-                className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold uppercase tracking-wider shadow-md hover:shadow-lg border border-slate-300 hover:border-slate-400 transition-all duration-200 flex items-center justify-center gap-2 group transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                <span>Sign In as Educator</span>
+                <span>Enter Workspace</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
 
           {/* Right Column: Graphic Showcase with Slide Deck */}
-          <div className="lg:col-span-7 flex items-center justify-center w-full">
-            <div className="relative w-full max-w-[600px] lg:max-w-none">
-              {/* Outer Card with curved border */}
+          <div className="lg:col-span-6 flex items-center justify-center w-full relative">
+            {/* Ambient background glow inside right column */}
+            <div className="absolute w-[80%] h-[80%] bg-gradient-to-tr from-brand-royal/10 to-brand-violet/10 blur-3xl opacity-60 -z-10 animate-pulse-slow" />
+            
+            <div className="relative w-full max-w-[540px] lg:max-w-none">
+              {/* Outer Card with curved border resembling a premium desktop application */}
               <div 
-                className="border border-slate-200/80 bg-gradient-to-br from-slate-50/50 to-white/30 p-4 shadow-xl hover:shadow-2xl transition-all duration-300"
+                className="border border-slate-200/50 bg-white/90 backdrop-blur-md p-3.5 shadow-2xl hover:shadow-[0_32px_80px_-24px_rgba(15,23,42,0.14)] hover:scale-[1.005] transition-all duration-500"
                 style={{ borderRadius: "24px" }}
               >
+                {/* Mock Browser Header */}
+                <div className="flex items-center justify-between px-4 pb-3 border-b border-slate-100 mb-3.5">
+                  {/* Windows controls + Nav */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="w-2.5 h-2.5 bg-rose-400 rounded-full" style={{ borderRadius: "50%" }} />
+                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full" style={{ borderRadius: "50%" }} />
+                      <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full" style={{ borderRadius: "50%" }} />
+                    </div>
+                    {/* Mock Browser Arrows */}
+                    <div className="hidden sm:flex items-center gap-1.5 text-slate-300">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                      </svg>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {/* Mock URL bar */}
+                  <div 
+                    className="flex-1 max-w-[240px] mx-4 bg-slate-50 border border-slate-100 text-center py-0.5 text-[9px] text-slate-400 font-medium tracking-wide flex items-center justify-center gap-1 select-none"
+                    style={{ borderRadius: "6px" }}
+                  >
+                    <svg className="w-2.5 h-2.5 text-slate-300" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    <span>nexoralearning.com/workspace</span>
+                  </div>
+
+                  {/* Right side helper info / status */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" style={{ borderRadius: "50%" }} />
+                    <span className="text-[9px] text-slate-400 font-bold tracking-wider uppercase">Live</span>
+                  </div>
+                </div>
+
                 <div 
-                  className="bg-white border border-slate-100 overflow-hidden shadow-inner flex items-center justify-center p-0 relative h-[320px] sm:h-[420px] md:h-[480px] lg:h-[500px]" 
-                  style={{ borderRadius: "18px" }}
+                  className="bg-slate-50 border border-slate-100 overflow-hidden shadow-inner flex items-center justify-center p-0 relative h-[280px] sm:h-[360px] md:h-[400px] lg:h-[420px]" 
+                  style={{ borderRadius: "16px" }}
                 >
                   <img
                     key={currentHeroImage}
@@ -453,11 +532,11 @@ export const LandingPage: React.FC = () => {
               </p>
             </div>
             <button
-              onClick={() => setView("signup")}
+              onClick={() => setView("contact-support")}
               className="px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-900 font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shrink-0"
               style={{ borderRadius: "30px" }}
             >
-              Enroll Now
+              Contact to Enroll
             </button>
           </div>
         </div>
@@ -491,19 +570,35 @@ export const LandingPage: React.FC = () => {
               <h4 className="text-xs font-bold text-white uppercase tracking-wider">Company</h4>
               <ul className="space-y-2.5 text-xs">
                 <li>
-                  <button onClick={() => setView("landing")} className="hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer text-slate-400">
+                  <button
+                    onClick={() => {
+                      setView("landing");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer text-slate-400 text-left"
+                  >
                     Home
                   </button>
                 </li>
                 <li>
-                  <a href="#features" className="hover:text-white transition-colors text-slate-400">
+                  <button
+                    onClick={() => {
+                      document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer text-slate-400 text-left"
+                  >
                     Features
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#testimonials" className="hover:text-white transition-colors text-slate-400">
+                  <button
+                    onClick={() => {
+                      document.getElementById("testimonials")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer text-slate-400 text-left"
+                  >
                     Testimonials
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
