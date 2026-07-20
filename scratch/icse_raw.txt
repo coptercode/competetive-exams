@@ -1,0 +1,37 @@
+Mathematics (Class 9)
+Pure Arithmetic: This covers rational and irrational numbers as real numbers, surds, and the rationalization of surds.
+Commercial Mathematics: This unit focuses on compound interest calculated as a repeated simple interest computation, including the use of the formula $A=P(1+\frac{r}{100})^{n}$.
+Algebra: This includes expansions, factorisation, simultaneous linear equations in two variables, indices/exponents, and logarithms.
+Geometry: This covers triangles (congruency, mid-point theorem, Pythagoras theorem), rectilinear figures (parallelograms, construction of polygons, area theorems), and circles (chord and arc properties).
+Statistics: This introduces the collection, presentation, and graphical representation of data, as well as calculating the mean and median of ungrouped data.
+Mensuration: This includes calculating the area and perimeter of triangles and quadrilaterals, the area and circumference of circles, and the surface area and volume of 3-D solids like cubes and cuboids.
+Trigonometry: This covers trigonometric ratios of standard and complementary angles, along with simple 2-D problems involving one right-angled triangle.
+Co-ordinate Geometry: This involves the Cartesian system, plotting points, solving simultaneous linear equations graphically, and using the distance formula.
+Biology (Class 9)
+Basic Biology: This unit covers the cell as a unit of life, cell organelles, and the types, structure, and functions of plant and animal tissues.
+Flowering Plants: This covers vegetative propagation, the structure of a bisexual flower, self and cross-pollination, and the process of fertilisation.
+Plant Physiology: This focuses on the structure and germination of dicot and monocot seeds, as well as respiration and gaseous exchange in plants.
+Diversity in Living Organisms / Ecosystems: This introduces ecosystems, the five kingdom classification, and the economic importance of bacteria and fungi.
+Human Anatomy and Physiology: This explores nutrition, the digestive system, movement and locomotion (skeleton and joints), the structure and functions of skin, and the respiratory system.
+Health and Hygiene: This covers the causes of diseases (bacteria, viruses, parasites) and the principles of personal and social hygiene.
+Waste Generation and Management: This highlights the sources of waste and the various methods for safe waste disposal.
+Physics (Class 9)
+Measurements and Experimentation: This includes the International System of Units and measurements using instruments like Vernier callipers, micro-metre screw gauges, and simple pendulums.
+Motion in One Dimension: This covers scalar and vector quantities, speed, velocity, acceleration, distance-time graphs, and the equations of uniformly accelerated motion.
+Laws of Motion: This focuses on contact and non-contact forces, Newton's three laws of motion, and the universal law of gravitation.
+Fluids: This explores pressure in liquids, atmospheric pressure, buoyancy, Archimedes' Principle, and relative density.
+Heat and Energy: This unit covers the concepts of heat and temperature, the anomalous expansion of water, energy flow, energy sources, and global warming.
+Light: This includes the reflection of light, images formed by plane mirrors, and the characteristics of images formed by spherical mirrors.
+Sound: This covers the nature and propagation of sound waves, as well as infrasonic, sonic, and ultrasonic frequencies.
+Electricity and Magnetism: This covers simple electric circuits, current electricity, induced magnetism, Earth's magnetic field, and electromagnets.
+Chemistry (Class 9)
+Matter and its Composition: This explains changes of state based on the Kinetic Theory of Matter and the Law of Conservation of Mass.
+Study of Gas Laws: This examines the behavior of gases under changes in temperature and pressure using Boyle's Law and Charles' Law, including the Kelvin scale.
+Elements, Compounds and Mixtures: This covers the general characteristics of these categories and the various methods used for the separation of mixtures.
+The Language of Chemistry: This introduces symbols, valency, formula writing for radicals and compounds, and the balancing of simple chemical equations.
+Physical and Chemical Changes: This distinguishes between physical and chemical changes, detailing the conditions, types, and energy changes of chemical reactions, including burning.
+Water: This studies water as a universal solvent, its physical and chemical properties, and the causes and treatments of water pollution.
+Atomic Structure: This explores the structure of an atom, atomic number, mass number, isotopes, and the octet rule.
+The Periodic Table: This covers the historical contributions to the periodic table (Dobereiner, Newlands, Mendeleev) and the Modern Periodic Law and Table.
+Study of the First Element - Hydrogen: This details the position of hydrogen in the periodic table, along with its laboratory preparation and properties.
+Atmospheric Pollution: This unit focuses on the composition and impact of acid rain, global warming, and ozone depletion.

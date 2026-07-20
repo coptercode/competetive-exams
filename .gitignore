@@ -27,3 +27,6 @@ secrets.*
 
 # Agent/IDE Temporary Files
 .claude
+
+# Local Uploads
+uploads/

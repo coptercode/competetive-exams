@@ -14,6 +14,7 @@ import type {
   QuizResult,
   Bookmark,
 } from "./types";
+import { initialBoards } from "../../prisma/boards-data";
 
 const makeId = (prefix: string) =>
   `${prefix}-${Math.random().toString(36).slice(2, 8)}-${Date.now()}`;
@@ -38,7 +39,7 @@ const defaultProfile: Profile = {
   certificates: [],
 };
 
-const defaultBoards: Board[] = [
+const oldDefaultBoards: Board[] = [
   {
     id: "tnsb",
     title: "TN State Board",
@@ -188,6 +189,29 @@ const defaultBoards: Board[] = [
               },
             ],
           },
+          {
+            id: "biology-10",
+            title: "Biology",
+            color: "#14b8a6",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "chap-1-bio",
+                title: "Chapter 1: Plant Anatomy and Plant Physiology",
+                imageUrl: undefined,
+                topics: [
+                  { 
+                    id: "topic-1-bio", 
+                    title: "Nutrition in Plants", 
+                    content: "Learn about the various modes of nutrition in plants.", 
+                    duration: "15m",
+                    pdfUrl: "/Class10_Science_Biology_Notes.pdf",
+                    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
+                  }
+                ],
+              },
+            ],
+          },
         ],
       },
       {
@@ -230,7 +254,407 @@ const defaultBoards: Board[] = [
       },
     ],
   },
+  {
+    id: "cbse",
+    title: "CBSE Board",
+    code: "CBSE",
+    classes: [
+      {
+        id: "class-12",
+        title: "Class 12",
+        subjects: [
+          {
+            id: "maths-12-cbse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-maths-12-ch1",
+                title: "Chapter 1: Relations and Functions",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-maths-12-ch1-t1", title: "Relations and Functions", content: "Sets, relations and functions definitions, domain and range.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "physics-12-cbse",
+            title: "Physics",
+            color: "#8b5cf6",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-physics-12-ch1",
+                title: "Chapter 1: Electric Charges and Fields",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-phys-12-ch1-t1", title: "Electrostatics", content: "Coulomb’s law, electric field and flux.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "chemistry-12-cbse",
+            title: "Chemistry",
+            color: "#ec4899",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-chemistry-12-ch1",
+                title: "Chapter 1: Solid State",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-chem-12-ch1-t1", title: "Crystal Structures", content: "Types of crystal lattices and defects.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "class-11",
+        title: "Class 11",
+        subjects: [
+          {
+            id: "maths-11-cbse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-maths-11-ch1",
+                title: "Chapter 1: Sets and Functions",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-maths-11-ch1-t1", title: "Introduction to Sets", content: "Venn diagrams, operations, functions.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "physics-11-cbse",
+            title: "Physics",
+            color: "#8b5cf6",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-physics-11-ch1",
+                title: "Chapter 1: Physical World",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-phys-11-ch1-t1", title: "Measurements and Scalars", content: "Units, dimensions, significant figures.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "chemistry-11-cbse",
+            title: "Chemistry",
+            color: "#ec4899",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-chem-11-ch1",
+                title: "Chapter 1: Some Basic Concepts of Chemistry",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-chem-11-ch1-t1", title: "Mole Concept", content: "Molar mass, empirical formulas, chemical equations.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "class-10",
+        title: "Class 10",
+        subjects: [
+          {
+            id: "maths-10-cbse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-maths-10-ch1",
+                title: "Chapter 1: Real Numbers",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-maths-10-ch1-t1", title: "Euclidean Algorithm", content: "GCD, LCM, and irrational numbers.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "science-10-cbse",
+            title: "Science",
+            color: "#10b981",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-science-10-ch1",
+                title: "Chapter 1: Chemical Reactions and Equations",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-sci-10-ch1-t1", title: "Balancing Equations", content: "Types of chemical reactions and conservation of mass.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "class-9",
+        title: "Class 9",
+        subjects: [
+          {
+            id: "maths-9-cbse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-maths-9-ch1",
+                title: "Chapter 1: Number Systems",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-maths-9-ch1-t1", title: "Rational and Irrational Numbers", content: "Real numbers and their properties.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "science-9-cbse",
+            title: "Science",
+            color: "#10b981",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "cbse-science-9-ch1",
+                title: "Chapter 1: Matter in Our Surroundings",
+                imageUrl: undefined,
+                topics: [
+                  { id: "cbse-sci-9-ch1-t1", title: "States of Matter", content: "Properties of solids, liquids and gases.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "icse",
+    title: "ICSE Board",
+    code: "ICSE",
+    classes: [
+      {
+        id: "class-12",
+        title: "Class 12",
+        subjects: [
+          {
+            id: "maths-12-icse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-maths-12-ch1",
+                title: "Chapter 1: Co-ordinate Geometry",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-maths-12-ch1-t1", title: "Straight Lines", content: "Slope, intercept, and distance formulas.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "physics-12-icse",
+            title: "Physics",
+            color: "#8b5cf6",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-physics-12-ch1",
+                title: "Chapter 1: Magnetism",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-phys-12-ch1-t1", title: "Magnetic Fields", content: "Field patterns, magnetic forces, and applications.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "chemistry-12-icse",
+            title: "Chemistry",
+            color: "#ec4899",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-chemistry-12-ch1",
+                title: "Chapter 1: Electrochemistry",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-chem-12-ch1-t1", title: "Redox Reactions", content: "Oxidation numbers, electrochemical cells.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "class-11",
+        title: "Class 11",
+        subjects: [
+          {
+            id: "maths-11-icse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-maths-11-ch1",
+                title: "Chapter 1: Algebra",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-maths-11-ch1-t1", title: "Sequences and Series", content: "Arithmetic progressions and geometric progressions.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "physics-11-icse",
+            title: "Physics",
+            color: "#8b5cf6",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-physics-11-ch1",
+                title: "Chapter 1: Motion",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-phys-11-ch1-t1", title: "Kinematics", content: "Distance, displacement, speed and velocity.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "chemistry-11-icse",
+            title: "Chemistry",
+            color: "#ec4899",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-chemistry-11-ch1",
+                title: "Chapter 1: Atoms and Molecules",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-chem-11-ch1-t1", title: "Atomic Structure", content: "Electronic configuration and isotopes.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "class-10",
+        title: "Class 10",
+        subjects: [
+          {
+            id: "maths-10-icse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-maths-10-ch1",
+                title: "Chapter 1: Geometry",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-maths-10-ch1-t1", title: "Triangles and Circles", content: "Basic geometry theorems and proofs.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "science-10-icse",
+            title: "Science",
+            color: "#10b981",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-science-10-ch1",
+                title: "Chapter 1: Chemical Substances",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-sci-10-ch1-t1", title: "Elements and Compounds", content: "Classification of matter and chemical symbols.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "class-9",
+        title: "Class 9",
+        subjects: [
+          {
+            id: "maths-9-icse",
+            title: "Mathematics",
+            color: "#4f46e5",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-maths-9-ch1",
+                title: "Chapter 1: Numbers",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-maths-9-ch1-t1", title: "Number Systems", content: "Integers, rational and irrational numbers.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "science-9-icse",
+            title: "Science",
+            color: "#10b981",
+            imageUrl: undefined,
+            chapters: [
+              {
+                id: "icse-science-9-ch1",
+                title: "Chapter 1: Food and Nutrition",
+                imageUrl: undefined,
+                topics: [
+                  { id: "icse-sci-9-ch1-t1", title: "Nutrients and Balanced Diet", content: "Macronutrients, micronutrients and healthy eating.", duration: "15m" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 ];
+
+export const defaultBoards: Board[] = (initialBoards as any[]).map(board => ({
+  ...board,
+  classes: board.classes.map((cls: any) => ({
+    ...cls,
+    subjects: cls.subjects.map((sub: any) => {
+      let color = sub.color;
+      if (color && color.startsWith('from-')) {
+        color = '#4f46e5';
+      }
+      return {
+        ...sub,
+        color
+      };
+    })
+  }))
+}));
+
 const defaultAssignments: Assignment[] = [];
 const defaultQuizzes: Quiz[] = [];
 const defaultNotifications: Notification[] = [
@@ -261,6 +685,30 @@ const getStoredProfile = (): Profile => {
 
 const getStoredActiveView = (): string => {
   return "landing";
+};
+
+const getStoredCompletedTopics = (): string[] => {
+  const stored = localStorage.getItem("lms_completed_topics");
+  if (stored) {
+    try {
+      return JSON.parse(stored) as string[];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+const getStoredBookmarks = (): Bookmark[] => {
+  const stored = localStorage.getItem("lms_bookmarks");
+  if (stored) {
+    try {
+      return JSON.parse(stored) as Bookmark[];
+    } catch {
+      return [];
+    }
+  }
+  return [];
 };
 
 export const useLmsStore = create<LMSStore>((set, get) => ({
@@ -320,17 +768,18 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
   setCurrentTopic: (topic: Topic) => set({ currentTopic: topic }),
 
   profile: getStoredProfile(),
-  boards: defaultBoards,
+  boards: [],
   assignments: defaultAssignments,
   quizzes: defaultQuizzes,
   activeQuizId: null,
   quizResults: [],
   notifications: defaultNotifications,
-  bookmarks: [],
+  bookmarks: getStoredBookmarks(),
   liveRoomState: null,
   activeSubjectId: getStoredProfile() ? getStoredProfile().optedSubjectId : "",
   activeChapterId: "",
   activeTopicId: "",
+  completedTopicIds: getStoredCompletedTopics(),
 
   submitAssignment: async (assignmentId, file) => {
     const token = localStorage.getItem("auth_token");
@@ -396,6 +845,22 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
       }
     } catch (err) {
       console.warn("Failed to fetch assignments:", err);
+    }
+  },
+
+  fetchNotes: async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/upload/notes/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        set({ notes: data.notes || [] });
+      }
+    } catch (err) {
+      console.warn("Failed to fetch notes:", err);
     }
   },
 
@@ -466,6 +931,7 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
         {
           id: makeId("bookmark"),
           timestamp,
+          profileId: state.profile?.id || "guest",
           ...bookmark,
         },
         ...state.bookmarks,
@@ -521,6 +987,7 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
               ),
             },
       ),
+      completedTopicIds: [...new Set([...state.completedTopicIds, topicId])],
       profile: {
         ...state.profile,
         xp: state.profile.xp + 50,
@@ -595,6 +1062,8 @@ useLmsStore.subscribe((state) => {
   if (state.profile && state.profile.id !== "student-001") {
     localStorage.setItem("lms_user_profile", JSON.stringify(state.profile));
   }
+  localStorage.setItem("lms_completed_topics", JSON.stringify(state.completedTopicIds || []));
+  localStorage.setItem("lms_bookmarks", JSON.stringify(state.bookmarks || []));
 });
 
 export type { LMSStore } from "./types";

@@ -1,0 +1,2939 @@
+
+### Mathematics (ICSE Class 9)
+
+* **Pure Arithmetic:** This covers rational and irrational numbers as real numbers, surds, and the rationalization of surds.
+
+
+* **Commercial Mathematics:** This unit focuses on compound interest calculated as a repeated simple interest computation, including the use of the formula $A=P(1+\frac{r}{100})^{n}$.
+
+
+* **Algebra:** This includes expansions, factorisation, simultaneous linear equations in two variables, indices/exponents, and logarithms.
+
+
+* **Geometry:** This covers triangles (congruency, mid-point theorem, Pythagoras theorem), rectilinear figures (parallelograms, construction of polygons, area theorems), and circles (chord and arc properties).
+
+
+* **Statistics:** This introduces the collection, presentation, and graphical representation of data, as well as calculating the mean and median of ungrouped data.
+
+
+* **Mensuration:** This includes calculating the area and perimeter of triangles and quadrilaterals, the area and circumference of circles, and the surface area and volume of 3-D solids like cubes and cuboids.
+
+
+* **Trigonometry:** This covers trigonometric ratios of standard and complementary angles, along with simple 2-D problems involving one right-angled triangle.
+
+
+* **Co-ordinate Geometry:** This involves the Cartesian system, plotting points, solving simultaneous linear equations graphically, and using the distance formula.
+
+
+
+---
+
+### Biology (ICSE Class 9)
+
+* **Basic Biology:** This unit covers the cell as a unit of life, cell organelles, and the types, structure, and functions of plant and animal tissues.
+
+
+* **Flowering Plants:** This covers vegetative propagation, the structure of a bisexual flower, self and cross-pollination, and the process of fertilisation.
+
+
+* **Plant Physiology:** This focuses on the structure and germination of dicot and monocot seeds, as well as respiration and gaseous exchange in plants.
+
+
+* **Diversity in Living Organisms / Ecosystems:** This introduces ecosystems, the five kingdom classification, and the economic importance of bacteria and fungi.
+
+
+* **Human Anatomy and Physiology:** This explores nutrition, the digestive system, movement and locomotion (skeleton and joints), the structure and functions of skin, and the respiratory system.
+
+
+* **Health and Hygiene:** This covers the causes of diseases (bacteria, viruses, parasites) and the principles of personal and social hygiene.
+
+
+* **Waste Generation and Management:** This highlights the sources of waste and the various methods for safe waste disposal.
+
+
+
+---
+
+### Physics (ICSE Class 9)
+
+* **Measurements and Experimentation:** This includes the International System of Units and measurements using instruments like Vernier callipers, micro-metre screw gauges, and simple pendulums.
+
+
+* **Motion in One Dimension:** This covers scalar and vector quantities, speed, velocity, acceleration, distance-time graphs, and the equations of uniformly accelerated motion.
+
+
+* **Laws of Motion:** This focuses on contact and non-contact forces, Newton's three laws of motion, and the universal law of gravitation.
+
+
+* **Fluids:** This explores pressure in liquids, atmospheric pressure, buoyancy, Archimedes' Principle, and relative density.
+
+
+* **Heat and Energy:** This unit covers the concepts of heat and temperature, the anomalous expansion of water, energy flow, energy sources, and global warming.
+
+
+* **Light:** This includes the reflection of light, images formed by plane mirrors, and the characteristics of images formed by spherical mirrors.
+
+
+* **Sound:** This covers the nature and propagation of sound waves, as well as infrasonic, sonic, and ultrasonic frequencies.
+
+
+* **Electricity and Magnetism:** This covers simple electric circuits, current electricity, induced magnetism, Earth's magnetic field, and electromagnets.
+
+
+
+---
+
+### Chemistry (ICSE Class 9)
+
+* **Matter and its Composition:** This explains changes of state based on the Kinetic Theory of Matter and the Law of Conservation of Mass.
+
+
+* **Study of Gas Laws:** This examines the behavior of gases under changes in temperature and pressure using Boyle's Law and Charles' Law, including the Kelvin scale.
+
+
+* **Elements, Compounds and Mixtures:** This covers the general characteristics of these categories and the various methods used for the separation of mixtures.
+
+
+* **The Language of Chemistry:** This introduces symbols, valency, formula writing for radicals and compounds, and the balancing of simple chemical equations.
+
+
+* **Physical and Chemical Changes:** This distinguishes between physical and chemical changes, detailing the conditions, types, and energy changes of chemical reactions, including burning.
+
+
+* **Water:** This studies water as a universal solvent, its physical and chemical properties, and the causes and treatments of water pollution.
+
+
+* **Atomic Structure:** This explores the structure of an atom, atomic number, mass number, isotopes, and the octet rule.
+
+
+* **The Periodic Table:** This covers the historical contributions to the periodic table (Dobereiner, Newlands, Mendeleev) and the Modern Periodic Law and Table.
+
+
+* **Study of the First Element - Hydrogen:** This details the position of hydrogen in the periodic table, along with its laboratory preparation and properties.
+
+
+* **Atmospheric Pollution:** This unit focuses on the composition and impact of acid rain, global warming, and ozone depletion.
+
+
+Mathematics (ICSE Class 10)
+Unit 1: Commercial Mathematics
+
+Value Added Tax (VAT) computation including discounts, profit, and loss
+
+Recurring Deposit Accounts and maturity value computation (Banking)
+
+Shares and Dividends (Face Value, Market Value, Dividend, Return)
+
+Unit 2: Algebra
+
+Solving Linear Inequations and Quadratic Equations in one variable
+
+Factorisation of polynomials using the Factor and Remainder Theorem
+
+Arithmetic and Geometric Progression (finding the nth term and sum of n terms)
+
+Unit 3: Geometry
+
+Similarity of triangles (conditions, Basic Proportionality Theorem, and applications)
+
+Loci theorems and constructions
+
+Circle properties (Angle, Cyclic, Tangent, and Secant properties)
+
+Unit 4: Mensuration
+
+Surface area and volume of right circular Cylinders
+
+Surface area and volume of right circular Cones
+
+Surface area and volume of Spheres (including combinations of these solids)
+
+Unit 5: Trigonometry
+
+Using trigonometric identities to solve and prove algebraic trigonometric expressions
+
+Heights and distances (solving 2-D problems involving angles of elevation and depression)
+
+Evaluating expressions using trigonometric ratios of standard angles
+
+Unit 6: Statistics
+
+Measures of Central Tendency (computing mean, median, and mode)
+
+Graphical Representation of data using Histograms
+
+Using an Ogive to find the median and quartiles
+
+Unit 7: Probability
+
+Random experiments and Sample space definitions
+
+The classical definition of probability
+
+Solving simple problems based on single events
+
+Biology (ICSE Class 10)
+Unit 1: Basic Biology
+
+Cell Cycle and Cell Division (understanding Mitosis and Meiosis)
+
+Structure of chromosomes and DNA (chromatin, chromatid, genes, centromere)
+
+Genetics (Mendel's laws of inheritance and sex-linked inheritance)
+
+Unit 2: Plant Physiology
+
+Absorption by roots (imbibition, diffusion, osmosis, active/passive transport)
+
+Transpiration (process, significance, and mechanism of stomatal transpiration)
+
+Photosynthesis (light and dark reactions, and the carbon cycle)
+
+Unit 3: Human Anatomy and Physiology
+
+The Circulatory System (structure and working of the heart, blood vessels, and composition of blood)
+
+The Excretory System (structure and function of the kidneys and nephrons)
+
+The Nervous and Endocrine Systems (brain, spinal cord, reflex action, sense organs, and endocrine glands)
+
+Physics (ICSE Class 10)
+Unit 1: Force, Work, Power and Energy
+
+Turning forces (moment of a force, torque, and centre of gravity)
+
+Work, energy, power, and the principle of conservation of energy
+
+Machines as force multipliers (mechanical advantage, velocity ratio, levers, and pulley systems)
+
+Unit 2: Light
+
+Refraction of light (through glass blocks, triangular prisms, and total internal reflection)
+
+Lenses (converging and diverging lenses, ray diagrams, and magnification)
+
+The Electromagnetic spectrum and the scattering of light
+
+Unit 3: Sound
+
+Reflection of Sound Waves and the practical use of echoes
+
+Natural vibrations, Damped vibrations, Forced vibrations, and Resonance
+
+Characteristics of sound (loudness, pitch, and quality/waveforms)
+
+Unit 4: Electricity and Magnetism
+
+Ohm's Law (concepts of emf, potential difference, and equivalent resistance in series/parallel circuits)
+
+Electrical power, energy measurement, and household circuits (switches, fuses, earthing)
+
+Magnetic effect of a current, electromagnets, and electromagnetic induction (AC generators and transformers)
+
+Unit 5: Heat
+
+Calorimetry (specific heat capacity and the principle of method of mixtures)
+
+Latent heat (loss and gain of heat involving a change of state for fusion)
+
+Change of phase and the heating curve for water
+
+Unit 6: Modern Physics
+
+Radioactivity (alpha, beta, and gamma emissions, and changes within the nucleus)
+
+Background radiation and safety precautions for radioactive materials
+
+Nuclear fission and fusion (basic introduction and equations)
+
+Chemistry (ICSE Class 10)
+Unit 1: Periodic Properties and Variations of Properties
+
+Definitions of periodic properties (atomic size, ionization potential, electron affinity, electronegativity)
+
+Variations of properties across groups and periods
+
+Periodicity on the basis of atomic number (with special reference to alkali metals and halogens)
+
+Unit 2: Chemical Bonding
+
+Electrovalent (ionic) bonding and the structure of compounds like NaCl, MgCl2, and CaO
+
+Covalent bonding and molecular structures based on duplets and octets
+
+Coordinate bonding (the lone pair effect in forming hydronium and ammonium ions)
+
+Unit 3: Study of Acids, Bases and Salts
+
+Ions present in mineral acids, alkalis, and salts (including the use of the pH scale)
+
+Types and general properties of salts (deliquescence, efflorescence, water of crystallization)
+
+Laboratory preparation techniques for normal and acid salts
+
+Unit 4: Analytical Chemistry
+
+The action of Sodium Hydroxide on salt solutions
+
+The action of Ammonium Hydroxide on salt solutions
+
+The action of alkalis on certain metals and their oxides to demonstrate amphoteric nature
+
+Unit 5: Mole Concept and Stoichiometry
+
+Gay Lussac's Law of Combining Volumes and Avogadro's Law
+
+Relative atomic masses and relative molecular masses
+
+Deduction of simple (empirical) and molecular formulas from percentage compositions
+
+Unit 6: Electrolysis
+
+Differentiating between electrolytes and non-electrolytes
+
+The migration of ions and factors influencing selective discharge (e.g., electrolysis of molten lead bromide)
+
+Applications of electrolysis (electroplating and metal purification)
+
+Unit 7: Metallurgy
+
+Position and characteristics of metals in the periodic table
+
+The extraction of metals based on their position in the activity series (reduction of metallic oxides)
+
+Metals and their alloys (including the extraction of Aluminium and the corrosion of iron)
+
+Unit 8: Study of Compounds
+
+Hydrogen Chloride (laboratory preparation, density, solubility, and acidic properties)
+
+Ammonia (laboratory preparation, Haber's process, and catalytic oxidation)
+
+Nitric Acid and Sulphuric Acid (laboratory preparation, oxidizing properties, and dehydrating properties)
+
+Unit 9: Organic Chemistry
+
+Structure, Isomerism, and Homologous series
+
+Hydrocarbons (preparation and chemical properties of alkanes, alkenes, and alkynes)
+
+Alcohols and Carboxylic acids (preparation, properties, and uses of ethanol and acetic acid)
+
+
+
+
+
+
+---
+
+### Class 9 (CBSE)
+
+**Mathematics**
+
+* **Chapter 1: Number Systems**
+* Review of representation of natural numbers, integers, and rational numbers on the number line.
+
+
+* Representation of terminating/non-terminating recurring decimals on the number line through successive magnification.
+
+
+* Rational numbers as recurring/terminating decimals and operations on real numbers.
+
+
+* Examples of non-recurring/non-terminating decimals and existence of non-rational numbers (irrational numbers).
+
+
+* Definition of nth root of a real number.
+
+
+* Rationalization of real numbers.
+
+
+* Recall of laws of exponents with integral powers and rational exponents with positive real bases.
+
+
+
+
+* **Chapter 2: Polynomials**
+* Definition of a polynomial in one variable, coefficients, terms, and zero polynomial.
+
+
+* Degree of a polynomial, constant, linear, quadratic, and cubic polynomials.
+
+
+* Monomials, binomials, trinomials, factors, and multiples.
+
+
+* Zeroes of a polynomial.
+
+
+* Statement and proof of the Remainder Theorem and Factor Theorem.
+
+
+* Factorization of quadratic and cubic polynomials using the Factor theorem.
+
+
+* Recall of algebraic expressions and identities, and their use in factorization of polynomials.
+
+
+
+
+* **Chapter 3: Linear Equations in Two Variables**
+* Recall of linear equations in one variable and introduction to the equation in two variables ($ax+by+c=0$).
+
+
+* Linear equations in two variables having infinitely many solutions and writing them as ordered pairs.
+
+
+* Graph of linear equations in two variables (Formative Assessment).
+
+
+* Problems from real life, including Ratio and Proportion problems (Formative Assessment).
+
+
+
+
+* **Chapter 4: Coordinate Geometry**
+* The Cartesian plane, coordinates of a point, names, and terms associated with the coordinate plane.
+
+
+* Plotting points in the plane (Formative Assessment).
+
+
+
+
+* **Chapter 5: Introduction to Euclid's Geometry**
+* History of Geometry in India and Euclid's geometry.
+
+
+* Euclid's method of formalizing observed phenomenon into rigorous Mathematics.
+
+
+* The five postulates of Euclid and equivalent versions of the fifth postulate.
+
+
+
+
+* **Chapter 6: Lines and Angles**
+* Adjacent angles formed when a ray stands on a line.
+
+
+* Vertically opposite angles when two lines intersect.
+
+
+* Lines which are parallel to a given line are parallel.
+
+
+* Corresponding angles, alternate angles, and interior angles when a transversal intersects two parallel lines (Formative Assessment).
+
+
+* Sum of the angles of a triangle is $180^{\circ}$ and the exterior angle property (Formative Assessment).
+
+
+
+
+* **Chapter 7: Triangles**
+* Congruence of triangles: SAS, ASA, SSS, and RHS Congruence.
+
+
+* Angles opposite to equal sides of a triangle are equal.
+
+
+* Sides opposite to equal angles of a triangle are equal.
+
+
+* Triangle inequalities and relation between 'angle and facing side' inequalities (Formative Assessment).
+
+
+
+
+* **Chapter 8: Quadrilaterals**
+* Diagonal divides a parallelogram into two congruent triangles.
+
+
+* Properties of parallelograms (opposite sides/angles are equal, diagonals bisect each other).
+
+
+* Conditions for a quadrilateral to be a parallelogram.
+
+
+* Line segment joining the mid points of any two sides of a triangle is parallel to the third side.
+
+
+
+
+* **Chapter 9: Circles**
+* Equal chords of a circle subtend equal angles at the center and its converse.
+
+
+* Perpendicular from the center of a circle to a chord bisects the chord and its converse.
+
+
+* Equal chords are equidistant from the center and conversely.
+
+
+* Angle subtended by an arc at the center is double the angle subtended by it at any point on the remaining part.
+
+
+* Angles in the same segment of a circle are equal.
+
+
+* Four points lying on a circle if a line segment subtends equal angles at two other points on the same side.
+
+
+* Sum of either pair of the opposite angles of a cyclic quadrilateral is $180^{\circ}$.
+
+
+* Definition of circle and related concepts (radius, circumference, diameter, chord, arc, secant, sector, segment) (Formative Assessment).
+
+
+* One and only one circle passing through three given non-collinear points (Formative Assessment).
+
+
+
+
+* **Chapter 10: Areas of Parallelograms and Triangles (Formative Assessment)**
+* Review concept of area, area of a rectangle.
+
+
+* Parallelograms on the same base and between the same parallels.
+
+
+* Triangles on the same base and between the same parallels.
+
+
+
+
+* **Chapter 11: Constructions (Formative Assessment)**
+* Construction of bisectors of line segments and angles of measure $60^{\circ}$, $90^{\circ}$, $45^{\circ}$, and equilateral triangles.
+
+
+* Construction of a triangle given its base, sum/difference of the other two sides and one base angle.
+
+
+
+
+* **Chapter 12: Areas**
+* Area of a triangle using Heron's formula.
+
+
+* Application of Heron's formula in finding the area of a quadrilateral (Formative Assessment).
+
+
+
+
+* **Chapter 13: Surface Areas and Volumes**
+* Surface areas and volumes of spheres, hemispheres, and right circular cones.
+
+
+* Surface areas and volumes of cubes, cuboids and right circular cylinders (Formative Assessment).
+
+
+
+
+* **Chapter 14: Statistics**
+* Bar graphs, Histograms (with varying base lengths), and Frequency polygons.
+
+
+* Collection and presentation of data (tabular form, ungrouped/grouped data) (Formative Assessment).
+
+
+* Mean, median and mode of ungrouped data (Formative Assessment).
+
+
+
+
+* **Chapter 15: Probability (Formative Assessment)**
+* History, Repeated experiments and observed frequency approach to probability.
+
+
+
+
+
+---
+
+### Class 10 (CBSE)
+
+**Mathematics**
+
+* **Chapter 1: Real Numbers**
+* Fundamental Theorem of Arithmetic.
+
+
+* Proofs of irrationality of $\sqrt{3}$, $\sqrt{5}$.
+
+
+
+
+* **Chapter 2: Polynomials**
+* Zeros of a polynomial.
+
+
+* Relationship between zeros and coefficients of quadratic polynomials.
+
+
+
+
+* **Chapter 3: Pair of Linear Equations in Two Variables**
+* Pair of linear equations in two variables and graphical method of their solution, consistency/inconsistency.
+
+
+* Algebraic conditions for number of solutions.
+
+
+* Solution of a pair of linear equations in two variables algebraically by substitution and by elimination.
+
+
+* Simple situational problems.
+
+
+
+
+* **Chapter 4: Quadratic Equations**
+* Standard form of a quadratic equation $ax^2+bx+c=0$.
+
+
+* Solutions of quadratic equations (only real roots) by factorization, and by using quadratic formula.
+
+
+* Relationship between discriminant and nature of roots.
+
+
+* Situational problems based on quadratic equations related to day-to-day activities.
+
+
+
+
+* **Chapter 5: Arithmetic Progressions**
+* Motivation for studying Arithmetic Progression.
+
+
+* Derivation of the nth term and sum of the first n terms of AP and their application in solving daily life problems.
+
+
+
+
+* **Chapter 6: Coordinate Geometry**
+* Review: Concepts of coordinate geometry.
+
+
+* Distance formula.
+
+
+* Section formula (internal division).
+
+
+
+
+* **Chapter 7: Triangles**
+* Definitions, examples, and counter examples of similar triangles.
+
+
+* Basic Proportionality Theorem (a line drawn parallel to one side dividing the other two sides in the same ratio) and its converse.
+
+
+* Similarity criteria for triangles (corresponding angles equal, corresponding sides proportional, and SAS similarity).
+
+
+
+
+* **Chapter 8: Circles**
+* The tangent at any point of a circle is perpendicular to the radius through the point of contact.
+
+
+* The lengths of tangents drawn from an external point to a circle are equal.
+
+
+
+
+* **Chapter 9: Introduction to Trigonometry**
+* Trigonometric ratios of an acute angle of a right-angled triangle and proof of their existence.
+
+
+* Values of the trigonometric ratios of $30^{\circ}$, $45^{\circ}$, $60^{\circ}$, $0^{\circ}$, and $90^{\circ}$.
+
+
+* Relationships between the ratios.
+
+
+
+
+* **Chapter 10: Trigonometric Identities**
+* Proof and applications of the identity $\sin^2A+\cos^2A=1$.
+
+
+* Simple identities.
+
+
+
+
+* **Chapter 11: Heights and Distances**
+* Angle of elevation and Angle of Depression.
+
+
+* Simple problems on heights and distances (angles of elevation/depression should be only $30^{\circ}$, $45^{\circ}$, and $60^{\circ}$).
+
+
+
+
+* **Chapter 12: Areas Related to Circles**
+* Area of sectors and segments of a circle.
+
+
+* Problems based on areas and perimeter/circumference of plane figures.
+
+
+
+
+* **Chapter 13: Surface Areas and Volumes**
+* Surface areas and volumes of combinations of cubes, cuboids, spheres, hemispheres, and right circular cylinders/cones.
+
+
+
+
+* **Chapter 14: Statistics**
+* Mean, median, and mode of grouped data.
+
+
+
+
+* **Chapter 15: Probability**
+* Classical definition of probability.
+
+
+* Simple problems on finding the probability of an event.
+
+
+
+---
+
+### Class 9 (CBSE)
+
+**Science**
+
+* **Chapter 1: Matter in Our Surroundings**
+* Definition of matter and Particulate Nature of Matter
+
+
+* States of Matter: solid, liquid and gas and their characteristics
+
+
+* Change of state: melting (absorption of heat), freezing, evaporation (cooling by evaporation), condensation, sublimation
+
+
+
+
+* **Chapter 2: Is Matter Around Us Pure**
+* Elements, compounds and mixtures
+
+
+* Heterogeneous and homogenous mixtures, colloids and suspensions
+
+
+* Physical and chemical changes
+
+
+* Pure and Impure substances
+
+
+
+
+* **Chapter 3: Atoms and Molecules**
+* Atoms and molecules, Law of Chemical Combination
+
+
+* Chemical formula of common compounds
+
+
+* Atomic and molecular masses
+
+
+
+
+* **Chapter 4: Structure of Atom**
+* Sub-atomic particles: Electrons, protons and neutrons
+
+
+* Models of atom
+
+
+* Valency, Atomic Number and Mass Number, Isotopes and Isobars
+
+
+
+
+* **Chapter 5: Cell - Basic Unit of Life**
+* Cell as a basic unit of life, prokaryotic and eukaryotic cells, multicellular organisms
+
+
+* Cell membrane and cell wall, cell organelles and cell inclusions
+
+
+* Chloroplast, mitochondria, vacuoles, endoplasmic reticulum, Golgi apparatus, nucleus
+
+
+* Chromosomes: basic structure, number
+
+
+
+
+* **Chapter 6: Tissues, Organs, Organ System, Organism**
+* Structure and functions of animal and plant tissues
+
+
+* Four types of tissues in animals
+
+
+* Meristematic and Permanent tissues in plants
+
+
+
+
+* **Chapter 7: Health and Diseases (Formative Assessment)**
+* Health and its failure
+
+
+* Infectious and Non-infectious diseases, their causes and manifestation
+
+
+* Diseases caused by microbes (Virus, Bacteria and Protozoans) and their prevention
+
+
+* Principles of treatment and prevention, Pulse Polio programmes
+
+
+
+
+* **Chapter 8: Motion**
+* Distance and displacement, velocity
+
+
+* Uniform and non-uniform motion along a straight line, acceleration
+
+
+* Distance-time and velocity-time graphs for uniform motion and uniformly accelerated motion
+
+
+* Elementary idea of uniform circular motion
+
+
+
+
+* **Chapter 9: Force and Newton's Laws**
+* Force and Motion, Newton's Laws of Motion, Action and Reaction forces
+
+
+* Inertia of a body, Inertia and mass
+
+
+* Momentum, Force and Acceleration
+
+
+* Elementary idea of conservation of Momentum (Formative Assessment)
+
+
+
+
+* **Chapter 10: Gravitation and Floatation**
+* Gravitation, Universal Law of Gravitation, Force of Gravitation of the earth (gravity)
+
+
+* Acceleration due to Gravity, Mass and Weight, Free fall
+
+
+* Thrust and Pressure
+
+
+* Archimedes' Principle and Buoyancy
+
+
+
+
+* **Chapter 11: Work, Energy and Power**
+* Work done by a Force, Energy, power
+
+
+* Kinetic and Potential energy
+
+
+* Law of conservation of energy (excluding commercial unit of Energy)
+
+
+
+
+* **Chapter 12: Sound**
+* Nature of sound and its propagation in various media
+
+
+* Speed of sound, range of hearing in humans
+
+
+* Ultrasound, reflection of sound, echo
+
+
+
+
+* **Chapter 13: Food Production**
+* Plant and animal breeding and selection for quality improvement and management
+
+
+* Use of fertilizers and manures
+
+
+* Protection from pests and diseases, Organic farming
+
+
+
+
+
+---
+
+### Class 10 (CBSE)
+
+**Science**
+
+* **Chapter 1: Chemical Reactions and Equations**
+* Chemical reactions, Chemical equation, Balanced chemical equation
+
+
+* Types of chemical reactions: combination, decomposition, displacement, double displacement, precipitation, endothermic exothermic reactions, oxidation and reduction
+
+
+
+
+* **Chapter 2: Acids, Bases and Salts**
+* Acids and Bases: definitions in terms of furnishing of H+ and OH- ions
+
+
+* Identification using indicators, chemical properties, examples and uses
+
+
+* Neutralization, concept of pH scale, importance of pH in everyday life
+
+
+* Preparation and uses of Sodium Hydroxide, Bleaching powder, Baking soda, Washing soda and Plaster of Paris
+
+
+
+
+* **Chapter 3: Metals and Non-metals**
+* Properties of metals and non-metals, Reactivity series
+
+
+* Formation and properties of ionic compounds
+
+
+* Basic metallurgical processes, Corrosion and its prevention
+
+
+
+
+* **Chapter 4: Carbon and its Compounds**
+* Covalent bonds formation and properties of covalent compounds, Versatile nature of carbon
+
+
+* Hydrocarbons: saturated and unsaturated, Homologous series
+
+
+* Nomenclature of alkanes, alkenes, alkyne and carbon compounds containing functional groups (halogens, alcohol, ketones, aldehydes)
+
+
+* Chemical properties of carbon compounds (combustion, oxidation, addition and substitution reaction)
+
+
+* Ethanol and Ethanoic acid (only properties and uses), soaps and detergents
+
+
+
+
+* **Chapter 5: Life Processes**
+* 'Living Being'
+
+
+* Basic concept of nutrition, respiration, transport and excretion in plants and animals
+
+
+
+
+* **Chapter 6: Control and Co-ordination in Animals and Plants**
+* Tropic movements in plants, Introduction of plant hormones
+
+
+* Control and co-ordination in animals: Nervous system, Voluntary, involuntary and reflex action
+
+
+* Chemical co-ordination: animal hormones
+
+
+
+
+* **Chapter 7: Reproduction**
+* Reproduction in animals and plants (asexual and sexual)
+
+
+* Reproductive health: need and methods of family planning
+
+
+* Safe sex vs HIV/AIDS, Child bearing and women's health
+
+
+
+
+* **Chapter 8: Heredity and Evolution**
+* Heredity, Mendel's contribution
+
+
+* Laws for inheritance of traits
+
+
+* Sex determination: brief introduction
+
+
+
+
+* **Chapter 9: Natural Phenomena (Light and Vision)**
+* Reflection of light by curved surfaces, Images formed by spherical mirrors
+
+
+* Centre of curvature, principal axis, principal focus, focal length, mirror formula, magnification
+
+
+* Refraction, Laws of refraction, refractive index
+
+
+* Refraction of light by spherical lens, Image formed by spherical lenses, Lens formula, Magnification, Power of a lens
+
+
+* Functioning of a lens in human eye, defects of vision and their corrections
+
+
+* Applications of spherical mirrors and lenses
+
+
+* Refraction of light through a prism, dispersion of light, scattering of light, applications in daily life
+
+
+
+
+* **Chapter 10: Effects of Current (Electricity)**
+* Electric current, potential difference and electric current
+
+
+* Ohm's law, Resistance, Resistivity, Factors on which the resistance of a conductor depends
+
+
+* Series combination of resistors, parallel combination of resistors and its applications in daily life
+
+
+* Heating effect of electric current and its applications in daily life
+
+
+* Electric power, Interrelation between P, V, I and R
+
+
+
+
+* **Chapter 11: Magnetic Effects of Current**
+* Magnetic field, field lines, field due to a current carrying conductor
+
+
+* Field due to current carrying coil or solenoid, Force on current carrying conductor, Fleming's Left Hand Rule
+
+
+* Direct current, Alternating current: frequency of AC, Advantage of AC over DC
+
+
+* Domestic electric circuits
+
+
+
+
+* **Chapter 12: Our Environment**
+* Eco-system
+
+
+* Environmental problems, Ozone depletion
+
+
+* Waste production and their solutions
+
+
+* Biodegradable and non-biodegradable substances
+
+---
+
+### Class 11 (CBSE)
+
+**Physics**
+
+* **Chapter 1: Units and Measurements**
+* Need for measurement, units of measurement, and systems of units.
+
+
+* $\text{SI}$ units, fundamental units, and derived units.
+
+
+* Significant figures and determining the uncertainty in a result.
+
+
+* Dimensions of physical quantities, dimensional analysis, and its applications.
+
+
+
+
+* **Chapter 2: Motion in a Straight Line**
+* Frame of reference and motion in a straight line.
+
+
+* Elementary concepts of differentiation and integration for describing motion.
+
+
+* Uniform and non-uniform motion, average speed, average velocity, and instantaneous velocity.
+
+
+* Uniformly accelerated motion, velocity-time graphs, and position-time graphs.
+
+
+* Relations for uniformly accelerated motion using graphical and calculus treatment.
+
+
+
+
+* **Chapter 3: Motion in a Plane**
+* Scalar and vector quantities, position and displacement vectors, and general vectors with their notations.
+
+
+* Equality of vectors, multiplication of vectors by a real number, addition of vectors, and subtraction of vectors.
+
+
+* Unit vector, resolution of a vector in a plane, and rectangular components.
+
+
+* Scalar product and vector product of vectors.
+
+
+* Motion in a plane, cases of uniform velocity, and uniform acceleration.
+
+
+* Projectile motion and uniform circular motion.
+
+
+
+
+* **Chapter 4: Laws of Motion**
+* Intuitive concept of force, inertia, and Newton's first law of motion.
+
+
+* Momentum, Newton's second law of motion, and impulse.
+
+
+* Newton's third law of motion.
+
+
+* Law of conservation of linear momentum and its applications.
+
+
+* Equilibrium of concurrent forces.
+
+
+* Static and kinetic friction, laws of friction, rolling friction, and lubrication.
+
+
+* Dynamics of uniform circular motion and centripetal force.
+
+
+* Examples of circular motion: a vehicle on a level circular road and a vehicle on a banked road.
+
+
+
+
+* **Chapter 5: Work, Energy and Power**
+* Work done by a constant force and a variable force.
+
+
+* Kinetic energy, work-energy theorem, and power.
+
+
+* Notion of potential energy and potential energy of a spring.
+
+
+* Conservative forces and non-conservative forces.
+
+
+* Motion in a vertical circle.
+
+
+* Elastic and inelastic collisions in one and two dimensions.
+
+
+
+
+* **Chapter 6: System of Particles and Rotational Motion**
+* Centre of mass of a two-particle system, momentum conservation, and centre of mass motion.
+
+
+* Centre of mass of a rigid body and centre of mass of a uniform rod.
+
+
+* Moment of a force, torque, angular momentum, and the law of conservation of angular momentum with its applications.
+
+
+* Equilibrium of rigid bodies, rigid body rotation, and equations of rotational motion.
+
+
+* Comparison of linear and rotational motions.
+
+
+* Moment of inertia and radius of gyration.
+
+
+* Values of moments of inertia for simple geometrical objects without derivation.
+
+
+
+
+* **Chapter 7: Gravitation**
+* Kepler's laws of planetary motion and the universal law of gravitation.
+
+
+* Acceleration due to gravity and its variation with altitude and depth.
+
+
+* Gravitational potential energy and gravitational potential.
+
+
+* Escape speed, orbital velocity of a satellite, and energy of an orbiting satellite.
+
+
+
+
+* **Chapter 8: Mechanical Properties of Solids**
+* Elasticity, stress-strain relationship, and Hooke's law.
+
+
+* Young's modulus, bulk modulus, and qualitative idea of shear modulus of rigidity.
+
+
+* Poisson's ratio and elastic energy.
+
+
+* Qualitative idea of the application of elastic behavior of materials.
+
+
+
+
+* **Chapter 9: Mechanical Properties of Fluids**
+* Pressure due to a fluid column, Pascal's law, and its applications including hydraulic lift and hydraulic brakes.
+
+
+* Effect of gravity on fluid pressure.
+
+
+* Viscosity, Stokes' law, terminal velocity, streamline flow, turbulent flow, and critical velocity.
+
+
+* Bernoulli's theorem and its simple applications including Torricelli's law and dynamic lift.
+
+
+* Surface energy, surface tension, angle of contact, and excess of pressure across a curved surface.
+
+
+* Application of surface tension ideas to drops, bubbles, and capillary rise.
+
+
+
+
+* **Chapter 10: Thermal Properties of Matter**
+* Heat, temperature, and thermal expansion.
+
+
+* Thermal expansion of solids, liquids, and gases, alongside the anomalous expansion of water.
+
+
+* Specific heat capacity, $C_p$, $C_v$, calorimetry, and change of state involving latent heat capacity.
+
+
+* Heat transfer via conduction, convection, and radiation.
+
+
+* Thermal conductivity and qualitative ideas of blackbody radiation.
+
+
+* Wein's displacement law and Stefan's law.
+
+
+
+
+* **Chapter 11: Thermodynamics**
+* Thermal equilibrium, definition of temperature, and the zeroth law of thermodynamics.
+
+
+* Heat, work, and internal energy.
+
+
+* First law of thermodynamics and second law of thermodynamics.
+
+
+* Thermodynamic state variables and equation of state.
+
+
+* Change of condition of gaseous state: isothermal, adiabatic, reversible, irreversible, and cyclic processes.
+
+
+
+
+* **Chapter 12: Kinetic Theory**
+* Equation of state of a perfect gas and work done in compressing a gas.
+
+
+* Kinetic theory of gases: assumptions and the concept of pressure.
+
+
+* Kinetic interpretation of temperature and rms speed of gas molecules.
+
+
+* Degrees of freedom, statement of the law of equi-partition of energy, and its application to specific heat capacities of gases.
+
+
+* Concept of mean free path and Avogadro's number.
+
+
+
+
+* **Chapter 13: Oscillations**
+* Periodic motion: time period, frequency, displacement as a function of time, and periodic functions with their applications.
+
+
+* Simple harmonic motion ($\text{S.H.M}$), uniform circular motion, and its equations of motion.
+
+
+* Phase, oscillations of a loaded spring, restoring force, and force constant.
+
+
+* Energy in $\text{S.H.M}$ including kinetic and potential energies.
+
+
+* Simple pendulum and the derivation of the expression for its time period.
+
+
+
+
+* **Chapter 14: Waves**
+* Wave motion: transverse and longitudinal waves.
+
+
+* Speed of a travelling wave and the displacement relation for a progressive wave.
+
+
+* Principle of superposition of waves and reflection of waves.
+
+
+* Standing waves in strings and organ pipes, fundamental mode, harmonics, and beats.
+
+
+
+
+
+---
+
+### Class 12 (CBSE)
+
+**Physics**
+
+* **Chapter 1: Electric Charges and Fields**
+* Electric charges, conservation of charge, and Coulomb's law for forces between two-point charges and multiple charges.
+
+
+* Superposition principle and continuous charge distribution.
+
+
+* Electric field, electric field due to a point charge, electric field lines, and electric dipoles.
+
+
+* Electric field due to a dipole and torque on a dipole in a uniform electric field.
+
+
+* Electric flux and the statement of Gauss's theorem.
+
+
+* Gauss's law applications to find the field due to an infinitely long straight wire, a uniformly charged infinite plane sheet, and a uniformly charged thin spherical shell both inside and outside.
+
+
+
+
+* **Chapter 2: Electrostatic Potential and Capacitance**
+* Electric potential, potential difference, and electric potential due to a point charge, a dipole, and a system of charges.
+
+
+* Equipotential surfaces and electrical potential energy of a system of two-point charges and of an electric dipole in an electrostatic field.
+
+
+* Conductors, insulators, and free charges and bound charges inside a conductor.
+
+
+* Dielectrics, electric polarization, capacitors, and capacitance.
+
+
+* Combination of capacitors in series and in parallel.
+
+
+* Capacitance of a parallel plate capacitor with and without a dielectric medium between the plates.
+
+
+* Formulae for the energy stored in a capacitor without derivation.
+
+
+
+
+* **Chapter 3: Current Electricity**
+* Electric current, flow of electric charges in a metallic conductor, drift velocity, mobility, and their relation with electric current.
+
+
+* Ohm's law and linear/non-linear $V\text{-}I$ characteristics.
+
+
+* Electrical energy, electrical power, electrical resistivity, and conductivity.
+
+
+* Temperature dependence of resistance.
+
+
+* Internal resistance of a cell, potential difference, and emf of a cell.
+
+
+* Combination of cells in series and in parallel.
+
+
+* Kirchhoff's rules and the Wheatstone bridge.
+
+
+
+
+* **Chapter 4: Moving Charges and Magnetism**
+* Concept of a magnetic field and Oersted's experiment.
+
+
+* Biot-Savart law and its application to a current-carrying circular loop.
+
+
+* Ampere's law and its applications to an infinitely long straight wire.
+
+
+* Qualitative treatment of a straight solenoid.
+
+
+* Force on a moving charge in uniform magnetic and electric fields.
+
+
+* Force on a current-carrying conductor in a uniform magnetic field.
+
+
+* Force between two parallel current-carrying conductors and the definition of an ampere.
+
+
+* Torque experienced by a current loop in a uniform magnetic field.
+
+
+* Current loop as a magnetic dipole, its magnetic dipole moment, and the moving coil galvanometer with its current sensitivity and conversion to an ammeter and voltmeter.
+
+
+
+
+* **Chapter 5: Magnetism and Matter**
+* Bar magnet and qualitative treatment of a bar magnet as an equivalent solenoid.
+
+
+* Qualitative treatment of magnetic field intensity due to a magnetic dipole along its axis and perpendicular to its axis.
+
+
+* Qualitative treatment of torque on a magnetic dipole in a uniform magnetic field.
+
+
+* Magnetic field lines.
+
+
+* Magnetic properties of materials: para-, dia-, and ferro-magnetic substances with examples.
+
+
+* Magnetization of materials and the effect of temperature on magnetic properties.
+
+
+
+
+* **Chapter 6: Electromagnetic Induction**
+* Electromagnetic induction, Faraday's laws, and induced emf and current.
+
+
+* Lenz's law, self-induction, and mutual induction.
+
+
+
+
+* **Chapter 7: Alternating Current**
+* Alternating currents, peak and rms value of alternating current/voltage.
+
+
+* Reactance, impedance, and LCR series circuits using phasors only.
+
+
+* Resonance, power in AC circuits, power factor, and wattless current.
+
+
+* AC generator and transformer.
+
+
+
+
+* **Chapter 8: Electromagnetic Waves**
+* Basic idea of displacement current and electromagnetic waves.
+
+
+* Characteristics and qualitative idea of the transverse nature of electromagnetic waves.
+
+
+* Electromagnetic spectrum (radio waves, microwaves, infrared, visible, ultraviolet, X-rays, gamma rays) along with elementary facts about their uses.
+
+
+
+
+* **Chapter 9: Ray Optics and Optical Instruments**
+* Reflection of light, spherical mirrors, and the mirror formula.
+
+
+* Refraction of light, total internal reflection, and optical fibers.
+
+
+* Refraction at spherical surfaces, lenses, thin lens formula, lens maker's formula, magnification, and power of a lens.
+
+
+* Combination of thin lenses in contact and the refraction of light through a prism.
+
+
+* Microscopes and astronomical telescopes (reflecting and refracting) along with their magnifying powers.
+
+
+
+
+* **Chapter 10: Wave Optics**
+* Wavefront and Huygen's principle.
+
+
+* Reflection and refraction of a plane wave at a plane surface using wavefronts, alongside proof of the laws of reflection and refraction using Huygen's principle.
+
+
+* Interference, coherent sources, sustained interference of light, and the final expression for fringe width without derivation from Young's double-slit experiment.
+
+
+* Diffraction due to a single slit and qualitative treatment of the width of central maxima.
+
+
+
+
+* **Chapter 11: Dual Nature of Radiation and Matter**
+* Dual nature of radiation, photoelectric effect, and the observations of Hertz and Lenard.
+
+
+* Einstein's photoelectric equation and the particle nature of light.
+
+
+* Experimental study of the photoelectric effect.
+
+
+* Matter waves, the wave nature of particles, and the de-Broglie relation.
+
+
+
+
+* **Chapter 12: Atoms**
+* Alpha-particle scattering experiment and Rutherford's model of the atom.
+
+
+* Bohr model of the hydrogen atom alongside expressions for the radius of the $n^{\text{th}}$ possible orbit, velocity, and energy of an electron in the $n^{\text{th}}$ orbit.
+
+
+* Qualitative treatment of hydrogen line spectra.
+
+
+
+
+* **Chapter 13: Nuclei**
+* Composition and size of the nucleus, and the nuclear force.
+
+
+* Mass-energy relation and mass defect.
+
+
+* Binding energy per nucleon and its variation with mass number.
+
+
+* Nuclear fission and nuclear fusion.
+
+
+
+
+* **Chapter 14: Semiconductor Electronics: Materials, Devices and Simple Circuits**
+* Qualitative ideas of energy bands in conductors, semiconductors, and insulators.
+
+
+* Intrinsic and extrinsic semiconductors ($p$ and $n$ type) alongside the $p\text{-}n$ junction.
+
+
+* Semiconductor diode $I\text{-}V$ characteristics in forward and reverse bias.
+
+
+* Application of a junction diode as a rectifier.
+
+
+
+
+
+
+### Class 11 Chemistry (CBSE)
+
+**Chapter 1: Some Basic Concepts of Chemistry**
+
+* Importance and scope of Chemistry, Nature of matter, and laws of chemical combination.
+
+
+* Dalton's atomic theory: concept of elements, atoms and molecules.
+
+
+* Atomic and molecular masses, mole concept and molar mass, and percentage composition.
+
+
+* Empirical and molecular formula, chemical reactions, stoichiometry and calculations based on stoichiometry.
+
+
+
+**Chapter 2: Structure of Atom**
+
+* Discovery of Electron, Proton and Neutron, atomic number, isotopes and isobars.
+
+
+* Thomson's model, Rutherford's model, Bohr's model, and their limitations.
+
+
+* Concept of shells and subshells, dual nature of matter and light, and de Broglie's relationship.
+
+
+* Heisenberg uncertainty principle, concept of orbitals, and quantum numbers.
+
+
+* Shapes of s, p and d orbitals, and rules for filling electrons in orbitals (Aufbau principle, Pauli's exclusion principle and Hund's rule).
+
+
+* Electronic configuration of atoms, and stability of half-filled and completely filled orbitals.
+
+
+
+**Chapter 3: Classification of Elements and Periodicity in Properties**
+
+* Significance of classification, brief history of the development of the periodic table.
+
+
+* Modern periodic law and the present form of the periodic table.
+
+
+* Periodic trends in properties of elements: atomic radii, ionic radii, inert gas radii.
+
+
+* Ionization enthalpy, electron gain enthalpy, electronegativity, and valiancy.
+
+
+* Nomenclature of elements with atomic number greater than 100.
+
+
+
+**Chapter 4: Chemical Bonding and Molecular Structure**
+
+* Valence electrons, ionic bond, covalent bond, bond parameters, and Lewis structure.
+
+
+* Polar character of covalent bond, and covalent character of ionic bond.
+
+
+* Valence bond theory, resonance, and geometry of covalent molecules.
+
+
+* VSEPR theory, concept of hybridization involving s, p and d orbitals and shapes of some simple molecules.
+
+
+* Molecular orbital theory of homonuclear diatomic molecules (qualitative idea only), and Hydrogen bond.
+
+
+
+**Chapter 5: Chemical Thermodynamics**
+
+* Concepts of System and types of systems, surroundings, work, heat, energy, extensive and intensive properties, and state functions.
+
+
+* First law of thermodynamics: internal energy and enthalpy, heat capacity and specific heat.
+
+
+* Measurement of $\Delta U$ and $\Delta H$, Hess's law of constant heat summation.
+
+
+* Enthalpy of bond dissociation, combustion, formation, atomization, sublimation, phase transition, ionization, solution and dilution.
+
+
+* Second law of Thermodynamics (brief introduction), and Introduction of entropy as a state function.
+
+
+* Gibb's energy change for spontaneous and non-spontaneous processes, criteria for equilibrium, and Third law of thermodynamics (brief introduction).
+
+
+
+**Chapter 6: Equilibrium**
+
+* Equilibrium in physical and chemical processes, dynamic nature of equilibrium, law of mass action, and equilibrium constant.
+
+
+* Factors affecting equilibrium: Le Chatelier's principle.
+
+
+* Ionic equilibrium: ionization of acids and bases, strong and weak electrolytes, degree of ionization, and ionization of poly basic acids.
+
+
+* Acid strength, concept of pH, hydrolysis of salts (elementary idea), buffer solution, and Henderson Equation.
+
+
+* Solubility product, and common ion effect (with illustrative examples).
+
+
+
+**Chapter 7: Redox Reactions**
+
+* Concept of oxidation and reduction, redox reactions, and oxidation number.
+
+
+* Balancing redox reactions in terms of loss and gain of electrons and change in oxidation number.
+
+
+* Applications of redox reactions.
+
+
+
+**Chapter 8: Organic Chemistry - Some Basic Principles and Techniques**
+
+* General introduction, methods of purification, qualitative and quantitative analysis.
+
+
+* Classification and IUPAC nomenclature of organic compounds.
+
+
+* Electronic displacements in a covalent bond: inductive effect, electrometric effect, resonance and hyper conjugation.
+
+
+* Homolytic and heterolytic fission of a covalent bond: free radicals, carbocations, carbanions, electrophiles and nucleophiles.
+
+
+* Types of organic reactions.
+
+
+
+**Chapter 9: Hydrocarbons**
+
+* Alkanes: Nomenclature, isomerism, conformation (ethane only), physical properties, and chemical reactions including free radical mechanism of halogenation, combustion and pyrolysis.
+
+
+* Alkenes: Nomenclature, structure of double bond (ethene), geometrical isomerism, physical properties, and methods of preparation.
+
+
+* Alkenes chemical reactions: addition of hydrogen, halogen, water, hydrogen halides (Markovnikov's addition and peroxide effect), ozonolysis, oxidation, mechanism of electrophilic addition.
+
+
+* Alkynes: Nomenclature, structure of triple bond (ethyne), physical properties, methods of preparation, and chemical reactions (acidic character of alkynes, addition reaction of hydrogen, halogens, hydrogen halides and water).
+
+
+* Aromatic Hydrocarbons: Introduction, IUPAC nomenclature, benzene (resonance, aromaticity), and chemical properties (mechanism of electrophilic substitution).
+
+
+* Nitration, sulphonation, halogenation, Friedel Craft's alkylation and acylation, directive influence of functional group in mono substituted benzene, and carcinogenicity and toxicity.
+
+
+
+**Chapter 10: s & p Block Elements (Formative Assessment)**
+
+* Electronic configuration, atomic & ionic radii, Ionization Enthalpy, and Hydration Enthalpy.
+
+
+* General trends in physical and chemical properties of s and p block elements across the periods and down the groups.
+
+
+* Unique behavior of the first element in each group.
+
+
+
+**Chapter 11: The Gaseous State (Formative Assessment)**
+
+* Qualitative treatment of Gas laws.
+
+
+* Ideal gas equation and deviations from it.
+
+
+
+---
+
+### Class 12 Chemistry (CBSE)
+
+**Chapter 1: Solutions**
+
+* Types of solutions, expression of concentration of solutions of solids in liquids, solubility of gases in liquids, and solid solutions.
+
+
+* Raoult's law and colligative properties (relative lowering of vapor pressure, elevation of boiling point, depression of freezing point, osmotic pressure).
+
+
+* Determination of molecular masses using colligative properties, abnormal molecular mass, and Van't Hoff factor.
+
+
+
+**Chapter 2: Electrochemistry**
+
+* Redox reactions, EMF of a cell, standard electrode potential, Nernst equation and its application to chemical cells.
+
+
+* Relation between Gibbs energy change and EMF of a cell, conductance in electrolytic solutions, specific and molar conductivity, variations of conductivity with concentration, and Kohlrausch's Law.
+
+
+* Electrolysis and law of electrolysis (elementary idea), dry cell-electrolytic cells and Galvanic cells, lead accumulator, fuel cells, and corrosion.
+
+
+
+**Chapter 3: Chemical Kinetics**
+
+* Rate of a reaction (Average and instantaneous) and factors affecting rate of reaction (concentration, temperature, catalyst).
+
+
+* Order and molecularity of a reaction, rate law and specific rate constant.
+
+
+* Integrated rate equations and half-life (only for zero and first order reactions).
+
+
+* Concept of collision theory (elementary idea, no mathematical treatment), activation energy, and Arrhenius equation.
+
+
+
+**Chapter 4: d and f Block Elements**
+
+* General introduction, electronic configuration, occurrence and characteristics of transition metals.
+
+
+* General trends in properties of the first row transition metals: metallic character, ionization enthalpy, oxidation states, ionic radii, colour, catalytic property, magnetic properties, interstitial compounds, and alloy formation.
+
+
+* Preparation and properties of $K_{2}Cr_{2}O_{7}$ and $KMnO_{4}$.
+
+
+* Lanthanides: Electronic configuration, oxidation states, chemical reactivity and lanthanide contraction and its consequences.
+
+
+* Actinides: Electronic configuration, oxidation states and comparison with lanthanides.
+
+
+
+**Chapter 5: Coordination Compounds**
+
+* Coordination compounds: Introduction, ligands, coordination number, colour, magnetic properties and shapes.
+
+
+* IUPAC nomenclature of mononuclear coordination compounds.
+
+
+* Bonding, Werner's theory, VBT, CFT, structure and stereoisomerism.
+
+
+* Importance of coordination compounds (in qualitative analysis, extraction of metals and biological system).
+
+
+
+**Chapter 6: Haloalkanes and Haloarenes**
+
+* Haloalkanes: Nomenclature, nature of $C-X$ bond, physical and chemical properties, and optical rotation mechanism of substitution reactions.
+
+
+* Haloarenes: Nature of $C-X$ bond, and substitution reactions (Directive influence of halogen in monosubstituted compounds only).
+
+
+* Uses and environmental effects of dichloromethane, trichloromethane, tetrachloromethane, iodoform, freons, and DDT.
+
+
+
+**Chapter 7: Alcohols, Phenols and Ethers**
+
+* Alcohols: Nomenclature, methods of preparation, physical and chemical properties (of primary alcohols only).
+
+
+* Identification of primary, secondary and tertiary alcohols, mechanism of dehydration, and uses with special reference to methanol and ethanol.
+
+
+* Phenols: Nomenclature, methods of preparation, physical and chemical properties, acidic nature of phenol, electrophilic substitution reactions, and uses of phenols.
+
+
+* Ethers: Nomenclature, methods of preparation, physical and chemical properties, and uses.
+
+
+
+**Chapter 8: Aldehydes, Ketones and Carboxylic Acids**
+
+* Aldehydes and Ketones: Nomenclature, nature of carbonyl group, methods of preparation, physical and chemical properties.
+
+
+* Mechanism of nucleophilic addition, reactivity of alpha hydrogen in aldehydes, and uses.
+
+
+* Carboxylic Acids: Nomenclature, acidic nature, methods of preparation, physical and chemical properties, and uses.
+
+
+
+**Chapter 9: Amines**
+
+* Amines: Nomenclature, classification, structure, methods of preparation, physical and chemical properties, uses, and identification of primary, secondary and tertiary amines.
+
+
+* Diazonium salts: Preparation, chemical reactions and importance in synthetic organic chemistry.
+
+
+
+**Chapter 10: Biomolecules**
+
+* Carbohydrates: Classification (aldoses and ketoses), monosaccharides (glucose and fructose), D-L configuration.
+
+
+* Oligosaccharides (sucrose, lactose, maltose), polysaccharides (starch, cellulose, glycogen), and Importance of carbohydrates.
+
+
+* Proteins: Elementary idea of amino acids, peptide bond, polypeptides, and proteins.
+
+
+* Structure of proteins (primary, secondary, tertiary structure and quaternary structures - qualitative idea only), denaturation of proteins, and enzymes.
+
+
+* Hormones (Elementary idea excluding structure) and Vitamins (Classification and functions).
+
+
+* Nucleic Acids: DNA and RNA.
+
+
+
+
+---
+
+### Class 11 (CBSE)
+
+**Mathematics**
+
+* **Chapter 1: Sets**
+* Sets and their representations
+
+
+* Empty set, Finite and Infinite sets, Equal sets
+
+
+* Subsets and Subsets of a set of real numbers (intervals with notations)
+
+
+* Universal set and Venn diagrams
+
+
+* Union and Intersection of sets
+
+
+* Difference and Complement of a set with their properties
+
+
+* Practical problems on Union and Intersection of two sets
+
+
+
+
+* **Chapter 2: Relations and Functions**
+* Ordered pairs and Cartesian product of sets
+
+
+* Number of elements in the Cartesian product of two finite sets
+
+
+* Cartesian product of the set of reals with itself up to $R\times R\times R$
+
+* Definition of relation: pictorial diagrams, domain, co-domain, and range
+
+
+* Function as a special type of relation and its pictorial representation
+
+
+* Domain, co-domain, and range of real valued functions
+
+
+* Constant, identity, polynomial, rational, modulus, signum, exponential, logarithmic, and greatest integer functions (with graphs)
+
+
+* Sum, difference, product, and quotients of functions
+
+
+* Composition of Functions
+
+
+
+
+* **Chapter 3: Trigonometric Functions**
+* Positive and negative angles
+
+
+* Measuring angles in radians and degrees (and their conversion)
+
+
+* Definition of trigonometric functions with the help of a unit circle
+
+
+* Truth of the identity $\sin^{2}x+\cos^{2}x=1$
+
+* Signs, domain, range, and graphs of trigonometric functions
+
+
+* Addition and subtraction formulas for $\sin(x\pm y)$ and $\cos(x\pm y)$
+
+* Product-to-sum and sum-to-product identities
+
+
+* Double and triple angle identities (related to $\sin 2x, \cos 2x, \tan 2x, \sin 3x, \cos 3x, \tan 3x$)
+
+
+* General solution of trigonometric equations of the type $\sin y=\sin a$, $\cos y=\cos a$, and $\tan y=\tan a$
+
+
+
+* **Chapter 4: Principle of Mathematical Induction**
+* Process of the proof by induction
+
+
+* Natural numbers as the least inductive subset of real numbers
+
+
+* The principle of mathematical induction and simple applications
+
+
+
+
+* **Chapter 5: Complex Numbers and Quadratic Equations**
+* Need for complex numbers ($\sqrt{-1}$) motivated by quadratic equations
+
+
+* Algebraic properties of complex numbers
+
+
+* Argand plane and Polar representation of complex numbers
+
+
+* Statement of Fundamental Theorem of Algebra
+
+
+* Solution of quadratic equations with real coefficients in the complex number system
+
+
+
+
+* **Chapter 6: Linear Inequalities**
+* Linear inequalities and algebraic solutions in one variable
+
+
+* Representation of solutions on the number line
+
+
+* Graphical solution of linear inequalities in two variables
+
+
+* Graphical method of finding a solution of a system of linear inequalities in two variables
+
+
+
+
+* **Chapter 7: Permutations and Combinations**
+* Fundamental principle of counting
+
+
+* Factorial notation ($n!$)
+
+
+* Permutations and combinations: derivation of formulas for ${}^{n}P_{r}$ and ${}^{n}C_{r}$
+
+* Connections between permutations and combinations with simple applications
+
+
+
+
+* **Chapter 8: Binomial Theorem**
+* Historical perspective and statement of the binomial theorem for positive integral indices
+
+
+* Proof of the binomial theorem, Pascal's triangle, and simple applications
+
+
+* General and middle term in a binomial expansion
+
+
+
+
+* **Chapter 9: Sequence and Series**
+* Sequence and Series concepts
+
+
+* Arithmetic Mean (A.M.)
+
+
+* Geometric Progression (G.P.): general term, sum of $n$ terms, and infinite G.P. sum
+
+
+* Geometric Mean (G.M.) and the relation between A.M. and G.M.
+
+
+* Formulae for special sums ($\sum k, \sum k^2, \sum k^3$)
+
+
+
+
+* **Chapter 10: Straight Lines**
+* Brief recall of 2D geometry
+
+
+* Slope of a line and angle between two lines
+
+
+* Various forms of equations of a line (parallel to axis, point-slope, slope-intercept, two-point, intercept form)
+
+
+* Normal form and General equation of a line
+
+
+* Distance of a point from a line
+
+
+
+
+* **Chapter 11: Conic Sections**
+* Sections of a cone: circles, ellipse, parabola, hyperbola
+
+
+* Degenerate cases of a conic section (point, straight line, pair of intersecting lines)
+
+
+* Standard equations and simple properties of parabola, ellipse, and hyperbola
+
+
+* Standard equation of a circle
+
+
+
+
+* **Chapter 12: Introduction to Three-dimensional Geometry**
+* Coordinate axes and coordinate planes in three dimensions
+
+
+* Coordinates of a point and distance between two points
+
+
+* Section formula in three dimensions
+
+
+
+
+* **Chapter 13: Limits and Derivatives**
+* Derivative introduced as rate of change (distance function and geometric interpretations)
+
+
+* Intuitive idea of limit
+
+
+* Limits of polynomials, rational functions, trigonometric, exponential, and logarithmic functions
+
+
+* Definition of derivative and its relationship to the slope of a tangent curve
+
+
+* Derivative rules: sum, difference, product, and quotient of polynomial and trigonometric functions
+
+
+* Derivatives of composite functions (Chain rule)
+
+
+
+
+* **Chapter 14: Statistics**
+* Measures of Dispersion
+
+
+* Range, Mean deviation, variance, and standard deviation of ungrouped data
+
+
+* Range, Mean deviation, variance, and standard deviation of grouped data
+
+
+
+
+* **Chapter 15: Probability**
+* Random experiments: outcomes and sample space (set representation)
+
+
+* Events: occurrence of events, 'not', 'and', and 'or' events
+
+
+* Exhaustive events and mutually exclusive events
+
+
+* Axiomatic (set theoretic) probability and connections with earlier classes
+
+
+* Probability of an event, and probability of 'not', 'and', and 'or' events
+
+
+
+
+
+---
+
+### Class 12 (CBSE)
+
+**Mathematics**
+
+* **Chapter 1: Relations and Functions**
+* Types of relations: reflexive, symmetric, transitive, and equivalence relations
+
+
+* One-to-one (injective) and onto (surjective) functions
+
+
+
+
+* **Chapter 2: Inverse Trigonometric Functions**
+* Definition, range, domain, and principal value branch
+
+
+* Graphs of inverse trigonometric functions
+
+
+
+
+* **Chapter 3: Matrices**
+* Concept, notation, order, equality, and types of matrices
+
+
+* Zero matrix, identity matrix, and transpose of a matrix
+
+
+* Symmetric and skew-symmetric matrices
+
+
+* Operations on matrices: addition, multiplication, and scalar multiplication
+
+
+* Properties of matrix addition, multiplication, and scalar multiplication
+
+
+* Non-commutativity of multiplication and existence of non-zero matrices whose product is the zero matrix
+
+
+* Invertible matrices and proof of the uniqueness of an inverse
+
+
+
+
+* **Chapter 4: Determinants**
+* Determinant of a square matrix (up to $3\times3$ matrices)
+
+
+* Minors, co-factors, and applications in finding the area of a triangle
+
+
+* Adjoint and inverse of a square matrix
+
+
+* Consistency, inconsistency, and number of solutions of systems of linear equations
+
+
+* Solving systems of linear equations in two or three variables (unique solution cases) using the matrix inverse method
+
+
+
+
+* **Chapter 5: Continuity and Differentiability**
+* Continuity and Differentiability basic concepts
+
+
+* Chain rule and derivative of composite functions
+
+
+* Derivatives of inverse trigonometric functions ($\sin^{-1}x$, $\cos^{-1}x$, $\tan^{-1}x$)
+
+
+* Derivative of implicit functions
+
+
+* Concept, properties, and derivatives of exponential and logarithmic functions
+
+
+* Logarithmic differentiation
+
+
+* Derivative of functions expressed in parametric forms
+
+
+* Second-order derivatives
+
+
+
+
+* **Chapter 6: Applications of Derivatives**
+* Rate of change of quantities
+
+
+* Increasing and decreasing functions
+
+
+* Maxima and Minima: geometric motivation of the first derivative test
+
+
+* Second derivative test as a provable tool with real-life situational problems
+
+
+
+
+* **Chapter 7: Integrals**
+* Integration as the inverse process of differentiation
+
+
+* Integration by substitution, partial fractions, and by parts
+
+
+* Evaluation of standard algebraic and trigonometric integrals
+
+
+* Fundamental Theorem of Calculus (without proof)
+
+
+* Basic properties of definite integrals and evaluation of definite integrals
+
+
+
+
+* **Chapter 8: Application of the Integrals**
+* Applications in finding the area under simple curves
+
+
+* Finding area bounded by lines, circles, parabolas, and ellipses (in standard form only)
+
+
+
+
+* **Chapter 9: Differential Equations**
+* Definition, order, and degree of a differential equation
+
+
+* General and particular solutions of a differential equation
+
+
+* Solution of differential equations by the method of separation of variables
+
+
+* Solutions of homogeneous differential equations of the first order and first degree
+
+
+* Solutions of linear differential equations of the type $\frac{dy}{dx}+py=q$
+
+* Solutions of linear differential equations of the type $\frac{dx}{dy}+px=q$
+
+
+
+* **Chapter 10: Vectors**
+* Vectors and scalars: magnitude and direction
+
+
+* Direction cosines and direction ratios of a vector
+
+
+* Types of vectors (equal, unit, zero, parallel, and collinear vectors)
+
+
+* Position vector of a point and negative of a vector
+
+
+* Components of a vector, addition of vectors, and scalar multiplication
+
+
+* Position vector of a point dividing a line segment in a given ratio
+
+
+* Definition, properties, geometrical interpretation, and application of the scalar (dot) product
+
+
+* Definition, properties, and application of the vector (cross) product
+
+
+
+
+* **Chapter 11: Three-dimensional Geometry**
+* Direction cosines and direction ratios of a line joining two points
+
+
+* Cartesian equation and vector equation of a line
+
+
+* Skew lines and the shortest distance between two lines
+
+
+* Angle between two lines
+
+
+
+
+* **Chapter 12: Linear Programming**
+* Introduction and terminology (constraints, objective function, optimization)
+
+
+* Graphical method of solution for problems in two variables
+
+
+* Feasible and infeasible regions (bounded or unbounded)
+
+
+* Feasible and infeasible solutions, and optimal feasible solutions (up to three non-trivial constraints)
+
+
+
+
+* **Chapter 13: Probability**
+* Conditional probability and the multiplication theorem on probability
+
+
+* Independent events
+
+
+* Total probability and Bayes' theorem
+
+
+
+---
+
+### Class 11 (CBSE)
+
+**Biology**
+
+* **Chapter 1: The Living World**
+* Biodiversity
+
+
+* Need for classification
+
+
+* Three domains of life
+
+
+* Taxonomy and systematics
+
+
+* Concept of species and taxonomical hierarchy
+
+
+* Binomial nomenclature
+
+
+
+
+* **Chapter 2: Biological Classification**
+* Five kingdom classification
+
+
+* Salient features and classification of Monera, Protista and Fungi into major groups
+
+
+* Lichens, Viruses and Viroids
+
+
+
+
+* **Chapter 3: Plant Kingdom**
+* Classification of plants into major groups
+
+
+* Salient and distinguishing features and a few examples of Algae, Bryophyta, Pteridophyta, Gymnospermae and Angiosperms
+
+
+
+
+* **Chapter 4: Animal Kingdom**
+* Salient features and classification of animals, non-chordates up to phyla level
+
+
+* Salient features and classification of chordates upto class level
+
+
+
+
+* **Chapter 5: Morphology of Flowering Plants**
+* Morphology of different parts of flowering plants: root, stem, leaf, inflorescence, flower, fruit and seed
+
+
+* Description of family Solanaceae
+
+
+
+
+* **Chapter 6: Anatomy of Flowering Plants**
+* Anatomy and functions of tissue systems in dicots and monocots
+
+
+
+
+* **Chapter 7: Structural Organisation in Animals**
+* Morphology, Anatomy and functions of different systems (digestive, circulatory, respiratory, nervous and reproductive) of frog
+
+
+
+
+* **Chapter 8: Cell-The Unit of Life**
+* Cell theory and cell as the basic unit of life
+
+
+* Structure of prokaryotic and eukaryotic cells (Plant cell and animal cell)
+
+
+* Cell envelope, cell membrane, cell wall
+
+
+* Cell organelles (endomembrane system, endoplasmic reticulum, golgi bodies, lysosomes, vacuoles, mitochondria, ribosomes, plastids, microbodies)
+
+
+* Cytoskeleton, cilia, flagella, centrioles (ultrastructure and function)
+
+
+* Nucleus
+
+
+
+
+* **Chapter 9: Biomolecules**
+* Chemical constituents of living cells (biomolecules)
+
+
+* Structure and function of proteins, carbohydrates, lipids, and nucleic acids
+
+
+* Enzyme - types, properties, enzyme action
+
+
+
+
+* **Chapter 10: Cell Cycle and Cell Division**
+* Cell cycle
+
+
+* Mitosis, meiosis and their significance
+
+
+
+
+* **Chapter 11: Photosynthesis in Higher Plants**
+* Photosynthesis as a means of autotrophic nutrition
+
+
+* Site of photosynthesis and pigments involved in photosynthesis
+
+
+* Photochemical and biosynthetic phases of photosynthesis
+
+
+* Cyclic and non-cyclic photophosphorylation
+
+
+* Chemiosmotic hypothesis
+
+
+* Photorespiration, C3 and C4 pathways
+
+
+* Factors affecting photosynthesis
+
+
+
+
+* **Chapter 12: Respiration in Plants**
+* Exchange of gases
+
+
+* Cellular respiration - glycolysis, fermentation (anaerobic)
+
+
+* TCA cycle and electron transport system (aerobic)
+
+
+* Energy relations - number of ATP molecules generated
+
+
+* Amphibolic pathways
+
+
+* Respiratory quotient
+
+
+
+
+* **Chapter 13: Plant - Growth and Development**
+* Seed germination
+
+
+* Phases of plant growth and plant growth rate, conditions of growth
+
+
+* Differentiation, dedifferentiation and redifferentiation
+
+
+* Sequence of developmental processes in a plant cell
+
+
+* Plant growth regulators - auxin, gibberellin, cytokinin, ethylene, ABA
+
+
+
+
+* **Chapter 14: Breathing and Exchange of Gases**
+* Respiratory organs in animals and Respiratory system in humans
+
+
+* Mechanism of breathing and its regulation in humans
+
+
+* Exchange of gases, transport of gases
+
+
+* Respiratory volume
+
+
+* Disorders related to respiration - asthma, emphysema, occupational respiratory disorders
+
+
+
+
+* **Chapter 15: Body Fluids and Circulation**
+* Composition of blood, blood groups, coagulation of blood
+
+
+* Composition of lymph and its function
+
+
+* Human circulatory system - Structure of human heart and blood vessels
+
+
+* Cardiac cycle, cardiac output, ECG
+
+
+* Double circulation and regulation of cardiac activity
+
+
+* Disorders of circulatory system - hypertension, coronary artery disease, angina pectoris, heart failure
+
+
+
+
+* **Chapter 16: Excretory Products and their Elimination**
+* Modes of excretion - ammonotelism, ureotelism, uricotelism
+
+
+* Human excretory system structure and function, urine formation, osmoregulation
+
+
+* Regulation of kidney function - renin angiotensin, atrial natriuretic factor, ADH and diabetes insipidus
+
+
+* Role of other organs in excretion
+
+
+* Disorders - uremia, renal failure, renal calculi, nephritis
+
+
+* Dialysis and artificial kidney, kidney transplant
+
+
+
+
+* **Chapter 17: Locomotion and Movement**
+* Types of movement - ciliary, flagellar, muscular
+
+
+* Skeletal muscle, contractile proteins and muscle contraction
+
+
+* Skeletal system and its functions, joints
+
+
+* Disorders of muscular and skeletal systems - myasthenia gravis, tetany, muscular dystrophy, arthritis, osteoporosis, gout
+
+
+
+
+* **Chapter 18: Neural Control and Coordination**
+* Neuron and nerves
+
+
+* Nervous system in humans - central nervous system, peripheral nervous system and visceral nervous system
+
+
+* Generation and conduction of nerve impulse
+
+
+
+
+* **Chapter 19: Chemical Coordination and Integration**
+* Endocrine glands and hormones
+
+
+* Human endocrine system - hypothalamus, pituitary, pineal, thyroid, parathyroid, adrenal, pancreas, gonads
+
+
+* Mechanism of hormone action (elementary idea)
+
+
+* Role of hormones as messengers and regulators
+
+
+* Hypo - and hyperactivity and related disorders (dwarfism, acromegaly, cretinism, goiter, exophthalmic goitre, diabetes, Addison's disease)
+
+
+
+
+
+---
+
+### Class 12 (CBSE)
+
+**Biology**
+
+* **Chapter 1: Sexual Reproduction in Flowering Plants**
+* Flower structure
+
+
+* Development of male and female gametophytes
+
+
+* Pollination - types, agencies and examples
+
+
+* Out breeding devices and pollen-pistil interaction
+
+
+* Double fertilization
+
+
+* Post fertilization events - development of endosperm and embryo, development of seed and formation of fruit
+
+
+* Special modes - apomixis, parthenocarpy, polyembryony
+
+
+* Significance of seed dispersal and fruit formation
+
+
+
+
+* **Chapter 2: Human Reproduction**
+* Male and female reproductive systems
+
+
+* Microscopic anatomy of testis and ovary
+
+
+* Gametogenesis - spermatogenesis and oogenesis
+
+
+* Menstrual cycle
+
+
+* Fertilisation, embryo development upto blastocyst formation, implantation
+
+
+* Pregnancy and placenta formation, parturition, lactation
+
+
+
+
+* **Chapter 3: Reproductive Health**
+* Need for reproductive health and prevention of Sexually Transmitted Diseases (STDs)
+
+
+* Birth control - need and methods, contraception and medical termination of pregnancy (MTP)
+
+
+* Amniocentesis
+
+
+* Infertility and assisted reproductive technologies - IVF, ZIFT, GIFT
+
+
+
+
+* **Chapter 4: Principles of Inheritance and Variation**
+* Heredity and variation: Mendelian inheritance
+
+
+* Deviations from Mendelism - incomplete dominance, co-dominance, multiple alleles and inheritance of blood groups, pleiotropy
+
+
+* Elementary idea of polygenic inheritance
+
+
+* Chromosome theory of inheritance, chromosomes and genes
+
+
+* Sex determination in humans, birds and honey bee
+
+
+* Linkage and crossing over
+
+
+* Sex linked inheritance - haemophilia, colour blindness
+
+
+* Mendelian disorders in humans - thalassemia
+
+
+* Chromosomal disorders in humans - Down's syndrome, Turner's and Klinefelter's syndromes
+
+
+
+
+* **Chapter 5: Molecular Basis of Inheritance**
+* Search for genetic material and DNA as genetic material
+
+
+* Structure of DNA and RNA
+
+
+* DNA packaging and DNA replication
+
+
+* Central Dogma
+
+
+* Transcription, genetic code, translation
+
+
+* Gene expression and regulation - lac operon
+
+
+* Genome, Human and rice genome projects
+
+
+* DNA fingerprinting
+
+
+
+
+* **Chapter 6: Evolution**
+* Origin of life
+
+
+* Biological evolution and evidences for biological evolution (paleontology, comparative anatomy, embryology and molecular evidences)
+
+
+* Darwin's contribution, modern synthetic theory of evolution
+
+
+* Mechanism of evolution - variation (mutation and recombination) and natural selection with examples, types of natural selection
+
+
+* Gene flow and genetic drift
+
+
+* Hardy- Weinberg's principle
+
+
+* Adaptive radiation
+
+
+* Human evolution
+
+
+
+
+* **Chapter 7: Human Health and Diseases**
+* Pathogens and parasites causing human diseases (malaria, dengue, chikungunya, filariasis, ascariasis, typhoid, pneumonia, common cold, amoebiasis, ring worm) and their control
+
+
+* Basic concepts of immunology - vaccines
+
+
+* Cancer, HIV and AIDS
+
+
+* Adolescence - drug and alcohol abuse
+
+
+
+
+* **Chapter 8: Microbes in Human Welfare**
+* Microbes in food processing, industrial production, sewage treatment, energy generation
+
+
+* Microbes as bio-control agents and bio-fertilizers
+
+
+* Antibiotics; production and judicious use
+
+
+
+
+* **Chapter 9: Biotechnology - Principles and Processes**
+* Genetic Engineering (Recombinant DNA Technology)
+
+
+
+
+* **Chapter 10: Biotechnology and its Applications**
+* Application of biotechnology in health and agriculture: Human insulin and vaccine production, stem cell technology, gene therapy
+
+
+* Genetically modified organisms - Bt crops; transgenic animals
+
+
+* Biosafety issues, biopiracy and patents
+
+
+
+
+* **Chapter 11: Organisms and Populations**
+* Population interactions - mutualism, competition, predation, parasitism
+
+
+* Population attributes - growth, birth rate and death rate, age distribution
+
+
+
+
+* **Chapter 12: Ecosystem**
+* Ecosystems: Patterns, components
+
+
+* Productivity and decomposition
+
+
+* Energy flow
+
+
+* Pyramids of number, biomass, energy
+
+
+
+
+* **Chapter 13: Biodiversity and its Conservation**
+* Biodiversity - Concept, patterns, importance
+
+
+* Loss of biodiversity and biodiversity conservation
+
+
+* Hotspots, endangered organisms, extinction, Red Data Book
+
+
+* Sacred Groves, biosphere reserves, national parks, wildlife, sanctuaries and Ramsar sites
+
+

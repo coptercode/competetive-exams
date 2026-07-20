@@ -63,9 +63,9 @@ export const LandingPage: React.FC = () => {
   const testimonials = [
     {
       quote:
-        "Nexora Learning completely revolutionized my daughter's Class 12 prep. The physical kit, combined with the real-time AI tutor, justified every rupee of the premium subscription. She cleared her TN State Board exams with top marks.",
+        "Nexora Learning completely revolutionized my daughter's Class 12 prep. The physical kit, combined with the real-time AI tutor, justified every rupee of the premium subscription. She cleared her board exams with top marks.",
       author: "Aditi Rao",
-      role: "Parent of Shreya Rao (Class 12 TNSB)",
+      role: "Parent of Shreya Rao (Class 12)",
       rating: 4.5,
       avatar: "/aditi_rao.png",
     },
@@ -73,7 +73,7 @@ export const LandingPage: React.FC = () => {
       quote:
         "Using Nexora Learning helped me improve my academic performance dramatically. By practicing with the expert worksheets and chapter tests, my conceptual understanding became so strong that I went from 70% to scoring 98% in my Class 12 board exams.",
       author: "Kabir Mehta",
-      role: "Class 12 Student (TNSB board)",
+      role: "Class 12 Student",
       rating: 5,
       avatar:
         "/kabir_mehta.png",

@@ -14,6 +14,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { getISTDate } from "../utils/dateUtils";
+import { getBoardSyllabusPhrase } from "../utils/boardUtils";
 
 // Helper function to determine meeting status based on current time in IST timezone
 const getMeetingStatus = (date: string, startTime: string, endTime: string): "Live" | "Upcoming" | "Ended" => {
@@ -54,7 +55,7 @@ const getMeetingStatus = (date: string, startTime: string, endTime: string): "Li
 };
 
 export const StudentDashboard: React.FC = () => {
-  const { setView, profile, boards, assignments, quizResults, setActiveCourseContext, joinLiveRoom } =
+  const { setView, profile, boards, assignments, quizResults, setActiveCourseContext, joinLiveRoom, completedTopicIds } =
     useLmsStore();
 
   const activeBoard =
@@ -179,7 +180,7 @@ export const StudentDashboard: React.FC = () => {
       b.classes.some((c) =>
         c.subjects.some((s) =>
           s.chapters.some((ch) =>
-            ch.topics.some((t) => t.isCompleted)
+            ch.topics.some((t) => t.isCompleted || completedTopicIds.includes(t.id))
           )
         )
       )
@@ -257,14 +258,15 @@ export const StudentDashboard: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {subjects.map((sub) => {
-              // Calculate completion percentage based on mock topics
-              const totalTopics = sub.chapters.reduce(
-                (acc, chap) => acc + chap.topics.length,
+              // Calculate completion percentage based on real topics
+              const realChapters = sub.chapters.filter((chap) => !chap.title.startsWith("#"));
+              const totalTopics = realChapters.reduce(
+                (acc, chap) => acc + chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#")).length,
                 0,
               );
-              const completedTopics = sub.chapters.reduce(
+              const completedTopics = realChapters.reduce(
                 (acc, chap) =>
-                  acc + chap.topics.filter((t) => t.isCompleted).length,
+                  acc + chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#") && (t.isCompleted || completedTopicIds.includes(t.id))).length,
                 0,
               );
               const percent =
@@ -295,7 +297,7 @@ export const StudentDashboard: React.FC = () => {
                     </div>
 
                     <h4 className="text-sm font-extrabold text-slate-900 dark:text-white mb-1 group-hover:text-brand-violet transition-colors">
-                      TN State Board Notes
+                      {getBoardSyllabusPhrase(activeBoard)} Notes
                     </h4>
                     
                     {/* Visual Progress Bar */}
@@ -307,19 +309,45 @@ export const StudentDashboard: React.FC = () => {
                     </div>
 
                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed min-h-[48px]">
-                      Complete TN State Board Syllabus study materials, expert revision notes, and practice assessments for {sub.title}.
+                      Complete {getBoardSyllabusPhrase(activeBoard)} study materials, expert revision notes, and practice assessments for {sub.title}.
                     </p>
 
                     <button
                       onClick={() => {
-                        const firstChapter = sub.chapters[0];
-                        const firstTopic = firstChapter?.topics[0];
-                        setActiveCourseContext(sub.id, firstChapter?.id || null, firstTopic?.id || null);
+                        const realChapters = sub.chapters.filter((chap) => !chap.title.startsWith("#"));
+                        
+                        let targetChapter = null;
+                        let targetTopic = null;
+
+                        // Find the first incomplete real topic
+                        for (const chap of realChapters) {
+                          const realTopics = chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#"));
+                          const incompleteTopic = realTopics.find(t => !(t.isCompleted || completedTopicIds.includes(t.id)));
+                          if (incompleteTopic) {
+                            targetChapter = chap;
+                            targetTopic = incompleteTopic;
+                            break;
+                          }
+                        }
+
+                        // If all are complete or none found, fallback to the first real topic
+                        if (!targetTopic) {
+                          for (const chap of realChapters) {
+                            const realTopics = chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#"));
+                            if (realTopics.length > 0) {
+                              targetChapter = chap;
+                              targetTopic = realTopics[0];
+                              break;
+                            }
+                          }
+                        }
+
+                        setActiveCourseContext(sub.id, targetChapter?.id || null, targetTopic?.id || null);
                         setView("course-view");
                       }}
                       className="w-full py-2 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-royal/10"
                     >
-                      <span>Start Learning</span>
+                      <span>{percent > 0 ? "Resume Learning" : "Start Learning"}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>

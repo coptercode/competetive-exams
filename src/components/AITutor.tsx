@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { tutorAPI } from "../services/api";
 import { useLmsStore } from "../store/index";
+import { getBoardSyllabusName } from "../utils/boardUtils";
 import {
   Send,
   Sparkles,
@@ -26,7 +27,7 @@ interface Message {
 }
 
 export const AITutor: React.FC = () => {
-  const { setView } = useLmsStore();
+  const { setView, boards, profile } = useLmsStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -77,6 +78,9 @@ export const AITutor: React.FC = () => {
   const handleSend = async (textToSend: string) => {
     if (!textToSend.trim() && !attachment) return;
 
+    const activeBoard = boards.find((b) => b.id === profile?.selectedBoardId) || boards[0];
+    const boardName = getBoardSyllabusName(activeBoard);
+
     const userMessage: Message = {
       role: "user",
       text: textToSend,
@@ -110,15 +114,15 @@ export const AITutor: React.FC = () => {
         if (textLower.includes("inertia")) {
           reply = `**Inertia** is the *tendency of an object to keep doing what it’s already doing*.\n\nThink of it as a kind of “weighty stubbornness” that resists changes in motion.\n\n### 1. The Physics Story\nNewton’s First Law (the Law of Inertia) says:\n> An object will stay at rest *or* keep moving in a straight line with constant speed unless a net external force acts on it.\n\n- **At rest** → it won’t start moving on its own.\n- **In motion** → it won’t speed up, slow down, or change direction unless something pushes or pulls on it.\n\n### 2. Relation to Mass\nInertia is tied directly to an object’s mass. A heavier object has *more* inertia because it has *more* mass to resist changes in motion.`;
         } else if (textLower.includes("set") || textLower.includes("union") || textLower.includes("intersection") || textLower.includes("subset")) {
-          reply = `### Sets & Mathematical Relations\n\nIn mathematics, a **set** is a well-defined collection of distinct objects. Under the Class 9 Samacheer Kalvi syllabus, we focus on several key set operations:\n\n1. **Union ($A \\cup B$):** The set containing all elements that belong to A, B, or both.\n2. **Intersection ($A \\cap B$):** The set containing only the elements common to both A and B.\n3. **Difference ($A - B$):** The set of elements that belong to A but not to B.\n4. **Symmetric Difference ($A \\Delta B$):** Defined as $(A - B) \\cup (B - A)$, containing elements in either A or B, but not both.\n5. **Complement ($A'$):** Elements in the Universal set $U$ that are not in $A$.`;
+          reply = `### Sets & Mathematical Relations\n\nIn mathematics, a **set** is a well-defined collection of distinct objects. Under the Class 9 ${boardName} syllabus, we focus on several key set operations:\n\n1. **Union ($A \\cup B$):** The set containing all elements that belong to A, B, or both.\n2. **Intersection ($A \\cap B$):** The set containing only the elements common to both A and B.\n3. **Difference ($A - B$):** The set of elements that belong to A but not to B.\n4. **Symmetric Difference ($A \\Delta B$):** Defined as $(A - B) \\cup (B - A)$, containing elements in either A or B, but not both.\n5. **Complement ($A'$):** Elements in the Universal set $U$ that are not in $A$.`;
         } else if (textLower.includes("force") || textLower.includes("newton")) {
           reply = `### Newton's Laws of Motion\n\n1. **First Law (Inertia):** An object remains in its state of rest or uniform motion unless acted upon by an external net force.\n2. **Second Law ($F = ma$):** The rate of change of momentum of an object is proportional to the applied force and takes place in the direction of the force.\n3. **Third Law:** For every action, there is an equal and opposite reaction. If object A exerts a force on object B, B exerts an equal force in the opposite direction on A.`;
         } else if (textLower.includes("screw gauge") || textLower.includes("pitch") || textLower.includes("least count")) {
           reply = `### Screw Gauge Measurements\n\nA **screw gauge** is an instrument used to measure dimensions up to $0.01\\text{ mm}$ (or $0.001\\text{ cm}$), such as the thickness of a wire or thin sheet.\n\n- **Pitch:** The distance moved by the spindle per rotation of the head.\n  $$\\text{Pitch} = \\frac{\\text{Distance on Pitch Scale}}{\\text{Number of Rotations}}$$\n- **Least Count (LC):** The smallest distance that can be measured by the instrument.\n  $$\\text{Least Count} = \\frac{\\text{Pitch}}{\\text{Total divisions on Head Scale}}$$\n- **Formula for Total Reading (TR):** \n  $$\\text{TR} = \\text{PSR (Pitch Scale Reading)} + (\\text{HSC} \\times \\text{LC}) \\pm \\text{Zero Correction}$$`;
         } else if (textLower.includes("hi") || textLower.includes("hello") || textLower.includes("hey")) {
-          reply = `Hello! I am your **Nexora Learning AI Tutor**. \n\nHow can I help you master your Samacheer Kalvi syllabus today? I can explain core concepts in Mathematics, Physics, Chemistry, and Biology. \n\nFeel free to ask me questions like: \n- *What is inertia?*\n- *Explain Union and Intersection of sets.*\n- *How does a screw gauge work?*`;
+          reply = `Hello! I am your **Nexora Learning AI Tutor**. \n\nHow can I help you master your ${boardName} syllabus today? I can explain core concepts in Mathematics, Physics, Chemistry, and Biology. \n\nFeel free to ask me questions like: \n- *What is inertia?*\n- *Explain Union and Intersection of sets.*\n- *How does a screw gauge work?*`;
         } else {
-          reply = `That is a very interesting academic question!\n\nTo analyze this under the Samacheer Kalvi syllabus:\n1. **Focus on Core Concepts:** Break down the main terms and mathematical/physical rules that govern this topic.\n2. **Verify Definitions:** Always start from the fundamental equations or definitions before deriving complex applications.\n3. **Practice Problems:** Try solving related questions in your workbook to solidify your understanding.\n\n*(Note: I am running in local offline mode since the server is unreachable. You can ask me about **Inertia**, **Sets**, **Newton's Laws**, or **Screw Gauges** for specialized offline explanations!)*`;
+          reply = `That is a very interesting academic question!\n\nTo analyze this under the ${boardName} syllabus:\n1. **Focus on Core Concepts:** Break down the main terms and mathematical/physical rules that govern this topic.\n2. **Verify Definitions:** Always start from the fundamental equations or definitions before deriving complex applications.\n3. **Practice Problems:** Try solving related questions in your workbook to solidify your understanding.\n\n*(Note: I am running in local offline mode since the server is unreachable. You can ask me about **Inertia**, **Sets**, **Newton's Laws**, or **Screw Gauges** for specialized offline explanations!)*`;
         }
 
         const modelMessage: Message = { role: "model", text: reply };

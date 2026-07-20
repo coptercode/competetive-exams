@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBSE Class 9 Maths - Chapter 1 Notes</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #fff;
+  }
+  h1 { color: #1e3a8a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+  h2 { color: #2563eb; margin-top: 30px; }
+  h3 { color: #3b82f6; }
+  .note-box {
+    background-color: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+  }
+  .important-box {
+    background-color: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+  }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 8px; }
+  code, .math {
+    background-color: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #b91c1c;
+  }
+  .checklist {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  .checklist li::before {
+    content: "☐";
+    margin-right: 10px;
+    color: #64748b;
+    font-size: 18px;
+  }
+</style>
+<!-- Load MathJax for rendering math formulas beautifully -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<h1>CBSE Class 9 Mathematics</h1>
+<h2>Chapter 1: Number Systems</h2>
+<p><strong>Comprehensive Study Notes & Summary</strong></p>
+
+<hr>
+
+<h3>1. Introduction to the Number System</h3>
+<p>The number system is a way of representing numbers on the number line. Understanding how different sets of numbers nest within each other is fundamental to algebra.</p>
+
+<ul>
+  <li><strong>Natural Numbers (\(\mathbb{N}\)):</strong> The counting numbers starting from 1. <br> \(\mathbb{N} = \{1, 2, 3, 4, ...\}\)</li>
+  <li><strong>Whole Numbers (\(\mathbb{W}\)):</strong> Natural numbers combined with zero. <br> \(\mathbb{W} = \{0, 1, 2, 3, 4, ...\}\)</li>
+  <li><strong>Integers (\(\mathbb{Z}\)):</strong> Whole numbers and their negative counterparts. <br> \(\mathbb{Z} = \{..., -3, -2, -1, 0, 1, 2, 3, ...\}\)</li>
+  <li><strong>Rational Numbers (\(\mathbb{Q}\)):</strong> Any number that can be expressed in the form \(p/q\), where \(p\) and \(q\) are integers and \(q \neq 0\). 
+    <ul>
+      <li><em>Examples:</em> \(1/2\), \(-3/4\), \(5\) (since \(5 = 5/1\)), \(0\).</li>
+      <li>There are infinitely many rational numbers between any two given rational numbers.</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="note-box">
+  <strong>Tip: Finding rational numbers between a and b:</strong><br>
+  If you need to find \(n\) rational numbers between \(a\) and \(b\), multiply the numerator and denominator by \((n+1)\).
+</div>
+
+<h3>2. Irrational Numbers and Real Numbers</h3>
+<p>Not all numbers can be written as fractions.</p>
+
+<ul>
+  <li><strong>Irrational Numbers:</strong> Numbers that <strong>cannot</strong> be written in the form \(p/q\) (where \(p, q \in \mathbb{Z}\) and \(q \neq 0\)).
+    <ul>
+      <li><em>Examples:</em> \(\sqrt{2}\), \(\sqrt{3}\), \(\pi\), \(0.101101110...\)</li>
+      <li>The decimal expansion of an irrational number is <strong>non-terminating and non-recurring</strong>.</li>
+    </ul>
+  </li>
+  <li><strong>Real Numbers (\(\mathbb{R}\)):</strong> The collection of all Rational and Irrational numbers combined. Every real number is represented by a unique point on the number line.</li>
+</ul>
+
+<h3>3. Decimal Representation of Rational Numbers</h3>
+<p>When you divide \(p\) by \(q\), the decimal expansion can only result in two scenarios:</p>
+
+<ol>
+  <li><strong>Terminating Decimal:</strong> The remainder becomes zero after some steps. <em>Example:</em> \(1/2 = 0.5\)</li>
+  <li><strong>Non-Terminating Recurring (Repeating) Decimal:</strong> The remainder never becomes zero, but a sequence of digits repeats endlessly. <em>Example:</em> \(1/3 = 0.\overline{3}\)</li>
+</ol>
+
+<div class="important-box">
+  <strong>Conclusion:</strong><br>
+  <ul>
+    <li>If a decimal is terminating or non-terminating recurring &rarr; <strong>Rational Number</strong>.</li>
+    <li>If a decimal is non-terminating non-recurring &rarr; <strong>Irrational Number</strong>.</li>
+  </ul>
+</div>
+
+<h3>4. Operations on Real Numbers</h3>
+<p>When combining rational and irrational numbers through arithmetic operations, follow these rules:</p>
+<ul>
+  <li>Rational &plusmn; Irrational = <strong>Irrational</strong></li>
+  <li>Rational &times; or &divide; Irrational (non-zero) = <strong>Irrational</strong></li>
+  <li>Irrational &plusmn; or &times; or &divide; Irrational = <strong>Can be Rational OR Irrational</strong></li>
+</ul>
+
+<p><strong>Useful Identities for Square Roots (where \(a, b > 0\)):</strong></p>
+<ul>
+  <li>\(\sqrt{ab} = \sqrt{a}\sqrt{b}\)</li>
+  <li>\(\sqrt{\frac{a}{b}} = \frac{\sqrt{a}}{\sqrt{b}}\)</li>
+  <li>\((\sqrt{a} + \sqrt{b})(\sqrt{a} - \sqrt{b}) = a - b\)</li>
+</ul>
+
+<h3>5. Rationalization of Denominators</h3>
+<p>When the denominator of an expression contains a term with a square root, the process of converting it to an equivalent expression whose denominator is a rational number is called <strong>rationalizing the denominator</strong>.</p>
+<ul>
+  <li><strong>Single term denominator:</strong> To rationalize \(\frac{1}{\sqrt{a}}\), multiply numerator and denominator by \(\sqrt{a}\).</li>
+  <li><strong>Binomial denominator:</strong> To rationalize \(\frac{1}{\sqrt{a} \pm \sqrt{b}}\), multiply numerator and denominator by its <strong>conjugate</strong> (\(\sqrt{a} \mp \sqrt{b}\)).</li>
+</ul>
+
+<h3>6. Laws of Exponents for Real Numbers</h3>
+<p>If \(a > 0\) is a real number and \(m\) and \(n\) are rational numbers, then:</p>
+<ul>
+  <li>\(a^m \cdot a^n = a^{m+n}\)</li>
+  <li>\(\frac{a^m}{a^n} = a^{m-n}\)</li>
+  <li>\((a^m)^n = a^{mn}\)</li>
+  <li>\(a^{-m} = \frac{1}{a^m}\)</li>
+  <li>\(a^{\frac{m}{n}} = \sqrt[n]{a^m}\)</li>
+</ul>
+
+<hr>
+
+<h3>Summary Checklist for Students</h3>
+<ul class="checklist">
+  <li>I can find rational numbers between two fractions.</li>
+  <li>I can convert repeating decimals into \(p/q\) fractions.</li>
+  <li>I can classify numbers as rational or irrational.</li>
+  <li>I can multiply, divide, add, and subtract expressions with roots.</li>
+  <li>I can easily rationalize binomial denominators using conjugates.</li>
+</ul>
+
+<br><br><br>
+</body>
+</html>

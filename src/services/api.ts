@@ -24,7 +24,10 @@ export const authAPI = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    if (!res.ok) throw new Error("Login failed");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Login failed");
+    }
     return res.json();
   },
 
@@ -83,7 +86,10 @@ export const authAPI = {
       },
       body: JSON.stringify(userData),
     });
-    if (!res.ok) throw new Error("Failed to create user");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to create user");
+    }
     return res.json();
   },
 

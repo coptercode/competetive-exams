@@ -85,12 +85,12 @@ export const TeacherUploadedNotesPage: React.FC = () => {
         />
         <button
           onClick={() => setView("assignment-view")}
-          className="flex items-center gap-2 text-white/80 hover:text-white text-sm font-semibold mb-6 transition-colors group"
+          className="relative z-10 flex items-center gap-2 text-white/80 hover:text-white text-sm font-semibold mb-6 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Homework Space
         </button>
-        <div className="flex items-center gap-4">
+        <div className="relative z-10 flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shadow-inner">
             <GraduationCap className="w-7 h-7 text-white" />
           </div>

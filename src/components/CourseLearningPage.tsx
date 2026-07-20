@@ -95,8 +95,12 @@ import {
   Minimize2,
   Sun,
   Moon,
+  Youtube
 } from "lucide-react";
-
+import ReactMarkdown from 'react-markdown';
+import { getVideoLinkForTopic } from "../utils/videoLinks";
+import { getPdfLinkForTopic } from "../utils/pdfLinks";
+import { getYoutubeLinkForTopic } from "../utils/youtubeLinks";
 
 export const CourseLearningPage: React.FC = () => {
   const {
@@ -106,6 +110,7 @@ export const CourseLearningPage: React.FC = () => {
     activeChapterId,
     activeTopicId,
     completeTopic,
+    completedTopicIds,
     bookmarks,
     addBookmark,
     deleteBookmark,
@@ -116,7 +121,7 @@ export const CourseLearningPage: React.FC = () => {
   } = useLmsStore();
 
   const [activeTab, setActiveTab] = useState<
-    "pdf" | "bookmarks" | "quiz"
+    "pdf" | "bookmarks" | "quiz" | "youtube"
   >("pdf");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -210,219 +215,35 @@ export const CourseLearningPage: React.FC = () => {
 
 
   const getTopicPdfInfo = (chapterTitle: string = "", topicPdfUrl?: string) => {
-    const title = (chapterTitle || "").toLowerCase();
-    const chId = activeChapter?.id || "";
-    const subId = activeSubject?.id || "";
-    const clId = activeClass?.id || "";
-
-    const isCl9 = clId === "class-9" || activeClass?.title === "Class 9";
-    const isCl10 = clId === "class-10" || activeClass?.title === "Class 10";
-    const isCl11 = clId === "class-11" || activeClass?.title === "Class 11";
-    const isCl12 = clId === "class-12" || activeClass?.title === "Class 12";
-
-    const sTitle = activeSubject?.title || "";
-
-    // Class 9 Maths chapters
-    if (isCl9 && (subId === "maths-9" || sTitle === "Mathematics")) {
-      if (title.includes("set language")) {
-        return { url: "/Unit_1_Set_Language_Notes.pdf", name: "Unit_1_Set_Language_Notes.pdf" };
-      }
-      if (title.includes("real numbers")) {
-        return { url: "/Unit_2_Real_Numbers_Notes.pdf", name: "Unit_2_Real_Numbers_Notes.pdf" };
-      }
-      if (title.includes("algebra")) {
-        return { url: "/Unit_3_Algebra_Notes.pdf", name: "Unit_3_Algebra_Notes.pdf" };
-      }
-      if (title.includes("coordinate geometry")) {
-        return { url: "/Unit_5_Coordinate_Geometry_Notes.pdf", name: "Unit_5_Coordinate_Geometry_Notes.pdf" };
-      }
-      if (title.includes("geometry")) {
-        return { url: "/Unit_4_Geometry_Notes.pdf", name: "Unit_4_Geometry_Notes.pdf" };
-      }
-      if (title.includes("trigonometry")) {
-        return { url: "/Unit_6_Trigonometry_Notes.pdf", name: "Unit_6_Trigonometry_Notes.pdf" };
-      }
-      if (title.includes("mensuration")) {
-        return { url: "/Unit_7_Mensuration_Notes.pdf", name: "Unit_7_Mensuration_Notes.pdf" };
-      }
-      if (title.includes("statistics")) {
-        return { url: "/Unit_8_Statistics_Notes.pdf", name: "Unit_8_Statistics_Notes.pdf" };
-      }
-      if (title.includes("probability")) {
-        return { url: "/Unit_9_Probability_Notes.pdf", name: "Unit_9_Probability_Notes.pdf" };
-      }
+    const pdfUrl = topicPdfUrl || activeTopic?.pdfUrl;
+    if (pdfUrl && !pdfUrl.includes("dummy.pdf")) {
+      return { url: pdfUrl, name: `${activeTopic?.title || chapterTitle} Notes` };
     }
-
-    // Class 9 Science topics
-    if (isCl9 && (subId === "science-9" || sTitle === "Science")) {
-      const tId = activeTopic?.id || "";
-      const tTitle = (activeTopic?.title || "").toLowerCase();
-      
-      if (tId.includes("sci-ph-t1") || tTitle.includes("measurement")) {
-        return { url: "/Science_Physics_Measurement_Notes.pdf", name: "Science_Physics_Measurement_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t2") || tTitle.includes("motion")) {
-        return { url: "/Science_Physics_Motion_Notes.pdf", name: "Science_Physics_Motion_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t3") || tTitle.includes("force")) {
-        return { url: "/Science_Physics_Force_Notes.pdf", name: "Science_Physics_Force_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t4") || tTitle.includes("gravitation")) {
-        return { url: "/Science_Physics_Gravitation_Notes.pdf", name: "Science_Physics_Gravitation_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t5") || tTitle.includes("work")) {
-        return { url: "/Science_Physics_Work_Power_Energy_Notes.pdf", name: "Science_Physics_Work_Power_Energy_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t6") || tTitle.includes("sound")) {
-        return { url: "/Science_Physics_Sound_Notes.pdf", name: "Science_Physics_Sound_Notes.pdf" };
-      }
-
-      if (tId.includes("sci-ch-t1") || tTitle.includes("matter")) {
-        return { url: "/Science_Chemistry_Matter_Notes.pdf", name: "Science_Chemistry_Matter_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t2") || tTitle.includes("atoms")) {
-        return { url: "/Science_Chemistry_Atoms_Molecules_Notes.pdf", name: "Science_Chemistry_Atoms_Molecules_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t3") || tTitle.includes("structure")) {
-        return { url: "/Science_Chemistry_Structure_Atom_Notes.pdf", name: "Science_Chemistry_Structure_Atom_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t4") || tTitle.includes("periodic")) {
-        return { url: "/Science_Chemistry_Periodic_Classification_Notes.pdf", name: "Science_Chemistry_Periodic_Classification_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t5") || tTitle.includes("bonding")) {
-        return { url: "/Science_Chemistry_Chemical_Bonding_Notes.pdf", name: "Science_Chemistry_Chemical_Bonding_Notes.pdf" };
-      }
-
-      if (tId.includes("sci-bi-t1") || tTitle.includes("cell")) {
-        return { url: "/Science_Biology_The_Cell_Notes.pdf", name: "Science_Biology_The_Cell_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t2") || tTitle.includes("tissues")) {
-        return { url: "/Science_Biology_Tissues_Notes.pdf", name: "Science_Biology_Tissues_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t3") || tTitle.includes("diversity")) {
-        return { url: "/Science_Biology_Diversity_Notes.pdf", name: "Science_Biology_Diversity_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t4") || tTitle.includes("ill") || tTitle.includes("health")) {
-        return { url: "/Science_Biology_Why_Do_We_Fall_Ill_Notes.pdf", name: "Science_Biology_Why_Do_We_Fall_Ill_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t5") || tTitle.includes("natural")) {
-        return { url: "/Science_Biology_Natural_Resources_Notes.pdf", name: "Science_Biology_Natural_Resources_Notes.pdf" };
-      }
-
-      if (title.includes("physics")) {
-        return { url: "/Science_Ch1_Physics_Notes.pdf", name: "Science_Ch1_Physics_Notes.pdf" };
-      }
-      if (title.includes("chemistry")) {
-        return { url: "/Science_Ch2_Chemistry_Notes.pdf", name: "Science_Ch2_Chemistry_Notes.pdf" };
-      }
-      if (title.includes("biology")) {
-        return { url: "/Science_Ch3_Biology_Notes.pdf", name: "Science_Ch3_Biology_Notes.pdf" };
-      }
+    const drivePdfUrl = getPdfLinkForTopic(activeTopic?.title);
+    if (drivePdfUrl) {
+      return { url: drivePdfUrl, name: `${activeTopic?.title || chapterTitle} Notes` };
     }
-
-    // Class 10 Maths
-    if (isCl10 && (subId === "maths-10" || sTitle === "Mathematics")) {
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class10_Maths_Ch${num}_Notes.pdf`, name: `Class10_Maths_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 10 Science
-    if (isCl10 && (subId === "science-10" || sTitle === "Science")) {
-      if (chId === "sci10-ch1" || title.includes("physics")) return { url: "/Class10_Science_Physics_Notes.pdf", name: "Class10_Science_Physics_Notes.pdf" };
-      if (chId === "sci10-ch2" || title.includes("chemistry")) return { url: "/Class10_Science_Chemistry_Notes.pdf", name: "Class10_Science_Chemistry_Notes.pdf" };
-      if (chId === "sci10-ch3" || title.includes("biology")) return { url: "/Class10_Science_Biology_Notes.pdf", name: "Class10_Science_Biology_Notes.pdf" };
-      if (chId === "sci10-ch4" || title.includes("computer science") || title.includes("compsci")) return { url: "/Class10_Science_CompSci_Notes.pdf", name: "Class10_Science_CompSci_Notes.pdf" };
-    }
-
-    // Class 11 Maths
-    if (isCl11 && (subId.startsWith("maths-11") || sTitle.startsWith("Mathematics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class11_Maths_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class11_Maths_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 11 Physics
-    if (isCl11 && (subId.startsWith("physics-11") || sTitle.startsWith("Physics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class11_Physics_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class11_Physics_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 11 Chemistry
-    if (isCl11 && (subId.startsWith("chemistry-11") || sTitle.startsWith("Chemistry"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class11_Chemistry_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class11_Chemistry_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 12 Maths
-    if (isCl12 && (subId.startsWith("maths-12") || sTitle.startsWith("Mathematics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class12_Maths_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class12_Maths_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 12 Physics
-    if (isCl12 && (subId.startsWith("physics-12") || sTitle.startsWith("Physics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class12_Physics_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class12_Physics_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 12 Chemistry
-    if (isCl12 && (subId.startsWith("chemistry-12") || sTitle.startsWith("Chemistry"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class12_Chemistry_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class12_Chemistry_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    return {
-      url: topicPdfUrl || "/adjoint_inverse_rank_notes.pdf",
-      name: topicPdfUrl ? topicPdfUrl.substring(topicPdfUrl.lastIndexOf("/") + 1) : "adjoint_inverse_rank_notes.pdf"
-    };
+    return null;
   };
+
+  const currentPdfInfo = getTopicPdfInfo(activeChapter?.title || "", activeTopic?.pdfUrl);
+  const isMarkdown = currentPdfInfo?.url?.toLowerCase().endsWith(".md");
+
+  const [mdContent, setMdContent] = useState<string | null>(null);
+  const [mdError, setMdError] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isMarkdown && currentPdfInfo?.url) {
+      setMdError(false);
+      fetch(currentPdfInfo.url)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load markdown");
+          return res.text();
+        })
+        .then((text) => setMdContent(text))
+        .catch(() => setMdError(true));
+    }
+  }, [currentPdfInfo?.url, isMarkdown]);
 
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
 
@@ -530,7 +351,7 @@ export const CourseLearningPage: React.FC = () => {
               activeSubject &&
               activeChapter &&
               activeTopic &&
-              !activeTopic.isCompleted
+              !(activeTopic.isCompleted || completedTopicIds.includes(activeTopic.id))
             ) {
               completeTopic(
                 activeBoard.id,
@@ -569,6 +390,7 @@ export const CourseLearningPage: React.FC = () => {
     activeChapter,
     activeTopic,
     completeTopic,
+    completedTopicIds
   ]);
 
   // Formatter for time display
@@ -671,87 +493,22 @@ export const CourseLearningPage: React.FC = () => {
             />
           ) : (
             <>
-              {/* Simulated Video Stream */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="absolute inset-0 bg-cover bg-center opacity-30 filter blur-[1px]"
-                  style={{
-                    backgroundImage: `url('${getTopicThumbnail(activeSubject?.title, activeChapter?.title, activeTopic?.title)}')`,
-                  }}
-                />
-
-                {/* Pulsing play button overlay when paused */}
-                {!isPlaying && (
-                  <button
-                    type="button"
-                    onClick={() => setIsPlaying(true)}
-                    className="w-20 h-20 rounded-full bg-black/60 hover:bg-black/85 border border-white/20 flex items-center justify-center relative z-10 hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-black/50 group cursor-pointer animate-pulse-slow"
-                  >
-                    <Play className="w-8 h-8 text-white fill-white translate-x-0.5 transition-transform duration-300 group-hover:scale-110" />
-                  </button>
-                )}
-
-                {/* Context Watermark */}
-                <div className="absolute top-4 left-4 text-[9px] text-white/20 select-none font-mono tracking-widest z-10">
-                  NEXORA LEARNING SECURE STREAM // IP: 192.168.1.1
-                </div>
-              </div>
-
-              {/* Custom Player Controls HUD */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/85 border-t border-white/10 flex flex-col gap-2 z-20">
-                {/* Progress Bar (Click to Seek) */}
-                <div
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const width = rect.width;
-                    const newPercent = clickX / width;
-                    setCurrentTime(Math.floor(newPercent * videoDuration));
-                  }}
-                  className="w-full h-1.5 bg-white/20 rounded-full cursor-pointer relative overflow-hidden"
-                >
-                  <div
-                    className="h-full bg-brand-royal"
-                    style={{ width: `${(currentTime / videoDuration) * 100}%` }}
+                {/* Board: {activeBoard?.title} | Class: {activeClass?.title} | Subject: {activeSubject?.title} | Chapter: {activeChapter?.title} | Topic: {activeTopic?.title} */}
+                {getVideoLinkForTopic(activeTopic?.title) ? (
+                  <iframe 
+                    src={getVideoLinkForTopic(activeTopic?.title) as string} 
+                    className="w-full h-full absolute inset-0 border-0 z-10" 
+                    allow="autoplay; fullscreen" 
+                    allowFullScreen
                   />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setIsPlaying(!isPlaying)}
-                      className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
-                    >
-                      {isPlaying ? (
-                        <Pause className="w-5 h-5 fill-current" />
-                      ) : (
-                        <Play className="w-5 h-5 fill-current" />
-                      )}
-                    </button>
-
-                    <span className="text-xs font-semibold text-slate-300 font-mono">
-                      {formatTime(currentTime)} / {formatTime(videoDuration)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider bg-slate-950 px-2 py-0.5 rounded border border-white/5">
-                      {activeTopic?.title || "Chapter Topic"}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={handleToggleFullscreen}
-                      className="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors"
-                      title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-                    >
-                      {isFullscreen ? (
-                        <Minimize2 className="w-4.5 h-4.5" />
-                      ) : (
-                        <Maximize2 className="w-4.5 h-4.5" />
-                      )}
-                    </button>
-                  </div>
+                ) : (
+                  <div className="text-white text-lg font-medium z-10">Video is not added</div>
+                )}
+                
+                {/* Context Watermark */}
+                <div className="absolute top-4 left-4 text-[9px] text-white/50 select-none font-mono tracking-widest z-20 pointer-events-none mix-blend-difference">
+                  NEXORA LEARNING SECURE STREAM // IP: 192.168.1.1
                 </div>
               </div>
             </>
@@ -768,7 +525,23 @@ export const CourseLearningPage: React.FC = () => {
               {activeTopic?.title || "Introductory Topic"}
             </h2>
           </div>
-
+          
+          <div>
+            {!(activeTopic?.isCompleted || (activeTopic && completedTopicIds.includes(activeTopic.id))) ? (
+              <button
+                onClick={handleMarkAsCompleted}
+                className="flex items-center gap-2 bg-brand-royal hover:bg-brand-royal/90 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors shadow-lg shadow-brand-royal/20"
+              >
+                <CheckCircle className="w-4 h-4" />
+                Mark as Completed
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
+                <CheckCircle className="w-4 h-4 fill-emerald-600 dark:fill-emerald-400 text-white dark:text-slate-900" />
+                Completed
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Lower Workspace Tabs (Content explanation, Bookmarks, PDFs) */}
@@ -778,8 +551,32 @@ export const CourseLearningPage: React.FC = () => {
               { id: "pdf", label: "Notes & Worksheets", icon: FileText },
               { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
               { id: "quiz", label: "Topic Quiz", icon: HelpCircle },
+              { id: "youtube", label: "YouTube Link", icon: Youtube },
             ].map((tab) => {
               const Icon = tab.icon;
+
+              if (tab.id === "youtube") {
+                const ytLink = getYoutubeLinkForTopic(
+                  activeBoard?.title,
+                  activeChapter?.title,
+                  activeTopic?.title
+                );
+                if (!ytLink) return null;
+                
+                return (
+                  <a
+                    key={tab.id}
+                    href={ytLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pb-3 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-all border-transparent text-slate-550 hover:text-slate-900 dark:hover:text-slate-300"
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </a>
+                );
+              }
+
               return (
                 <button
                   key={tab.id}
@@ -809,42 +606,81 @@ export const CourseLearningPage: React.FC = () => {
                   }
                 `}} />
                 
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
-                  <div>
-                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                      {getTopicPdfInfo(activeChapter?.title || "", activeTopic?.pdfUrl).name}
-                    </h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      Standard syllabus study note handbook
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setView("secure-note-preview")}
-                      className="px-3.5 py-1.5 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-brand-royal/10 active:scale-95 cursor-pointer"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      <span>View Fullscreen</span>
-                    </button>
-                    <span className="text-[9px] bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                      Preview Only (Protected)
-                    </span>
-                  </div>
-                </div>
-
-                <div 
-                  className="relative w-full h-[650px] border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden bg-slate-950 select-none shadow-inner"
-                  onContextMenu={(e) => e.preventDefault()}
-                >
-                  {/* Secure PDF embed */}
-                  <iframe
-                    src={`${getTopicPdfInfo(activeChapter?.title || "", activeTopic?.pdfUrl).url}#toolbar=0&navpanes=0&scrollbar=1`}
-                    className="w-full h-full border-0"
-                    title="Notes Preview"
-                  />
+                {(() => {
+                  const pdfInfo = getTopicPdfInfo(activeChapter?.title || "", activeTopic?.pdfUrl);
                   
+                  if (!pdfInfo) {
+                    return (
+                      <div className="flex flex-col items-center justify-center h-[400px] border border-slate-200 dark:border-white/10 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+                        <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center mb-4">
+                          <FileText className="w-8 h-8 text-slate-400" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Notes Available</h3>
+                        <p className="text-sm text-slate-500 text-center max-w-sm">
+                          Study notes for this topic have not been added yet. Please check back later.
+                        </p>
+                      </div>
+                    );
+                  }
 
-                </div>
+                  return (
+                    <>
+                      <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <div>
+                          <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                            {pdfInfo.name}
+                          </h4>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            Standard syllabus study note handbook
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setView("secure-note-preview")}
+                            className="px-3.5 py-1.5 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-brand-royal/10 active:scale-95 cursor-pointer"
+                          >
+                            <Maximize2 className="w-3.5 h-3.5" />
+                            <span>View Fullscreen</span>
+                          </button>
+                          <span className="text-[9px] bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            Preview Only (Protected)
+                          </span>
+                        </div>
+                      </div>
+
+                      <div 
+                        className="relative w-full h-[650px] border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden bg-slate-950 select-none shadow-inner"
+                        onContextMenu={(e) => e.preventDefault()}
+                      >
+                        {isMarkdown ? (
+                          <div className="w-full h-full p-8 overflow-y-auto bg-white dark:bg-slate-800 custom-scrollbar text-left text-slate-900 dark:text-white">
+                            {mdError ? (
+                              <div className="flex flex-col items-center justify-center w-full h-full text-slate-400">
+                                <FileText className="w-12 h-12 mb-4 opacity-50" />
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Error Loading Notes</h3>
+                                <p>Could not load the markdown notes. Please try again.</p>
+                              </div>
+                            ) : mdContent ? (
+                              <article className="prose dark:prose-invert max-w-none prose-headings:text-brand-royal dark:prose-headings:text-brand-royal-300 prose-a:text-brand-royal dark:prose-a:text-brand-royal-300 hover:prose-a:text-brand-royal/80 dark:hover:prose-a:text-brand-royal-400 prose-strong:text-slate-900 dark:prose-strong:text-white prose-code:text-amber-600 dark:prose-code:text-amber-300 prose-pre:bg-slate-100 dark:prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-200 dark:prose-pre:border-white/10">
+                                <ReactMarkdown>{mdContent}</ReactMarkdown>
+                              </article>
+                            ) : (
+                              <div className="flex items-center justify-center w-full h-full">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-royal"></div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <iframe
+                            src={`${pdfInfo.url}#toolbar=0&navpanes=0&scrollbar=1`}
+                            className="w-full h-full border-0"
+                            title="Notes Preview"
+                          />
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
 
@@ -945,21 +781,24 @@ export const CourseLearningPage: React.FC = () => {
                 </form>
 
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                  {bookmarks.filter((b) => b.topicId === activeTopic?.id)
+                  {bookmarks.filter((b) => b.chapterTitle === activeChapter?.title && b.subjectTitle === activeSubject?.title && b.profileId === (profile?.id || "guest"))
                     .length === 0 ? (
                     <div className="py-8 text-center text-xs text-slate-500">
-                      No bookmarks saved in this lecture.
+                      No bookmarks saved in this chapter.
                     </div>
                   ) : (
                     bookmarks
-                      .filter((b) => b.topicId === activeTopic?.id)
+                      .filter((b) => b.chapterTitle === activeChapter?.title && b.subjectTitle === activeSubject?.title && b.profileId === (profile?.id || "guest"))
                       .map((bm) => (
                         <div
                           key={bm.id}
                           className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5 flex items-center justify-between hover:border-slate-300 dark:hover:border-white/10 transition-colors"
                         >
                           <div className="text-left">
-                            <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mt-1">
+                            <span className="text-[10px] font-bold text-brand-royal uppercase tracking-wider bg-brand-royal/10 px-2 py-0.5 rounded-md">
+                              {bm.topicTitle}
+                            </span>
+                            <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mt-2">
                               {bm.note}
                             </p>
                           </div>
@@ -1007,7 +846,8 @@ export const CourseLearningPage: React.FC = () => {
                   key={sub.id}
                   onClick={() => {
                     const firstChapter = sub.chapters[0];
-                    const firstTopic = firstChapter?.topics[0];
+                    const cleanTopics = firstChapter?.topics.filter(t => t.title !== firstChapter.title) || [];
+                    const firstTopic = cleanTopics.length > 0 ? cleanTopics[0] : firstChapter?.topics[0];
                     setActiveCourseContext(
                       sub.id,
                       firstChapter?.id || null,
@@ -1045,21 +885,23 @@ export const CourseLearningPage: React.FC = () => {
                 No content exists. Create chapters inside teacher dashboard.
               </p>
             ) : (
-              activeSubject.chapters.map((chapter) => {
-                const isChapterActive = activeChapterId === chapter.id;
-                const isExpanded = expandedChapterId === chapter.id;
-                const firstTopic = chapter.topics[0];
-                return (
-                  <div key={chapter.id} className="space-y-1">
-                    {/* Clickable Chapter Header Row */}
-                    <button
-                      onClick={() => {
-                        if (isExpanded) {
-                          setExpandedChapterId(null);
-                        } else {
-                          setExpandedChapterId(chapter.id);
-                        }
-                      }}
+              activeSubject.chapters
+                .filter((c) => !c.title.startsWith("#"))
+                .map((chapter) => {
+                  const isChapterActive = activeChapterId === chapter.id;
+                  const isExpanded = expandedChapterId === chapter.id;
+                  const firstTopic = chapter.topics[0];
+                  return (
+                    <div key={chapter.id} className="space-y-1">
+                      {/* Clickable Chapter Header Row */}
+                      <button
+                        onClick={() => {
+                          if (isExpanded) {
+                            setExpandedChapterId(null);
+                          } else {
+                            setExpandedChapterId(chapter.id);
+                          }
+                        }}
                       className={`w-full py-2.5 px-3 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 font-bold ${
                         isChapterActive
                           ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300"
@@ -1076,38 +918,43 @@ export const CourseLearningPage: React.FC = () => {
                     {/* Topics list - only shown when chapter is active */}
                     {isExpanded && (
                       <div className="space-y-0.5 ml-3 border-l border-brand-royal/20 pl-2">
-                        {chapter.topics.map((topic) => {
-                          const isTopicActive = activeTopic?.id === topic.id;
-                          return (
-                            <button
-                              key={topic.id}
-                              onClick={() =>
-                                setActiveCourseContext(
-                                  activeSubject.id,
-                                  chapter.id,
-                                  topic.id,
-                                )
-                              }
-                              className={`w-full py-2 px-2.5 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 ${
-                                isTopicActive
-                                  ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300 font-semibold"
-                                  : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 truncate">
-                                {topic.isCompleted ? (
-                                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-                                ) : (
-                                  <div className="w-3.5 h-3.5 rounded-full border border-slate-400 dark:border-slate-600 flex-shrink-0" />
-                                )}
-                                <span className="truncate">{topic.title}</span>
-                              </div>
-                              <span className="text-[10px] text-slate-500 dark:text-slate-500 font-mono font-medium flex-shrink-0">
-                                {topic.duration}
-                              </span>
-                            </button>
-                          );
-                        })}
+                        {(() => {
+                          const cleanTopics = chapter.topics.filter(t => t.title !== chapter.title && !t.title.startsWith('#'));
+                          const displayTopics = cleanTopics.length > 0 ? cleanTopics : chapter.topics;
+                          
+                          return displayTopics.map((topic) => {
+                            const isTopicActive = activeTopic?.id === topic.id;
+                            return (
+                              <button
+                                key={topic.id}
+                                onClick={() =>
+                                  setActiveCourseContext(
+                                    activeSubject.id,
+                                    chapter.id,
+                                    topic.id,
+                                  )
+                                }
+                                className={`w-full py-2 px-2.5 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 ${
+                                  isTopicActive
+                                    ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300 font-semibold"
+                                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  {(topic.isCompleted || completedTopicIds.includes(topic.id)) ? (
+                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                                  ) : (
+                                    <div className="w-3.5 h-3.5 rounded-full border border-slate-400 dark:border-slate-600 flex-shrink-0" />
+                                  )}
+                                  <span className="truncate">{topic.title}</span>
+                                </div>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-500 font-mono font-medium flex-shrink-0">
+                                  {topic.duration}
+                                </span>
+                              </button>
+                            );
+                          });
+                        })()}
                       </div>
                     )}
                   </div>

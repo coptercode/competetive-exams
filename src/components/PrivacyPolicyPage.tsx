@@ -63,7 +63,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-slate-650 text-sm sm:text-base">
               <li>
-                <strong className="text-slate-800">Account Information:</strong> Profile credentials, including username, email address, password hash, age, school board affiliations (e.g., TN State Board), and grade levels (Class 9 to 12).
+                <strong className="text-slate-800">Account Information:</strong> Profile credentials, including username, email address, password hash, age, school board affiliations (e.g., TN State Board, CBSE, ICSE), and grade levels (Class 9 to 12).
               </li>
               <li>
                 <strong className="text-slate-800">Academic Data:</strong> Quiz submissions, selected answers, assignment file uploads, marks, learning speeds, completed chapter topics, and earned achievements (XP, levels, and coins).

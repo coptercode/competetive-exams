@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TimePicker from "react-time-picker";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
-import { useLmsStore } from "./store/index";
+import { useLmsStore, defaultBoards } from "./store/index";
 import { 
   Video, 
   Tv, 
@@ -793,7 +793,7 @@ function RoomJoinFallback() {
 }
 
 function App() {
-  const { activeView, isDarkMode, setView, profile, boards, liveRoomState, auth } = useLmsStore();
+  const { activeView, isDarkMode, setView, profile, boards, liveRoomState, auth, activeSubjectId, activeChapterId, activeTopicId } = useLmsStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const token = localStorage.getItem("auth_token");
 
@@ -804,21 +804,28 @@ function App() {
       .then((boards) => {
         if (boards?.length) {
           useLmsStore.setState({ boards });
+        } else {
+          useLmsStore.setState({ boards: defaultBoards });
         }
       })
       .catch(() => {
         // keep demo boards when API is offline
+        useLmsStore.setState({ boards: defaultBoards });
       });
 
     // Initial notifications and assignments load and polling setup
     const fetchNotifs = useLmsStore.getState().fetchNotifications;
     const fetchAssigns = useLmsStore.getState().fetchAssignments;
+    const fetchNotes = useLmsStore.getState().fetchNotes;
     fetchNotifs();
     fetchAssigns();
+    fetchNotes();
+
     
     const interval = setInterval(() => {
       fetchNotifs();
       fetchAssigns();
+      fetchNotes();
     }, 8000);
     return () => clearInterval(interval);
   }, [profile?.id]);
@@ -833,7 +840,10 @@ function App() {
       const matchedBoard = boards.find(
         (b) =>
           b.id === profile.selectedBoardId ||
-          b.code?.toLowerCase() === profile.selectedBoardId?.toLowerCase(),
+          b.code?.toLowerCase() === profile.selectedBoardId?.toLowerCase() ||
+          (b.code === 'STATE' && profile.selectedBoardId === 'stateboard') ||
+          (b.code === 'CBSE' && profile.selectedBoardId === 'cbse') ||
+          (b.code === 'ICSE' && profile.selectedBoardId === 'icse'),
       );
       if (matchedBoard && matchedBoard.id !== profile.selectedBoardId) {
         newProfile.selectedBoardId = matchedBoard.id;
@@ -906,7 +916,9 @@ function App() {
       "contact-support",
     ];
 
-    const initialHash = window.location.hash.replace(/^#\/?/, "").split("?")[0] || "landing";
+    const fullInitialHash = window.location.hash.replace(/^#\/?/, "");
+    const initialHashParts = fullInitialHash.split("/");
+    const initialHash = initialHashParts[0].split("?")[0] || "landing";
     const isAuthenticated = auth.isAuthenticated && !!token;
 
     const getDashboardView = () => {
@@ -925,11 +937,17 @@ function App() {
     } else if (publicViews.includes(initialHash)) {
       setView(initialHash);
     } else {
+      if (initialHash === "course-view" && initialHashParts.length >= 4) {
+        useLmsStore.getState().setActiveCourseContext(initialHashParts[1], initialHashParts[2], initialHashParts[3]);
+      }
       setView(initialHash);
     }
 
     const handleHashChange = () => {
-      const hash = window.location.hash.replace(/^#\/?/, "").split("?")[0] || "landing";
+      const fullHash = window.location.hash.replace(/^#\/?/, "");
+      const hashParts = fullHash.split("/");
+      const hash = hashParts[0].split("?")[0] || "landing";
+
       if (!isAuthenticated && !publicViews.includes(hash)) {
         setView("login-student");
         window.location.hash = "/login-student";
@@ -938,6 +956,9 @@ function App() {
         setView(dash);
         window.location.hash = "/" + dash;
       } else {
+        if (hash === "course-view" && hashParts.length >= 4) {
+          useLmsStore.getState().setActiveCourseContext(hashParts[1], hashParts[2], hashParts[3]);
+        }
         setView(hash);
       }
     };
@@ -946,13 +967,30 @@ function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [setView, auth.isAuthenticated, token, profile]);
 
-  // Keep URL hash in sync with activeView
+  // Keep URL hash in sync with activeView and course context
   useEffect(() => {
-    const currentHash = window.location.hash.replace(/^#\/?/, "").split("?")[0] || "landing";
-    if (currentHash !== activeView) {
+    const fullHash = window.location.hash.replace(/^#\/?/, "");
+    const hashParts = fullHash.split("/");
+    const currentHash = hashParts[0].split("?")[0] || "landing";
+    
+    // Check if we need to update the hash
+    if (currentHash !== activeView || (activeView === "course-view" && hashParts.length < 4)) {
+      if (activeView === "course-view") {
+        if (activeSubjectId && activeChapterId && activeTopicId) {
+          window.location.hash = `/course-view/${activeSubjectId}/${activeChapterId}/${activeTopicId}`;
+          return;
+        }
+      }
       window.location.hash = "/" + activeView;
+    } else if (activeView === "course-view" && hashParts.length >= 4) {
+      // Check if URL parameters differ from current state and we need to push a new one
+      if (activeSubjectId && activeChapterId && activeTopicId) {
+        if (hashParts[1] !== activeSubjectId || hashParts[2] !== activeChapterId || hashParts[3] !== activeTopicId) {
+          window.location.hash = `/course-view/${activeSubjectId}/${activeChapterId}/${activeTopicId}`;
+        }
+      }
     }
-  }, [activeView]);
+  }, [activeView, activeSubjectId, activeChapterId, activeTopicId]);
 
   // Define simple routing function based on state
   const renderActiveScreen = () => {

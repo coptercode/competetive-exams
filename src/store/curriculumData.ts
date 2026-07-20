@@ -1616,7 +1616,7 @@ export const chemistry11Data: Record<number, ChapterContent> = {
   },
 };
 
-// ==================== CLASS 12 ====================
+// ==================== CLASS 12 (CBSE / State Board) ====================
 
 export const maths12Data: Record<number, ChapterContent> = {
   1:

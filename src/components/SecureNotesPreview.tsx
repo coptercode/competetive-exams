@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useLmsStore } from "../store/index";
-import { ArrowLeft, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ShieldAlert, FileText, FileDown } from "lucide-react";
+import { getPdfLinkForTopic } from "../utils/pdfLinks";
+import ReactMarkdown from 'react-markdown';
 
 export const SecureNotesPreview: React.FC = () => {
   const {
@@ -54,219 +56,15 @@ export const SecureNotesPreview: React.FC = () => {
   }
 
   // Helper to resolve the correct PDF path for preview
-  const getTopicPdfInfo = (chapterTitle: string = "", topicPdfUrl?: string) => {
-    const title = (chapterTitle || "").toLowerCase();
-    const chId = activeChapter?.id || "";
-    const subId = activeSubject?.id || "";
-    const clId = activeClass?.id || "";
-
-    const isCl9 = clId === "class-9" || activeClass?.title === "Class 9";
-    const isCl10 = clId === "class-10" || activeClass?.title === "Class 10";
-    const isCl11 = clId === "class-11" || activeClass?.title === "Class 11";
-    const isCl12 = clId === "class-12" || activeClass?.title === "Class 12";
-
-    const sTitle = activeSubject?.title || "";
-
-    // Class 9 Maths chapters
-    if (isCl9 && (subId === "maths-9" || sTitle === "Mathematics")) {
-      if (title.includes("set language")) {
-        return { url: "/Unit_1_Set_Language_Notes.pdf", name: "Unit_1_Set_Language_Notes.pdf" };
-      }
-      if (title.includes("real numbers")) {
-        return { url: "/Unit_2_Real_Numbers_Notes.pdf", name: "Unit_2_Real_Numbers_Notes.pdf" };
-      }
-      if (title.includes("algebra")) {
-        return { url: "/Unit_3_Algebra_Notes.pdf", name: "Unit_3_Algebra_Notes.pdf" };
-      }
-      if (title.includes("coordinate geometry")) {
-        return { url: "/Unit_5_Coordinate_Geometry_Notes.pdf", name: "Unit_5_Coordinate_Geometry_Notes.pdf" };
-      }
-      if (title.includes("geometry")) {
-        return { url: "/Unit_4_Geometry_Notes.pdf", name: "Unit_4_Geometry_Notes.pdf" };
-      }
-      if (title.includes("trigonometry")) {
-        return { url: "/Unit_6_Trigonometry_Notes.pdf", name: "Unit_6_Trigonometry_Notes.pdf" };
-      }
-      if (title.includes("mensuration")) {
-        return { url: "/Unit_7_Mensuration_Notes.pdf", name: "Unit_7_Mensuration_Notes.pdf" };
-      }
-      if (title.includes("statistics")) {
-        return { url: "/Unit_8_Statistics_Notes.pdf", name: "Unit_8_Statistics_Notes.pdf" };
-      }
-      if (title.includes("probability")) {
-        return { url: "/Unit_9_Probability_Notes.pdf", name: "Unit_9_Probability_Notes.pdf" };
-      }
+  const getTopicPdfInfo = () => {
+    if (activeTopic?.pdfUrl && !activeTopic.pdfUrl.includes("dummy.pdf")) {
+      return { url: activeTopic.pdfUrl, name: `${activeTopic.title} Notes` };
     }
-
-    // Class 9 Science topics
-    if (isCl9 && (subId === "science-9" || sTitle === "Science")) {
-      const tId = activeTopic?.id || "";
-      const tTitle = (activeTopic?.title || "").toLowerCase();
-      
-      if (tId.includes("sci-ph-t1") || tTitle.includes("measurement")) {
-        return { url: "/Science_Physics_Measurement_Notes.pdf", name: "Science_Physics_Measurement_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t2") || tTitle.includes("motion")) {
-        return { url: "/Science_Physics_Motion_Notes.pdf", name: "Science_Physics_Motion_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t3") || tTitle.includes("force")) {
-        return { url: "/Science_Physics_Force_Notes.pdf", name: "Science_Physics_Force_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t4") || tTitle.includes("gravitation")) {
-        return { url: "/Science_Physics_Gravitation_Notes.pdf", name: "Science_Physics_Gravitation_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t5") || tTitle.includes("work")) {
-        return { url: "/Science_Physics_Work_Power_Energy_Notes.pdf", name: "Science_Physics_Work_Power_Energy_Notes.pdf" };
-      }
-      if (tId.includes("sci-ph-t6") || tTitle.includes("sound")) {
-        return { url: "/Science_Physics_Sound_Notes.pdf", name: "Science_Physics_Sound_Notes.pdf" };
-      }
-
-      if (tId.includes("sci-ch-t1") || tTitle.includes("matter")) {
-        return { url: "/Science_Chemistry_Matter_Notes.pdf", name: "Science_Chemistry_Matter_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t2") || tTitle.includes("atoms")) {
-        return { url: "/Science_Chemistry_Atoms_Molecules_Notes.pdf", name: "Science_Chemistry_Atoms_Molecules_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t3") || tTitle.includes("structure")) {
-        return { url: "/Science_Chemistry_Structure_Atom_Notes.pdf", name: "Science_Chemistry_Structure_Atom_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t4") || tTitle.includes("periodic")) {
-        return { url: "/Science_Chemistry_Periodic_Classification_Notes.pdf", name: "Science_Chemistry_Periodic_Classification_Notes.pdf" };
-      }
-      if (tId.includes("sci-ch-t5") || tTitle.includes("bonding")) {
-        return { url: "/Science_Chemistry_Chemical_Bonding_Notes.pdf", name: "Science_Chemistry_Chemical_Bonding_Notes.pdf" };
-      }
-
-      if (tId.includes("sci-bi-t1") || tTitle.includes("cell")) {
-        return { url: "/Science_Biology_The_Cell_Notes.pdf", name: "Science_Biology_The_Cell_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t2") || tTitle.includes("tissues")) {
-        return { url: "/Science_Biology_Tissues_Notes.pdf", name: "Science_Biology_Tissues_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t3") || tTitle.includes("diversity")) {
-        return { url: "/Science_Biology_Diversity_Notes.pdf", name: "Science_Biology_Diversity_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t4") || tTitle.includes("ill") || tTitle.includes("health")) {
-        return { url: "/Science_Biology_Why_Do_We_Fall_Ill_Notes.pdf", name: "Science_Biology_Why_Do_We_Fall_Ill_Notes.pdf" };
-      }
-      if (tId.includes("sci-bi-t5") || tTitle.includes("natural")) {
-        return { url: "/Science_Biology_Natural_Resources_Notes.pdf", name: "Science_Biology_Natural_Resources_Notes.pdf" };
-      }
-
-      if (title.includes("physics")) {
-        return { url: "/Science_Ch1_Physics_Notes.pdf", name: "Science_Ch1_Physics_Notes.pdf" };
-      }
-      if (title.includes("chemistry")) {
-        return { url: "/Science_Ch2_Chemistry_Notes.pdf", name: "Science_Ch2_Chemistry_Notes.pdf" };
-      }
-      if (title.includes("biology")) {
-        return { url: "/Science_Ch3_Biology_Notes.pdf", name: "Science_Ch3_Biology_Notes.pdf" };
-      }
+    const drivePdfUrl = getPdfLinkForTopic(activeTopic?.title);
+    if (drivePdfUrl) {
+      return { url: drivePdfUrl, name: `${activeTopic?.title} Notes` };
     }
-
-    // Class 10 Maths
-    if (isCl10 && (subId === "maths-10" || sTitle === "Mathematics")) {
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class10_Maths_Ch${num}_Notes.pdf`, name: `Class10_Maths_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 10 Science
-    if (isCl10 && (subId === "science-10" || sTitle === "Science")) {
-      if (chId === "sci10-ch1" || title.includes("physics")) return { url: "/Class10_Science_Physics_Notes.pdf", name: "Class10_Science_Physics_Notes.pdf" };
-      if (chId === "sci10-ch2" || title.includes("chemistry")) return { url: "/Class10_Science_Chemistry_Notes.pdf", name: "Class10_Science_Chemistry_Notes.pdf" };
-      if (chId === "sci10-ch3" || title.includes("biology")) return { url: "/Class10_Science_Biology_Notes.pdf", name: "Class10_Science_Biology_Notes.pdf" };
-      if (chId === "sci10-ch4" || title.includes("computer science") || title.includes("compsci")) return { url: "/Class10_Science_CompSci_Notes.pdf", name: "Class10_Science_CompSci_Notes.pdf" };
-    }
-
-    // Class 11 Maths
-    if (isCl11 && (subId.startsWith("maths-11") || sTitle.startsWith("Mathematics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class11_Maths_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class11_Maths_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 11 Physics
-    if (isCl11 && (subId.startsWith("physics-11") || sTitle.startsWith("Physics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class11_Physics_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class11_Physics_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 11 Chemistry
-    if (isCl11 && (subId.startsWith("chemistry-11") || sTitle.startsWith("Chemistry"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class11_Chemistry_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class11_Chemistry_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 12 Maths
-    if (isCl12 && (subId.startsWith("maths-12") || sTitle.startsWith("Mathematics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class12_Maths_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class12_Maths_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 12 Physics
-    if (isCl12 && (subId.startsWith("physics-12") || sTitle.startsWith("Physics"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class12_Physics_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class12_Physics_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    // Class 12 Chemistry
-    if (isCl12 && (subId.startsWith("chemistry-12") || sTitle.startsWith("Chemistry"))) {
-      const vol = (subId.includes("v1") || sTitle.includes("Volume 1")) ? "1" : "2";
-      let num = "";
-      const idMatch = chId.match(/ch(\d+)/i);
-      const titleMatch = chapterTitle.match(/(?:Chapter|Unit)\s+(\d+)/i);
-      if (idMatch) num = idMatch[1];
-      else if (titleMatch) num = titleMatch[1];
-      if (num) {
-        return { url: `/Class12_Chemistry_Vol${vol}_Ch${num}_Notes.pdf`, name: `Class12_Chemistry_Vol${vol}_Ch${num}_Notes.pdf` };
-      }
-    }
-
-    return {
-      url: topicPdfUrl || "/adjoint_inverse_rank_notes.pdf",
-      name: topicPdfUrl ? topicPdfUrl.substring(topicPdfUrl.lastIndexOf("/") + 1) : "adjoint_inverse_rank_notes.pdf"
-    };
+    return null;
   };
 
   // Read PDF from query parameter if redirected from direct access
@@ -288,10 +86,30 @@ export const SecureNotesPreview: React.FC = () => {
   };
 
   const pdfQueryUrl = getPdfUrlFromQuery();
-  const pdfInfo = getTopicPdfInfo(activeChapter.title, activeTopic.pdfUrl);
+  const pdfInfo = getTopicPdfInfo();
 
-  const displayPdfUrl = pdfQueryUrl || pdfInfo.url;
-  const displayPdfName = pdfQueryUrl ? displayPdfUrl.substring(displayPdfUrl.lastIndexOf("/") + 1) : pdfInfo.name;
+  const displayPdfUrl = pdfQueryUrl || pdfInfo?.url;
+  const displayPdfName = pdfQueryUrl 
+    ? pdfQueryUrl.substring(pdfQueryUrl.lastIndexOf("/") + 1) 
+    : pdfInfo?.name || "No Notes Available";
+
+  const [mdContent, setMdContent] = React.useState<string | null>(null);
+  const [mdError, setMdError] = React.useState<boolean>(false);
+
+  const isMarkdown = displayPdfUrl?.toLowerCase().endsWith(".md");
+
+  useEffect(() => {
+    if (isMarkdown && displayPdfUrl) {
+      setMdError(false);
+      fetch(displayPdfUrl)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load markdown");
+          return res.text();
+        })
+        .then((text) => setMdContent(text))
+        .catch(() => setMdError(true));
+    }
+  }, [displayPdfUrl, isMarkdown]);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-slate-950 text-white select-none relative overflow-hidden" onContextMenu={(e) => e.preventDefault()}>
@@ -332,14 +150,43 @@ export const SecureNotesPreview: React.FC = () => {
         </div>
       </div>
 
-      {/* Content Viewport */}
-      <div className="flex-1 relative w-full h-[calc(100vh-68px)] overflow-hidden bg-slate-950">
-        {/* Secure PDF embed */}
-        <iframe
-          src={`${displayPdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
-          className="w-full h-full border-0"
-          title="Notes Fullscreen Preview"
-        />
+      {/* PDF or Markdown View */}
+      <div className="flex-1 w-full bg-slate-900/50 p-6 relative overflow-y-auto">
+        <div className="w-full h-full max-w-6xl mx-auto bg-slate-800 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+          {displayPdfUrl ? (
+            isMarkdown ? (
+              <div className="w-full h-full p-8 overflow-y-auto bg-slate-800 custom-scrollbar">
+                {mdError ? (
+                  <div className="flex flex-col items-center justify-center w-full h-full text-slate-400">
+                    <FileText className="w-12 h-12 mb-4 opacity-50" />
+                    <h3 className="text-xl font-bold text-white mb-2">Error Loading Notes</h3>
+                    <p>Could not load the markdown notes. Please try again.</p>
+                  </div>
+                ) : mdContent ? (
+                  <article className="prose prose-invert max-w-none prose-headings:text-brand-royal-300 prose-a:text-brand-royal-300 hover:prose-a:text-brand-royal-400 prose-strong:text-white prose-code:text-amber-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-white/10">
+                    <ReactMarkdown>{mdContent}</ReactMarkdown>
+                  </article>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-royal"></div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <iframe
+                src={`${displayPdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
+                className="w-full h-full border-0"
+                title="Secure PDF Viewer"
+              />
+            )
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full h-full text-slate-400">
+              <FileText className="w-12 h-12 mb-4 opacity-50" />
+              <h3 className="text-xl font-bold text-white mb-2">No Notes Available</h3>
+              <p>Study notes for this topic have not been added yet.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

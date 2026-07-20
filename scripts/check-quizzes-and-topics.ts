@@ -1,21 +1,21 @@
-import { initialBoards } from '../prisma/tnsb-data';
+import { initialBoards } from '../prisma/boards-data';
 
 function main() {
   console.log("=== SUBJECT / CHAPTER / TOPIC ANALYSIS ===");
   
   const subjectsMap: Record<string, { chaptersCount: number, topicsCount: number, topics: string[] }> = {};
   
-  initialBoards.forEach(board => {
-    board.classes.forEach(cls => {
-      cls.subjects.forEach(sub => {
+  initialBoards.forEach((board: any) => {
+    board.classes.forEach((cls: any) => {
+      cls.subjects.forEach((sub: any) => {
         const key = `${cls.title} - ${sub.title} (${sub.id})`;
         if (!subjectsMap[key]) {
           subjectsMap[key] = { chaptersCount: 0, topicsCount: 0, topics: [] };
         }
         
-        sub.chapters.forEach(chap => {
+        sub.chapters.forEach((chap: any) => {
           subjectsMap[key].chaptersCount++;
-          chap.topics.forEach(top => {
+          chap.topics.forEach((top: any) => {
             subjectsMap[key].topicsCount++;
             subjectsMap[key].topics.push(`Chap: ${chap.title} | Top: ${top.title} (${top.id})`);
           });

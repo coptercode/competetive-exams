@@ -48,15 +48,30 @@ const videoUpload = multer({
 // ─────────────────────────────────────────────
 router.get('/upload/structure', requireAuth, async (_req, res) => {
   try {
-    const boards = await prisma.board.findMany({
+    const dbBoards = await prisma.board.findMany({
       include: {
         classes: {
-          include: { subjects: { select: { id: true, name: true } } },
+          include: { subjects: { select: { id: true, name: true, code: true } } },
           orderBy: { sortOrder: 'asc' },
         },
       },
       orderBy: { name: 'asc' },
     });
+
+    const boards = dbBoards.map(b => ({
+      ...b,
+      title: b.name,
+      classes: b.classes.map(c => ({
+        ...c,
+        title: c.name,
+        subjects: c.subjects.map(s => ({
+          ...s,
+          title: s.name,
+          color: s.code // Use code as color if needed, or leave undefined
+        }))
+      }))
+    }));
+
     res.json({ boards });
   } catch (err) {
     console.error('Failed to fetch upload structure:', err);
@@ -116,13 +131,17 @@ router.post(
       const uploadingUser = await prisma.user.findUnique({ where: { id: req.auth!.userId } });
       const professorName = uploadingUser ? `${uploadingUser.firstName} ${uploadingUser.lastName}` : 'Professor';
 
+      const existingNotesCount = await prisma.courseNote.count({
+        where: { topicId: topic.id }
+      });
+
       // Save note record in DB
       const note = await prisma.courseNote.create({
         data: {
           title,
           fileUrl,
           topicId: topic.id,
-          sortOrder: 999,
+          sortOrder: existingNotesCount + 1,
           isRequiredForComplete: false,
           uploadedByUserId: req.auth!.userId,
           uploadedByName: professorName,
@@ -325,9 +344,33 @@ router.get('/upload/notes', requireAuth, async (req, res) => {
 //  GET /upload/notes/all
 //  List ALL notes across every subject (for student notes gallery)
 // ─────────────────────────────────────────────
-router.get('/upload/notes/all', requireAuth, async (_req, res) => {
+router.get('/upload/notes/all', requireAuth, async (req, res) => {
   try {
+    let whereClause: any = {};
+    if (req.auth?.role === 'STUDENT') {
+      const studentProfile = await prisma.student.findUnique({
+        where: { id: req.auth.userId }
+      });
+      if (studentProfile) {
+        whereClause = {
+          topic: {
+            chapter: {
+              unit: {
+                subject: {
+                  classId: studentProfile.classId,
+                  class: {
+                    boardId: studentProfile.boardId
+                  }
+                }
+              }
+            }
+          }
+        };
+      }
+    }
+
     const notes = await prisma.courseNote.findMany({
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
       include: {
         topic: {
@@ -393,7 +436,7 @@ router.get('/upload/assignments', requireAuth, async (req, res) => {
 //  Admin updates the deadline (also controls locking)
 // ─────────────────────────────────────────────
 router.patch('/upload/assignment/:id/deadline', requireAuth, requireAdminOrTeacher, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { deadline } = req.body as { deadline?: string };
   if (!deadline) return res.status(400).json({ error: 'deadline is required' });
 
@@ -414,7 +457,7 @@ router.patch('/upload/assignment/:id/deadline', requireAuth, requireAdminOrTeach
 //  DELETE /upload/assignment/:id
 // ─────────────────────────────────────────────
 router.delete('/upload/assignment/:id', requireAuth, requireAdminOrTeacher, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   try {
     await prisma.assignment.delete({ where: { id } });
     res.json({ success: true });
@@ -427,7 +470,7 @@ router.delete('/upload/assignment/:id', requireAuth, requireAdminOrTeacher, asyn
 //  DELETE /upload/note/:id
 // ─────────────────────────────────────────────
 router.delete('/upload/note/:id', requireAuth, requireAdminOrTeacher, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   try {
     await prisma.courseNote.delete({ where: { id } });
     res.json({ success: true });
@@ -504,6 +547,10 @@ router.post(
       // Duration parsing (input in minutes, convert to seconds)
       const durationSeconds = Math.max(10, Math.round(parseFloat(duration || '10') * 60));
 
+      const existingVideosCount = await prisma.courseVideo.count({
+        where: { topicId: topic.id }
+      });
+
       // Save video record in DB (DRM fields populated after processing for protected uploads)
       const video = await prisma.courseVideo.create({
         data: {
@@ -511,7 +558,7 @@ router.post(
           videoUrl: fileUrl,
           duration: durationSeconds,
           topicId: topic.id,
-          sortOrder: 999,
+          sortOrder: existingVideosCount + 1,
           drmEnabled: enableDrm ? true : undefined,
         },
       });
@@ -583,7 +630,7 @@ router.get('/upload/videos', requireAuth, async (req, res) => {
 //  DELETE /upload/video/:id
 // ─────────────────────────────────────────────
 router.delete('/upload/video/:id', requireAuth, requireAdminOrTeacher, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   try {
     await prisma.courseVideo.delete({ where: { id } });
     res.json({ success: true });

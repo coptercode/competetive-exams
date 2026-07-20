@@ -148,7 +148,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
       }
       return;
     } catch (err: any) {
-      setError("Invalid academic email or password. Please try again.");
+      console.error("Login Error:", err);
+      if (err.message && err.message !== "Login failed") {
+        setError(err.message);
+      } else {
+        setError("Invalid academic email or password. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -219,52 +224,48 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
 
         <div className="text-center mb-8 mt-2">
           {/* Portal icon */}
-          <div className={`w-12 h-12 rounded-xl ${accentBg} bg-opacity-10 border ${accentBorder} border-opacity-20 flex items-center justify-center mx-auto mb-4`}>
-            {isEducator ? (
-              <ShieldCheck className={`w-6 h-6 ${accentText}`} />
-            ) : (
-              <User className={`w-6 h-6 ${accentText}`} />
-            )}
+          <div className="w-12 h-12 bg-blue-50/50 border border-blue-200 flex items-center justify-center mx-auto mb-6">
+            <User className="w-6 h-6 text-blue-600" />
           </div>
-          <h2 className="text-2xl font-extrabold font-display text-slate-900 tracking-tight">
+          <h2 className="text-[28px] font-extrabold font-display text-slate-900 tracking-tight">
             {pageHeading}
           </h2>
           {pageSubtitle && (
-            <p className="text-xs text-slate-500 mt-1">{pageSubtitle}</p>
+            <p className="text-sm text-slate-500 mt-2">{pageSubtitle}</p>
           )}
         </div>
 
         {/* Role Select Tabs — rendered based on mode */}
         {mode === "all" && (
-          <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 border border-slate-300 rounded-xl mb-6">
+          <div className="flex bg-slate-50 border border-slate-200 mb-8">
             <button
               type="button"
               onClick={() => { setRole("student"); setError(""); }}
-              className={`py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
-                role === "student" ? "bg-brand-royal text-white shadow-md" : "text-slate-600 hover:text-slate-900"
+              className={`flex-1 py-3 text-sm flex items-center justify-center gap-2 transition-all border-r border-slate-200 ${
+                role === "student" ? "bg-[#2563eb] text-white font-bold" : "text-slate-600 font-medium hover:bg-slate-100"
               }`}
             >
-              <User className="w-3.5 h-3.5" />
+              <User className="w-4 h-4" />
               <span>Student</span>
             </button>
             <button
               type="button"
               onClick={() => { setRole("teacher"); setError(""); }}
-              className={`py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
-                role === "teacher" ? "bg-brand-royal text-white shadow-md" : "text-slate-600 hover:text-slate-900"
+              className={`flex-1 py-3 text-sm flex items-center justify-center gap-2 transition-all border-r border-slate-200 ${
+                role === "teacher" ? "bg-[#2563eb] text-white font-bold" : "text-slate-600 font-medium hover:bg-slate-100"
               }`}
             >
-              <GraduationCap className="w-3.5 h-3.5" />
+              <GraduationCap className="w-4 h-4" />
               <span>Teacher</span>
             </button>
             <button
               type="button"
               onClick={() => { setRole("admin"); setError(""); }}
-              className={`py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
-                role === "admin" ? "bg-brand-royal text-white shadow-md" : "text-slate-600 hover:text-slate-900"
+              className={`flex-1 py-3 text-sm flex items-center justify-center gap-2 transition-all ${
+                role === "admin" ? "bg-[#2563eb] text-white font-bold" : "text-slate-600 font-medium hover:bg-slate-100"
               }`}
             >
-              <Lock className="w-3.5 h-3.5" />
+              <Lock className="w-4 h-4" />
               <span>Admin</span>
             </button>
           </div>
@@ -310,14 +311,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4 text-left" autoComplete="off">
+        <form onSubmit={handleLogin} className="space-y-5 text-left" autoComplete="off">
           {/* Identifier (Username or Email) */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
               {role === "student" ? "Gmail Address" : "Academic Email"}
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500" />
+              <Mail className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-500" />
               <input
                 type="email"
                 name="login-email"
@@ -330,13 +331,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
                   setUsernameOrEmail(e.target.value);
                   setError("");
                 }}
-                className="premium-input pl-10 text-xs sm:text-sm"
+                className="w-full pl-11 pr-4 py-3.5 border-2 border-blue-200 bg-white text-slate-800 text-[15px] focus:outline-none focus:border-blue-600 transition-colors placeholder:text-slate-400"
                 required
               />
             </div>
           </div>
-
-
 
           {/* Password */}
           <div className="space-y-1.5">
@@ -347,13 +346,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
               <button
                 type="button"
                 onClick={() => setView('forgot-password')}
-                className="text-[10px] text-brand-violet hover:underline font-semibold"
+                className="text-xs text-[#8b5cf6] hover:underline font-semibold"
               >
                 Forget password
               </button>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500" />
+              <Lock className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-500" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••••••"
@@ -362,33 +361,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
                   setPassword(e.target.value);
                   setError("");
                 }}
-                className="premium-input pl-10 pr-10 text-xs sm:text-sm"
+                className="w-full pl-11 pr-11 py-3.5 border border-slate-300 bg-white text-slate-800 text-[15px] focus:outline-none focus:border-blue-600 transition-colors placeholder:text-slate-400"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3.5 text-slate-500 hover:text-slate-800"
+                className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-800"
               >
                 {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
+                  <EyeOff className="w-5 h-5" />
                 ) : (
-                  <Eye className="w-4 h-4" />
+                  <Eye className="w-5 h-5" />
                 )}
               </button>
             </div>
           </div>
 
           {/* Remember me */}
-          <div className="flex items-center">
+          <div className="flex items-center pt-2">
             <input
               id="remember"
               type="checkbox"
-              className="w-4 h-4 bg-white border-slate-300 rounded focus:ring-brand-royal text-brand-royal"
+              className="w-4 h-4 bg-white border-slate-300 rounded-sm focus:ring-[#2563eb] text-[#2563eb]"
             />
             <label
               htmlFor="remember"
-              className="ml-2 text-xs text-slate-600 select-none"
+              className="ml-2 text-[13px] text-slate-500 select-none"
             >
               Remember this device for 30 days
             </label>
@@ -396,14 +395,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
 
           <button
             type="submit"
-            className={`w-full py-3.5 text-xs font-bold rounded-xl text-white flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${
+            className={`w-full mt-2 py-4 text-[15px] font-bold text-white flex items-center justify-center gap-2 transition-colors ${
               isEducator
                 ? "bg-emerald-600 hover:bg-emerald-700"
-                : "bg-brand-royal hover:bg-blue-650"
+                : "bg-[#2563eb] hover:bg-blue-700"
             }`}
           >
             <span>{loading ? "Signing in..." : "Authenticate Securely"}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-5 h-5" />
           </button>
         </form>
 

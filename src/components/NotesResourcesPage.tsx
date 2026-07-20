@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLmsStore } from "../store/index";
-import { BookOpen, ArrowRight, ArrowLeft, Search, Sparkles } from "lucide-react";
+import { BookOpen, ArrowRight, ArrowLeft, Search, Sparkles, ChevronRight, FolderOpen } from "lucide-react";
+import { getBoardSyllabusPhrase } from "../utils/boardUtils";
 
 const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
   const titleLower = (subjectTitle || "").toLowerCase();
@@ -227,7 +228,7 @@ export const NotesResourcesPage: React.FC = () => {
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             {selectedSubjectFilter === "all"
-              ? "Comprehensive Tamil Nadu State Board study guides, notes, and interactive learning modules."
+              ? `Comprehensive ${getBoardSyllabusPhrase(activeBoard)} study guides, notes, and interactive learning modules.`
               : `Study guides, formulas, and revision materials for ${selectedSubject?.title}.`}
           </p>
         </div>
@@ -249,6 +250,26 @@ export const NotesResourcesPage: React.FC = () => {
             className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-xs focus:outline-none focus:border-brand-royal transition-colors"
           />
         </div>
+      </div>
+      
+      {/* Teacher Uploaded Notes CTA */}
+      <div className="bg-gradient-to-r from-brand-royal/10 to-brand-royal/5 border border-brand-royal/20 dark:border-brand-royal/15 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-brand-royal flex items-center justify-center shadow-lg shadow-brand-royal/20">
+            <BookOpen className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white">Teacher Uploaded Notes</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400">View additional study materials & PDFs shared directly by your professors.</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setView("teacher-uploaded-notes")}
+          className="whitespace-nowrap px-4 py-2 bg-brand-royal text-white rounded-lg text-xs font-bold hover:bg-brand-royal/90 shadow-md transition-all flex items-center gap-2"
+        >
+          View Uploads
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
       </div>
 
       <div className="space-y-6">

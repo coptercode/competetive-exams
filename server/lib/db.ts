@@ -8,11 +8,12 @@ const pgDir = path.join(root, '.pgdata');
 
 async function canConnect(url: string): Promise<boolean> {
   try {
-    const client = new pg.Client({ connectionString: url });
+    const client = new pg.Client({ connectionString: url, ssl: url.includes('supabase.com') ? { rejectUnauthorized: false } : undefined });
     await client.connect();
     await client.end();
     return true;
-  } catch {
+  } catch (err: any) {
+    console.warn('canConnect failed:', err.message);
     return false;
   }
 }
@@ -42,6 +43,11 @@ export async function startDatabase() {
   
   if (await canConnect(databaseUrl)) {
     console.log('Database already reachable at DATABASE_URL.');
+    return;
+  }
+
+  if (databaseUrl.includes('supabase.com') || databaseUrl.includes('rds.amazonaws.com') || databaseUrl.includes('aws')) {
+    console.warn('Remote database is unreachable, but skipping local embedded-postgres startup.');
     return;
   }
 

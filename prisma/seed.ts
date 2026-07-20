@@ -1,6 +1,6 @@
 import { PrismaClient, UserRole, QuestionType, LiveClassStatus, AttendanceStatus, NotificationType, BillingPeriod, SubscriptionStatus, PaymentStatus, PaymentGateway, SubmissionStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { initialBoards } from './tnsb-data';
+import { initialBoards } from './boards-data';
 
 const prisma = new PrismaClient();
 
@@ -164,184 +164,159 @@ async function main() {
   }
 
   // ==========================================
-  // 4. DYNAMIC ACADEMIC HIERARCHY (TNSB ONLY)
+  // 4. DYNAMIC ACADEMIC HIERARCHY
   // ==========================================
-  console.log('Seeding TNSB Academic Hierarchy...');
-
-  let boardTNSB: any;
-  let class12: any;
-  let class9: any;
-  let maths: any;
-  let physics: any;
-  let chemistry: any;
-  let chemistry9: any; // We map this to class 9 science subject
-
-  let topicMath1: any;
-  let topicMath2: any;
-  let topicPhys1: any;
-  let topicPhys2: any;
-  let topicChem1: any;
-  let topicChem2: any;
-  let topicMatter1: any;
-  let topicMatter2: any;
-
-  for (const boardData of initialBoards) {
-    const dbBoard = await prisma.board.upsert({
-      where: { code: boardData.id.toUpperCase() },
-      update: {},
-      create: { name: boardData.title, code: boardData.id.toUpperCase() },
-    });
-
-    if (boardData.id === 'tnsb') {
-      boardTNSB = dbBoard;
-    }
-
-    for (let cIndex = 0; cIndex < boardData.classes.length; cIndex++) {
-      const classData = boardData.classes[cIndex];
-      const sortOrder = classData.id === 'class-12' ? 12 : classData.id === 'class-11' ? 11 : classData.id === 'class-10' ? 10 : 9;
-      const dbClass = await prisma.class.upsert({
-        where: { boardId_name: { boardId: dbBoard.id, name: classData.title } },
+  console.log('Seeding academic hierarchy for all boards...');
+  try {
+    for (const boardData of initialBoards) {
+      const dbBoard = await prisma.board.upsert({
+        where: { code: boardData.id.toUpperCase() },
         update: {},
-        create: { name: classData.title, sortOrder, boardId: dbBoard.id },
+        create: { name: boardData.title, code: boardData.id.toUpperCase() },
       });
 
-      if (boardData.id === 'tnsb') {
-        if (classData.id === 'class-12') class12 = dbClass;
-        if (classData.id === 'class-9') class9 = dbClass;
-      }
-
-      for (let sIndex = 0; sIndex < classData.subjects.length; sIndex++) {
-        const subjectData = classData.subjects[sIndex];
-        const dbSubject = await prisma.subject.upsert({
-          where: { classId_name: { classId: dbClass.id, name: subjectData.title } },
-          update: {},
+      for (let classIndex = 0; classIndex < boardData.classes.length; classIndex++) {
+        const classData = boardData.classes[classIndex];
+        const dbClass = await prisma.class.upsert({
+          where: { boardId_name: { boardId: dbBoard.id, name: classData.title } },
+          update: { name: classData.title },
           create: {
-            name: subjectData.title,
-            code: subjectData.id.toUpperCase(),
-            sortOrder: sIndex + 1,
-            classId: dbClass.id
-          }
+            name: classData.title,
+            boardId: dbBoard.id,
+            sortOrder: classIndex + 1,
+          },
         });
 
-        if (boardData.id === 'tnsb') {
-          if (classData.id === 'class-12') {
-            if (subjectData.id === 'maths-12-v1') maths = dbSubject;
-            if (subjectData.id === 'physics-12-v1') physics = dbSubject;
-            if (subjectData.id === 'chemistry-12-v1') chemistry = dbSubject;
-          }
-          if (classData.id === 'class-9') {
-            if (subjectData.id === 'science-9') chemistry9 = dbSubject;
-          }
-        }
-
-        // Create a default unit:
-        const dbUnit = await prisma.unit.upsert({
-          where: { subjectId_name: { subjectId: dbSubject.id, name: 'Core Syllabus' } },
-          update: {},
-          create: {
-            name: 'Core Syllabus',
-            sortOrder: 1,
-            subjectId: dbSubject.id
-          }
-        });
-
-        for (let chapIndex = 0; chapIndex < subjectData.chapters.length; chapIndex++) {
-          const chapterData = subjectData.chapters[chapIndex];
-          const dbChapter = await prisma.chapter.upsert({
-            where: { unitId_name: { unitId: dbUnit.id, name: chapterData.title } },
-            update: {},
+        for (let subjectIndex = 0; subjectIndex < classData.subjects.length; subjectIndex++) {
+          const subjectData = classData.subjects[subjectIndex];
+          const dbSubject = await prisma.subject.upsert({
+            where: { classId_name: { classId: dbClass.id, name: subjectData.title } },
+            update: {
+              name: subjectData.title,
+            },
             create: {
-              name: chapterData.title,
-              sortOrder: chapIndex + 1,
-              unitId: dbUnit.id
-            }
+              name: subjectData.title,
+              code: subjectData.id.toUpperCase(),
+              classId: dbClass.id,
+              sortOrder: subjectIndex + 1,
+            },
           });
 
-          for (let topIndex = 0; topIndex < chapterData.topics.length; topIndex++) {
-            const topicData = chapterData.topics[topIndex];
-            const dbTopic = await prisma.topic.upsert({
-              where: { chapterId_name: { chapterId: dbChapter.id, name: topicData.title } },
-              update: {},
+          // Add a default Unit to bridge the gap if units are not provided in data
+          const dbUnit = await prisma.unit.upsert({
+            where: { subjectId_name: { subjectId: dbSubject.id, name: 'Core Syllabus' } },
+            update: { name: 'Core Syllabus' },
+            create: {
+              name: 'Core Syllabus',
+              subjectId: dbSubject.id,
+              sortOrder: 1,
+            },
+          });
+
+          for (let chapterIndex = 0; chapterIndex < subjectData.chapters.length; chapterIndex++) {
+            const chapterData = subjectData.chapters[chapterIndex];
+            const dbChapter = await prisma.chapter.upsert({
+              where: { unitId_name: { unitId: dbUnit.id, name: chapterData.title } },
+              update: { name: chapterData.title },
               create: {
-                name: topicData.title,
-                sortOrder: topIndex + 1,
-                chapterId: dbChapter.id,
-                requireWatchPercent: 90.0,
-                requireQuizPass: true
-              }
+                name: chapterData.title,
+                unitId: dbUnit.id,
+                sortOrder: chapterIndex + 1,
+              },
             });
 
-            if ((topicData as any).videoUrl && ((topicData as any).videoUrl.includes('youtube.com') || (topicData as any).videoUrl.includes('youtu.be'))) {
-              const videoCount = await prisma.courseVideo.count({
-                where: { topicId: dbTopic.id }
+            for (let topIndex = 0; topIndex < chapterData.topics.length; topIndex++) {
+              const topicData = chapterData.topics[topIndex];
+              
+              // Skip dummy topics that share the exact same title as the chapter itself
+              if (topicData.title === chapterData.title) {
+                continue;
+              }
+
+              let dbTopic;
+              try {
+                dbTopic = await prisma.topic.upsert({
+                  where: { chapterId_name: { chapterId: dbChapter.id, name: topicData.title } },
+                  update: {
+                    sortOrder: topIndex + 1,
+                  },
+                  create: {
+                    name: topicData.title,
+                    chapterId: dbChapter.id,
+                    sortOrder: topIndex + 1,
+                    requireWatchPercent: 90.0,
+                    requireQuizPass: true,
+                  },
+                });
+              } catch (err: any) {
+                console.error(`[SEED ERROR] Failed to upsert Topic: "${topicData.title}" in Chapter: "${chapterData.title}"`);
+                console.error(`Error details: ${err.message?.split('\n').pop()}`);
+                continue;
+              }
+
+              if (
+                (topicData as any).videoUrl &&
+                ((topicData as any).videoUrl.includes('youtube.com') ||
+                  (topicData as any).videoUrl.includes('youtu.be'))
+              ) {
+                const videoCount = await prisma.courseVideo.count({
+                  where: { topicId: dbTopic.id },
+                });
+                if (videoCount === 0) {
+                  await prisma.courseVideo.create({
+                    data: {
+                      title: `Video: ${dbTopic.name}`,
+                      videoUrl: (topicData as any).videoUrl,
+                      duration: 900,
+                      topicId: dbTopic.id,
+                      sortOrder: 1,
+                    },
+                  });
+                } else {
+                  const existingVideo = await prisma.courseVideo.findFirst({
+                    where: { topicId: dbTopic.id },
+                  });
+                  if (existingVideo) {
+                    await prisma.courseVideo.update({
+                      where: { id: existingVideo.id },
+                      data: {
+                        videoUrl: (topicData as any).videoUrl,
+                      },
+                    });
+                  }
+                }
+              }
+
+              // SEED DUMMY NOTES
+              const noteCount = await prisma.courseNote.count({
+                where: { topicId: dbTopic.id },
               });
-              if (videoCount === 0) {
-                await prisma.courseVideo.create({
+              if (noteCount === 0) {
+                await prisma.courseNote.create({
                   data: {
-                    title: `Video: ${dbTopic.name}`,
-                    videoUrl: (topicData as any).videoUrl,
-                    duration: 900,
+                    title: `Comprehensive Notes: ${dbTopic.name}`,
+                    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
                     topicId: dbTopic.id,
                     sortOrder: 1,
-                  }
+                    subjectTitle: subjectData.title,
+                  },
                 });
-              } else {
-                const existingVideo = await prisma.courseVideo.findFirst({
-                  where: { topicId: dbTopic.id }
-                });
-                if (existingVideo) {
-                  await prisma.courseVideo.update({
-                    where: { id: existingVideo.id },
-                    data: {
-                      videoUrl: (topicData as any).videoUrl
-                    }
-                  });
-                }
-              }
-            }
-
-            // Map standard topic variables for later courses/materials seeding
-            if (boardData.id === 'tnsb') {
-              if (classData.id === 'class-12') {
-                if (subjectData.id === 'maths-12-v1') {
-                  if (topicData.title.includes('Adjoint')) topicMath1 = dbTopic;
-                  if (topicData.title.includes('Rank')) topicMath2 = dbTopic;
-                }
-                if (subjectData.id === 'physics-12-v1') {
-                  if (topicData.title.includes('Coulomb')) topicPhys1 = dbTopic;
-                  if (topicData.title.includes('Electric Field')) topicPhys2 = dbTopic;
-                }
-                if (subjectData.id === 'chemistry-12-v1') {
-                  if (topicData.title.includes('Concentration')) topicChem1 = dbTopic;
-                  if (topicData.title.includes('Extraction')) topicChem2 = dbTopic;
-                }
-              }
-              if (classData.id === 'class-9') {
-                if (subjectData.id === 'science-9') {
-                  if (topicData.title.includes('Matter')) topicMatter1 = dbTopic;
-                  if (topicData.title.includes('Atomic')) topicMatter2 = dbTopic;
-                }
               }
             }
           }
         }
       }
     }
+  } catch (error: any) {
+    console.error(`\n[CRITICAL SEED ERROR] Failed during Academic Hierarchy seeding:`);
+    console.error(error.message);
+    console.log(`Skipping remainder of academic seed and proceeding to create Admin user...\n`);
   }
 
-  // Fallbacks in case titles mismatched slightly:
-  if (!topicMath1) topicMath1 = await prisma.topic.findFirst({ where: { chapter: { unit: { subjectId: maths.id } } } });
-  if (!topicMath2) topicMath2 = await prisma.topic.findFirst({ where: { chapter: { unit: { subjectId: maths.id } }, NOT: { id: topicMath1?.id } } });
-  if (!topicPhys1) topicPhys1 = await prisma.topic.findFirst({ where: { chapter: { unit: { subjectId: physics.id } } } });
-  if (!topicPhys2) topicPhys2 = await prisma.topic.findFirst({ where: { chapter: { unit: { subjectId: physics.id } }, NOT: { id: topicPhys1?.id } } });
-  if (!topicChem1) topicChem1 = await prisma.topic.findFirst({ where: { chapter: { unit: { subjectId: chemistry.id } } } });
-  if (!topicChem2) topicChem2 = await prisma.topic.findFirst({ where: { chapter: { unit: { subjectId: chemistry.id } }, NOT: { id: topicChem1?.id } } });
-  if (!topicMatter1) topicMatter1 = await prisma.topic.findFirst({ where: { name: { contains: 'Matter' }, chapter: { unit: { subjectId: chemistry9.id } } } });
-  if (!topicMatter2) topicMatter2 = await prisma.topic.findFirst({ where: { name: { contains: 'Atomic' }, chapter: { unit: { subjectId: chemistry9.id } } } });
-
-  const chapterMatrices = await prisma.chapter.findFirst({ where: { name: { contains: 'Matrices' }, unit: { subjectId: maths.id } } });
-  const chapterElectrostatics = await prisma.chapter.findFirst({ where: { name: { contains: 'Electrostatics' }, unit: { subjectId: physics.id } } });
-  const chapterMetallurgy = await prisma.chapter.findFirst({ where: { name: { contains: 'Metallurgy' }, unit: { subjectId: chemistry.id } } });
+  const topicForQuiz = await prisma.topic.findFirst();
+  if (!topicForQuiz) {
+    throw new Error('No topics were created during board seeding, cannot seed sample quiz.');
+  }
 
 
 
@@ -363,7 +338,7 @@ async function main() {
       firstName: 'Aarav',
       lastName: 'Sharma',
       role: UserRole.ADMIN,
-      phoneNumber: '9876543210',
+      phoneNumber: '9874563210',
     },
   });
 
@@ -391,7 +366,7 @@ async function main() {
     data: {
       title: 'Matrices Basics Assessment',
       description: 'Test your understanding of matrices and determinants properties.',
-      topicId: topicMath1.id,
+      topicId: topicForQuiz.id,
       passingScore: 80.0,
       maxAttempts: 3,
       timeLimitMinutes: 10,

@@ -11,6 +11,11 @@ export function subjectColor(code: string, index: number) {
   return SUBJECT_COLORS[(hash + index) % SUBJECT_COLORS.length];
 }
 
+const cleanLatex = (text: string) => {
+  if (!text) return text;
+  return text.replace(/\$([0-9]+)\^\{?\\circ\}?\$?/g, '$1°');
+};
+
 export function mapTopic(topic: {
   id: string;
   name: string;
@@ -29,8 +34,8 @@ export function mapTopic(topic: {
 
   return {
     id: topic.id,
-    title: topic.name,
-    content: `Study material for ${topic.name}.`,
+    title: cleanLatex(topic.name),
+    content: cleanLatex(`Study material for ${topic.name}.`),
     duration: firstVideo ? `${Math.round(firstVideo.duration / 60)} mins` : '15 mins',
     isCompleted: topic.studentProgress?.[0]?.isCompleted ?? false,
     pdfUrl: firstNote?.fileUrl || undefined,
@@ -62,6 +67,8 @@ export function mapSubject(
     name: string;
     code: string;
     units: Array<{
+      id: string;
+      name: string;
       chapters: Array<{
         id: string;
         name: string;
@@ -99,6 +106,8 @@ export function mapClassLevel(
       name: string;
       code: string;
       units: Array<{
+        id: string;
+        name: string;
         chapters: Array<{
           id: string;
           name: string;

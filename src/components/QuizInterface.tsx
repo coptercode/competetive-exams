@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { generateQuizForChapter } from "../utils/quizGenerator";
+import { getBoardSyllabusName, getBoardSyllabusPhrase } from "../utils/boardUtils";
 
 export const QuizInterface: React.FC = () => {
   const {
@@ -372,9 +373,7 @@ export const QuizInterface: React.FC = () => {
                     </h4>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-normal line-clamp-2">
                       Test your understanding of the concepts introduced in this
-                      chapter of the Class{" "}
-                      {selectedClassId.replace("class-", "")} Samacheer Kalvi
-                      syllabus.
+                      chapter of the Class {selectedClassId.replace("class-", "")} {getBoardSyllabusPhrase(activeBoard)}.
                     </p>
                   </div>
                   <div className="flex items-center justify-between border-t border-slate-200 dark:border-white/5 pt-4 mt-4">

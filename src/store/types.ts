@@ -92,6 +92,7 @@ export interface Bookmark {
   subjectTitle: string;
   note: string;
   timestamp: string;
+  profileId?: string;
 }
 
 export interface Notification {
@@ -215,6 +216,7 @@ export interface LMSStore {
   fetchNotifications: () => Promise<void>;
 
   bookmarks: Bookmark[];
+  notes: any[];
   addBookmark: (
     bookmark: Omit<Bookmark, "id" | "timestamp">,
     timestamp: string,
@@ -249,4 +251,6 @@ export interface LMSStore {
     subjectTitle: string,
     subjectColor: string,
   ) => void;
+
+  completedTopicIds: string[];
 }
