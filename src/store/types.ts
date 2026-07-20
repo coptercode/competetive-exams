@@ -217,6 +217,7 @@ export interface LMSStore {
 
   bookmarks: Bookmark[];
   notes: any[];
+  fetchNotes: () => Promise<void>;
   addBookmark: (
     bookmark: Omit<Bookmark, "id" | "timestamp">,
     timestamp: string,

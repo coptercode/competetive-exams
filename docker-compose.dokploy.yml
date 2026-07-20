@@ -1,0 +1,64 @@
+# Deployed by Dokploy as a "Docker Compose" application.
+# Postgres is NOT included here — this stack expects Dokploy's managed Database
+# resource; see DEPLOYMENT.md for why and how to wire DATABASE_URL/DIRECT_URL.
+#
+# Every ${VAR} below is read from the environment variables you set in Dokploy's
+# "Environment" tab for this application (Dokploy exposes them to compose the
+# same way a .env file next to this compose file would).
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Build-time only — baked into the frontend JS bundle by Vite, so this
+        # must be set in Dokploy's env BEFORE the first build, not after.
+        VITE_LIVEKIT_URL: ${VITE_LIVEKIT_URL:-}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      ENABLE_PUBLIC_AI_FALLBACK: ${ENABLE_PUBLIC_AI_FALLBACK:-false}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET:-lms-files}
+      MINIO_USE_SSL: "false"
+      LIVEKIT_URL: ${LIVEKIT_URL:-}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - minio
+    # Expose the app's domain/SSL binding from Dokploy's "Domains" tab instead of
+    # hardcoding Traefik labels here — point it at service "app", port 3000.
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    # Optional: if you want to browse the MinIO console from outside, add a
+    # second Dokploy domain pointed at service "minio", port 9001.
+
+volumes:
+  uploads_data:
+  minio_data:

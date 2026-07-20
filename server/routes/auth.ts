@@ -1,21 +1,45 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma.js';
 import { mapUserProfile } from '../lib/mappers.js';
-import { signToken, requireAuth, requireAdmin } from '../middleware/auth.js';
+import { signToken, requireAuth, requireAdmin, type AuthPayload } from '../middleware/auth.js';
 import { generateSecurePassword, sendCredentialsEmail, sendSubscriptionConfirmationEmail, sendOtpEmail } from '../lib/emailService.js';
+import { isProduction, getJwtSecret } from '../lib/env.js';
+import { authLimiter, otpLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
 
-// In-memory store for OTPs (email -> { otp, expiresAt })
-const passwordResetStore = new Map<string, { otp: string; expiresAt: number }>();
+// DB-backed OTP store (survives restarts, works across multiple server instances).
+async function setOtp(email: string, otp: string, ttlMs: number) {
+  const expiresAt = new Date(Date.now() + ttlMs);
+  await prisma.passwordResetOtp.deleteMany({ where: { email } });
+  await prisma.passwordResetOtp.create({ data: { email, otp, expiresAt } });
+}
+
+async function getOtp(email: string) {
+  const record = await prisma.passwordResetOtp.findFirst({
+    where: { email },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (!record) return null;
+  if (record.expiresAt.getTime() < Date.now()) {
+    await prisma.passwordResetOtp.deleteMany({ where: { email } });
+    return null;
+  }
+  return record;
+}
+
+async function clearOtp(email: string) {
+  await prisma.passwordResetOtp.deleteMany({ where: { email } });
+}
 
 // Dev-only helper: return OTP for testing (only available when not in production)
 router.get('/debug/otp', async (req, res) => {
-  if (process.env.NODE_ENV === 'production') return res.status(404).end();
+  if (isProduction()) return res.status(404).end();
   const { email } = req.query as { email?: string };
   if (!email) return res.status(400).json({ error: 'Email is required' });
-  const record = passwordResetStore.get(email.toLowerCase());
+  const record = await getOtp(email.toLowerCase());
   if (!record) return res.status(404).json({ error: 'No OTP for this email' });
   return res.json({ email: email.toLowerCase(), otp: record.otp, expiresAt: record.expiresAt });
 });
@@ -48,14 +72,8 @@ router.get('/check-email', async (req, res) => {
   return res.json({ exists: !!existing });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body as { email?: string; password?: string };
-  if (password) {
-    const charCodes = Array.from(password).map(c => c.charCodeAt(0)).join(', ');
-    console.log(`[server] Login attempt: email="${email}", passwordLength=${password.length}, charCodes=[${charCodes}]`);
-  } else {
-    console.log(`[server] Login attempt: email="${email}", password=undefined`);
-  }
   if (!email || !password) {
     console.warn(`[server] Login failed: Missing email or password in request body`);
     return res.status(400).json({ error: 'Email and password are required' });
@@ -87,7 +105,7 @@ router.post('/login', async (req, res) => {
   });
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, async (req, res) => {
   const { email, password, firstName, lastName, role, boardId, classId, location } = req.body as {
     email?: string;
     password?: string;
@@ -176,7 +194,7 @@ router.post('/signup', async (req, res) => {
     });
   } catch (error: any) {
     console.error('Signup error:', error);
-    return res.status(500).json({ error: error.message || 'Failed to create account' });
+    return res.status(500).json({ error: 'Failed to create account' });
   }
 });
 
@@ -295,7 +313,7 @@ router.post('/subscribe', async (req, res) => {
     });
   } catch (error: any) {
     console.error('Subscription error:', error);
-    return res.status(500).json({ error: error.message || 'Subscription failed' });
+    return res.status(500).json({ error: 'Subscription failed' });
   }
 });
 
@@ -324,7 +342,8 @@ router.get('/users', requireAuth, requireAdmin, async (req, res) => {
     });
     return res.json(users);
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    console.error('Failed to fetch users:', error);
+    return res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
@@ -395,7 +414,8 @@ router.post('/users', requireAuth, requireAdmin, async (req, res) => {
 
     return res.status(201).json(user);
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    console.error('Failed to create user:', error);
+    return res.status(500).json({ error: 'Failed to create user' });
   }
 });
 
@@ -468,7 +488,8 @@ router.put('/users/:id', requireAuth, requireAdmin, async (req, res) => {
 
     return res.json(updatedUser);
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    console.error('Failed to update user:', error);
+    return res.status(500).json({ error: 'Failed to update user' });
   }
 });
 
@@ -484,7 +505,8 @@ router.delete('/users/:id', requireAuth, requireAdmin, async (req, res) => {
     await prisma.user.delete({ where: { id } });
     return res.json({ success: true });
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    console.error('Failed to delete user:', error);
+    return res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 
@@ -619,7 +641,7 @@ router.post('/users/:id/activate', requireAuth, requireAdmin, async (req, res) =
     return res.json({ success: true, message: 'Account activated and email sent successfully.' });
   } catch (error: any) {
     console.error('Activation error:', error);
-    return res.status(500).json({ error: error.message || 'Failed to activate user' });
+    return res.status(500).json({ error: 'Failed to activate user' });
   }
 });
 
@@ -661,37 +683,17 @@ router.get('/admin-analytics', requireAuth, requireAdmin, async (req, res) => {
       return { state, count, percentage: percentage + "%", students: count.toString() };
     }).sort((a, b) => b.count - a.count);
 
-    // Compute Platform Uptime
+    // Server uptime in seconds since this process started
     const serverUptime = process.uptime();
 
-    // Compute dynamic database queries count based on DB tables record count
-    const [
-      userCount,
-      studentCount,
-      teacherCount,
-      courseCount,
-      videoCount,
-      quizCount,
-      submissionCount,
-      paymentCount,
-      subCount
-    ] = await Promise.all([
-      prisma.user.count(),
-      prisma.student.count(),
-      prisma.teacher.count(),
-      prisma.course.count(),
-      prisma.courseVideo.count(),
-      prisma.quiz.count(),
-      prisma.assignmentSubmission.count(),
-      prisma.payment.count(),
-      prisma.subscription.count()
-    ]);
-    const totalRecords = userCount + studentCount + teacherCount + courseCount + videoCount + quizCount + submissionCount + paymentCount + subCount;
-    // 145000 base + (15 queries per record) + (1.8 queries per second of process runtime)
-    const databaseQueries = 145000 + (totalRecords * 15) + Math.floor(serverUptime * 1.8);
+    // Total platform revenue: sum of actually collected (SUCCESS) payments
+    const revenueAgg = await prisma.payment.aggregate({
+      where: { status: 'SUCCESS' },
+      _sum: { amount: true },
+    });
+    const totalRevenue = Number(revenueAgg._sum.amount || 0);
 
-    // Platform Revenue: base 0, and add 20000 for each user.
-    const totalRevenue = userCount * 20000;
+    const totalStudents = await prisma.student.count();
 
     return res.json({
       activeSubscriptionsCount,
@@ -699,22 +701,37 @@ router.get('/admin-analytics', requireAuth, requireAdmin, async (req, res) => {
       regionalDistribution,
       serverUptime,
       totalRevenue,
-      databaseQueries
+      totalStudents,
     });
   } catch (error: any) {
     console.error('Admin analytics error:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Failed to fetch analytics' });
   }
 });
 
-router.post('/logout', (_req, res) => {
+router.post('/logout', async (req, res) => {
+  const header = req.headers.authorization;
+  if (header?.startsWith('Bearer ')) {
+    try {
+      const payload = jwt.verify(header.slice(7), getJwtSecret()) as AuthPayload;
+      if (payload.jti && payload.exp) {
+        await prisma.revokedToken.create({
+          data: { jti: payload.jti, expiresAt: new Date(payload.exp * 1000) },
+        });
+        // Opportunistically prune expired entries so this table doesn't grow unbounded.
+        await prisma.revokedToken.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+      }
+    } catch {
+      // Token already invalid/expired — nothing to revoke.
+    }
+  }
   res.json({ success: true });
 });
 
 export default router;
 
 // Forgot password: send OTP
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', authLimiter, async (req, res) => {
   const { email } = req.body as { email?: string };
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
@@ -723,8 +740,7 @@ router.post('/forgot-password', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-    passwordResetStore.set(email.toLowerCase(), { otp, expiresAt });
+    await setOtp(email.toLowerCase(), otp, 10 * 60 * 1000); // 10 minutes
 
     const sent = await sendOtpEmail(email.toLowerCase(), otp);
     if (!sent) return res.status(500).json({ error: 'Failed to send OTP' });
@@ -732,43 +748,35 @@ router.post('/forgot-password', async (req, res) => {
     return res.json({ success: true, message: 'OTP sent to email' });
   } catch (err: any) {
     console.error('Forgot password error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to process request' });
+    return res.status(500).json({ error: 'Failed to process request' });
   }
 });
 
 // Verify OTP
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', otpLimiter, async (req, res) => {
   const { email, otp } = req.body as { email?: string; otp?: string };
   if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
 
   try {
-    const record = passwordResetStore.get(email.toLowerCase());
-    if (!record) return res.status(400).json({ error: 'No OTP requested for this email' });
-    if (record.expiresAt < Date.now()) {
-      passwordResetStore.delete(email.toLowerCase());
-      return res.status(400).json({ error: 'OTP expired' });
-    }
+    const record = await getOtp(email.toLowerCase());
+    if (!record) return res.status(400).json({ error: 'No OTP requested for this email, or it has expired' });
     if (record.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
 
     return res.json({ success: true, message: 'OTP verified successfully' });
   } catch (err: any) {
     console.error('Verify OTP error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to verify OTP' });
+    return res.status(500).json({ error: 'Failed to verify OTP' });
   }
 });
 
 // Reset password: verify OTP and set new password
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', otpLimiter, async (req, res) => {
   const { email, otp, newPassword } = req.body as { email?: string; otp?: string; newPassword?: string };
   if (!email || !otp || !newPassword) return res.status(400).json({ error: 'Missing required fields' });
 
   try {
-    const record = passwordResetStore.get(email.toLowerCase());
-    if (!record) return res.status(400).json({ error: 'No OTP requested for this email' });
-    if (record.expiresAt < Date.now()) {
-      passwordResetStore.delete(email.toLowerCase());
-      return res.status(400).json({ error: 'OTP expired' });
-    }
+    const record = await getOtp(email.toLowerCase());
+    if (!record) return res.status(400).json({ error: 'No OTP requested for this email, or it has expired' });
     if (record.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
 
     const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
@@ -777,11 +785,11 @@ router.post('/reset-password', async (req, res) => {
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
 
-    passwordResetStore.delete(email.toLowerCase());
+    await clearOtp(email.toLowerCase());
     return res.json({ success: true, message: 'Password reset successful' });
   } catch (err: any) {
     console.error('Reset password error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to reset password' });
+    return res.status(500).json({ error: 'Failed to reset password' });
   }
 });
 

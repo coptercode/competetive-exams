@@ -317,13 +317,12 @@ export const AdminPortal: React.FC = () => {
     activeSubscriptionsCount: 0,
     monthlyActiveSubscriptions: Array(12).fill(0),
     regionalDistribution: [],
-    totalRevenue: 45000000,
+    totalRevenue: 0,
     serverUptime: 0,
-    databaseQueries: 145000
+    totalStudents: 0
   });
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [liveUptime, setLiveUptime] = useState<number>(0);
-  const [liveQueries, setLiveQueries] = useState<number>(145000);
 
   // Helper to format live uptime duration
   const formatUptimeDuration = (seconds: number) => {
@@ -386,7 +385,6 @@ export const AdminPortal: React.FC = () => {
       const data = await authAPI.getAdminAnalytics();
       setAnalyticsData(data);
       if (data.serverUptime !== undefined) setLiveUptime(data.serverUptime);
-      if (data.databaseQueries !== undefined) setLiveQueries(data.databaseQueries);
     } catch (err) {
       console.warn("Failed to fetch admin analytics:", err);
     } finally {
@@ -400,16 +398,12 @@ export const AdminPortal: React.FC = () => {
     }
   }, [activeView]);
 
-  // Live ticking hook for real-time uptime and database queries updates
+  // Live ticking hook for real-time uptime display (uptime only, no fabricated metrics)
   useEffect(() => {
     if (activeView !== "admin-analytics") return;
 
     const interval = setInterval(() => {
       setLiveUptime((prev) => prev + 1);
-      setLiveQueries((prev) => {
-        const jitter = Math.floor(Math.random() * 3) + 1; // +1 to +3 queries
-        return prev + jitter;
-      });
     }, 1000);
 
     return () => clearInterval(interval);
@@ -423,7 +417,6 @@ export const AdminPortal: React.FC = () => {
       authAPI.getAdminAnalytics().then((data) => {
         setAnalyticsData(data);
         if (data.serverUptime !== undefined) setLiveUptime(data.serverUptime);
-        if (data.databaseQueries !== undefined) setLiveQueries(data.databaseQueries);
       }).catch((err) => console.warn("Background analytics poll failed:", err));
     }, 20000); // Poll every 20 seconds
 
@@ -1415,8 +1408,8 @@ export const AdminPortal: React.FC = () => {
             {[
               { label: "Active Subscriptions", value: `${analyticsData.activeSubscriptionsCount || 0} Scholars`, icon: Users, color: "text-blue-500" },
               { label: "Total Platform Revenue", value: formatRevenue(analyticsData.totalRevenue), icon: DollarSign, color: "text-emerald-500" },
-              { label: "Server Uptime", value: `99.98% (${formatUptimeDuration(liveUptime)})`, icon: Activity, color: "text-violet-500" },
-              { label: "Database Queries", value: liveQueries.toLocaleString(), icon: Database, color: "text-indigo-500" },
+              { label: "Server Uptime", value: formatUptimeDuration(liveUptime), icon: Activity, color: "text-violet-500" },
+              { label: "Total Students", value: (analyticsData.totalStudents || 0).toLocaleString(), icon: Database, color: "text-indigo-500" },
             ].map((stat, idx) => {
               const Icon = stat.icon;
               return (

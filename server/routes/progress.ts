@@ -4,7 +4,14 @@ import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/students/:studentId/progress/topics/:topicId', requireAuth, async (req, res) => {
+function requireSelfOrStaff(req: any, res: any, next: any) {
+  if (req.auth.role === 'STUDENT' && req.auth.userId !== req.params.studentId) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  next();
+}
+
+router.get('/students/:studentId/progress/topics/:topicId', requireAuth, requireSelfOrStaff, async (req, res) => {
   const progress = await prisma.studentTopicProgress.findUnique({
     where: {
       studentId_topicId: {
@@ -17,7 +24,7 @@ router.get('/students/:studentId/progress/topics/:topicId', requireAuth, async (
   res.json(progress ?? { isCompleted: false, watchPercent: 0, unlocked: false });
 });
 
-router.get('/students/:studentId/progress/subjects/:subjectId', requireAuth, async (req, res) => {
+router.get('/students/:studentId/progress/subjects/:subjectId', requireAuth, requireSelfOrStaff, async (req, res) => {
   const progress = await prisma.studentSubjectProgress.findUnique({
     where: {
       studentId_subjectId: {
@@ -30,7 +37,7 @@ router.get('/students/:studentId/progress/subjects/:subjectId', requireAuth, asy
   res.json(progress ?? { completedPercentage: 0, isCompleted: false, unlocked: false });
 });
 
-router.get('/students/:studentId/analytics', requireAuth, async (req, res) => {
+router.get('/students/:studentId/analytics', requireAuth, requireSelfOrStaff, async (req, res) => {
   try {
     const studentId = req.params.studentId;
 
@@ -139,7 +146,7 @@ router.get('/students/:studentId/analytics', requireAuth, async (req, res) => {
     res.json(responseData);
   } catch (err: any) {
     console.error("Failed to fetch student analytics:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to fetch student analytics' });
   }
 });
 

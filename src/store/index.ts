@@ -775,6 +775,7 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
   quizResults: [],
   notifications: defaultNotifications,
   bookmarks: getStoredBookmarks(),
+  notes: [],
   liveRoomState: null,
   activeSubjectId: getStoredProfile() ? getStoredProfile().optedSubjectId : "",
   activeChapterId: "",

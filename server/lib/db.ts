@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import path from 'path';
 import EmbeddedPostgres from 'embedded-postgres';
 import pg from 'pg';
+import { isProduction } from './env.js';
 
 const root = process.cwd();
 const pgDir = path.join(root, '.pgdata');
@@ -38,15 +39,28 @@ function parseDatabaseUrl(urlStr: string) {
 }
 
 export async function startDatabase() {
-  const databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/lms_db';
-  const dbParams = parseDatabaseUrl(databaseUrl);
-  
-  if (await canConnect(databaseUrl)) {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (isProduction()) {
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL environment variable is required in production');
+    }
+    if (!(await canConnect(databaseUrl))) {
+      throw new Error('Cannot reach DATABASE_URL. Production requires a real, reachable Postgres instance — the embedded-postgres dev fallback is disabled in production.');
+    }
+    console.log('Database reachable at DATABASE_URL.');
+    return;
+  }
+
+  const effectiveUrl = databaseUrl || 'postgresql://postgres:postgres@127.0.0.1:5432/lms_db';
+  const dbParams = parseDatabaseUrl(effectiveUrl);
+
+  if (await canConnect(effectiveUrl)) {
     console.log('Database already reachable at DATABASE_URL.');
     return;
   }
 
-  if (databaseUrl.includes('supabase.com') || databaseUrl.includes('rds.amazonaws.com') || databaseUrl.includes('aws')) {
+  if (effectiveUrl.includes('supabase.com') || effectiveUrl.includes('rds.amazonaws.com') || effectiveUrl.includes('aws')) {
     console.warn('Remote database is unreachable, but skipping local embedded-postgres startup.');
     return;
   }
@@ -70,7 +84,7 @@ export async function startDatabase() {
     console.log('Local PostgreSQL database started successfully.');
 
     // Reconcile password if necessary
-    if (!(await canConnect(databaseUrl))) {
+    if (!(await canConnect(effectiveUrl))) {
       const fallbackUrl = `postgresql://${dbParams.user}:postgres@127.0.0.1:${dbParams.port}/postgres`;
       try {
         const client = new pg.Client({ connectionString: fallbackUrl });
@@ -84,7 +98,7 @@ export async function startDatabase() {
     }
 
     // Ensure database exists
-    const adminUrl = databaseUrl.replace(`/${dbParams.database}`, '/postgres');
+    const adminUrl = effectiveUrl.replace(`/${dbParams.database}`, '/postgres');
     try {
       const client = new pg.Client({ connectionString: adminUrl });
       await client.connect();

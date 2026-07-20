@@ -8,6 +8,7 @@ const envPath = path.join(root, '.env');
 const pgDir = path.join(root, '.pgdata');
 
 const defaultEnv = `DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/lms_db"
+DIRECT_URL="postgresql://postgres:postgres@127.0.0.1:5432/lms_db"
 PORT=3000
 JWT_SECRET="eduverse-dev-secret-change-in-production"
 VITE_API_URL="http://localhost:3000/api"

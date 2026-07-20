@@ -1,0 +1,38 @@
+node_modules
+dist
+.pgdata
+uploads
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+
+# Local dev/test tooling not needed in the image
+scratch
+scripts
+*.md
+!README.md
+
+# Raw seed-source content — already imported into the DB via prisma/seed.ts,
+# not needed at runtime or referenced by the frontend build (unlike public/).
+cbse notes
+icse_ise notes
+stateboard notes
+full_syllabus.txt
+syllubus.md
+Tamil_Nadu_State_Board_Curriculum.md
+workflow_documentation.md
+
+# One-off local test/debug scripts at repo root
+*.stackdump
+test-db.js
+test-prisma.ts
+seed_stateboard.js
+seed_stateboard_assignment.js
+update_icse.js
+count_topics.js
+count_topics.ts
+fix_latex.ts
+scratch_diff.js
+npx

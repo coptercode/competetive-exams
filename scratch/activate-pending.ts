@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
+import { confirmDestructive } from './_confirmDestructive.js';
 const prisma = new PrismaClient();
 
 async function main() {
+  confirmDestructive('activate-pending.ts');
   // Update all PENDING subscriptions to ACTIVE
   const subs = await prisma.subscription.updateMany({
     where: { status: 'PENDING' },

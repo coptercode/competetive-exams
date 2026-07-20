@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { isPublicAiFallbackEnabled } from '../lib/env.js';
 
 const router = Router();
 
@@ -9,7 +10,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const isApiKeyValid = apiKey && (apiKey.startsWith('AIzaSy') || apiKey.startsWith('AQ.')) && apiKey !== 'your-gemini-api-key-here' && apiKey.trim() !== '';
 const genAI = isApiKeyValid ? new GoogleGenerativeAI(apiKey) : null;
 const tutorModels = Array.from(
-  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter(Boolean))
+  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter((m): m is string => Boolean(m)))
 );
 
 
@@ -131,8 +132,14 @@ router.post('/tutor', requireAuth, async (req, res) => {
     textQuestion = `[User attached file: ${attachment.name} (type: ${attachment.type})]\n\n${question}`;
   }
 
-  // Helper to query Pollinations AI as a free public fallback
+  // Helper to query Pollinations AI as a free public fallback.
+  // This sends the student's question (and any attachment) to an unauthenticated
+  // third-party endpoint, so it's opt-in only — see ENABLE_PUBLIC_AI_FALLBACK.
   const queryPollinations = async (): Promise<string | null> => {
+    if (!isPublicAiFallbackEnabled()) {
+      console.warn('Pollinations AI fallback is disabled (ENABLE_PUBLIC_AI_FALLBACK not set to true).');
+      return null;
+    }
     try {
       console.log('Attempting Pollinations AI fallback...');
       const response = await fetch("https://text.pollinations.ai/", {

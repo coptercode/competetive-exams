@@ -25,6 +25,9 @@ const pdfRedirectPlugin = () => ({
 
 export default defineConfig({
   plugins: [react(), pdfRedirectPlugin()],
+  build: {
+    outDir: 'dist/client',
+  },
   server: {
     host: '0.0.0.0',
     proxy: {

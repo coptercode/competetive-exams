@@ -4,6 +4,7 @@ import { requireAuth, requireAdmin, requireAdminOrTeacher } from '../middleware/
 import { uploadToMinio, buildStorageKey, deleteFromMinio } from '../lib/minio.js';
 import { processVideoForDrm, isFfmpegAvailable } from '../lib/drm-processor.js';
 import { prisma } from '../lib/prisma.js';
+import { matchesDeclaredType } from '../lib/fileSignature.js';
 
 const router = Router();
 
@@ -99,6 +100,10 @@ router.post(
 
       if (!req.file || !subjectId || !title) {
         return res.status(400).json({ error: 'file, subjectId, and title are required' });
+      }
+
+      if (!matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
+        return res.status(400).json({ error: 'File content does not match its declared type' });
       }
 
       // Find a topic to attach the note to (first topic in subject)
@@ -227,6 +232,10 @@ router.post(
 
       if (!subjectId || !title || !deadline) {
         return res.status(400).json({ error: 'subjectId, title, and deadline are required' });
+      }
+
+      if (req.file && !matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
+        return res.status(400).json({ error: 'File content does not match its declared type' });
       }
 
       // Find a topic to attach the assignment to
@@ -506,6 +515,10 @@ router.post(
 
       if (!req.file && !videoUrl) {
         return res.status(400).json({ error: 'Either file or videoUrl is required' });
+      }
+
+      if (req.file && !matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
+        return res.status(400).json({ error: 'File content does not match its declared type' });
       }
 
       const enableDrm = drmProtected === 'true' && !!req.file;

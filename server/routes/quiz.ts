@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/auth.js';
 import fs from 'fs';
 import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { isPublicAiFallbackEnabled } from '../lib/env.js';
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const isApiKeyValid = apiKey && (apiKey.startsWith('AIzaSy') || apiKey.startsWith('AQ.')) && apiKey !== 'your-gemini-api-key-here' && apiKey.trim() !== '';
 const genAI = isApiKeyValid ? new GoogleGenerativeAI(apiKey) : null;
 const quizModels = Array.from(
-  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter(Boolean))
+  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter((m): m is string => Boolean(m)))
 );
 
 interface AIQuestion {
@@ -104,6 +105,10 @@ JSON format:
 ]`;
 
   const queryPollinations = async (): Promise<string | null> => {
+    if (!isPublicAiFallbackEnabled()) {
+      console.warn('Pollinations AI fallback is disabled (ENABLE_PUBLIC_AI_FALLBACK not set to true).');
+      return null;
+    }
     try {
       console.log('Attempting Pollinations AI quiz generation fallback...');
       const response = await fetch("https://text.pollinations.ai/", {
@@ -643,6 +648,9 @@ router.post('/quizzes/:quizId/attempt', requireAuth, async (req, res) => {
 });
 
 router.get('/students/:studentId/quiz-results', requireAuth, async (req, res) => {
+  if (req.auth!.role === 'STUDENT' && req.auth!.userId !== req.params.studentId) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   const results = await prisma.quizResult.findMany({
     where: { studentId: req.params.studentId },
     include: { quiz: true },
