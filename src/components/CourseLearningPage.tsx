@@ -223,25 +223,6 @@ export const CourseLearningPage: React.FC = () => {
     }
   }, [activeChapterId]);
 
-  if (!activeBoard || !activeClass) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-royal"></div>
-      </div>
-    );
-  }
-
-  const youtubeId = getYouTubeId(activeTopic?.videoUrl);
-  const useDrmPlayer = activeTopic?.drmEnabled === true && !!activeTopic?.videoId;
-  const hasVideo = !!(
-    youtubeId || 
-    useDrmPlayer || 
-    getVideoLinkForTopic(activeTopic?.title) || 
-    (activeTopic?.videoUrl && activeTopic.videoUrl !== "https://www.w3schools.com/html/movie.mp4")
-  );
-
-
-
   const getTopicPdfInfo = (chapterTitle: string = "", topicPdfUrl?: string) => {
     const pdfUrl = topicPdfUrl || activeTopic?.pdfUrl;
     if (pdfUrl && !pdfUrl.includes("dummy.pdf")) {
@@ -274,6 +255,82 @@ export const CourseLearningPage: React.FC = () => {
   }, [currentPdfInfo?.url, isMarkdown]);
 
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
+
+  const timerRef = useRef<number | null>(null);
+
+  // Playback Simulation
+  useEffect(() => {
+    if (isPlaying) {
+      timerRef.current = window.setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= videoDuration) {
+            setIsPlaying(false);
+            if (timerRef.current) clearInterval(timerRef.current);
+
+            // Auto-complete topic when video ends
+            if (
+              activeSubject &&
+              activeChapter &&
+              activeTopic &&
+              !(activeTopic.isCompleted || completedTopicIds.includes(activeTopic.id))
+            ) {
+              completeTopic(
+                activeBoard?.id || "",
+                activeClass?.id || "",
+                activeSubject.id,
+                activeChapter.id,
+                activeTopic.id,
+              );
+              useLmsStore
+                .getState()
+                .addNotification(
+                  "Topic Completed",
+                  `You have successfully completed "${activeTopic.title}"!`,
+                  "success",
+                );
+            }
+            return videoDuration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [
+    isPlaying,
+    videoDuration,
+    activeBoard?.id,
+    activeClass?.id,
+    activeSubject,
+    activeChapter,
+    activeTopic,
+    completeTopic,
+    completedTopicIds
+  ]);
+
+
+  if (!activeBoard || !activeClass) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-royal"></div>
+      </div>
+    );
+  }
+
+  const youtubeId = getYouTubeId(activeTopic?.videoUrl);
+  const useDrmPlayer = activeTopic?.drmEnabled === true && !!activeTopic?.videoId;
+  const hasVideo = !!(
+    youtubeId || 
+    useDrmPlayer || 
+    getVideoLinkForTopic(activeTopic?.title) || 
+    (activeTopic?.videoUrl && activeTopic.videoUrl !== "https://www.w3schools.com/html/movie.mp4")
+  );
 
 
 
@@ -363,63 +420,6 @@ export const CourseLearningPage: React.FC = () => {
     }
   };
 
-  const timerRef = useRef<number | null>(null);
-
-  // Playback Simulation
-  useEffect(() => {
-    if (isPlaying) {
-      timerRef.current = window.setInterval(() => {
-        setCurrentTime((prev) => {
-          if (prev >= videoDuration) {
-            setIsPlaying(false);
-            if (timerRef.current) clearInterval(timerRef.current);
-
-            // Auto-complete topic when video ends
-            if (
-              activeSubject &&
-              activeChapter &&
-              activeTopic &&
-              !(activeTopic.isCompleted || completedTopicIds.includes(activeTopic.id))
-            ) {
-              completeTopic(
-                activeBoard.id,
-                activeClass.id,
-                activeSubject.id,
-                activeChapter.id,
-                activeTopic.id,
-              );
-              useLmsStore
-                .getState()
-                .addNotification(
-                  "Topic Completed",
-                  `You have successfully completed "${activeTopic.title}"!`,
-                  "success",
-                );
-            }
-            return videoDuration;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [
-    isPlaying,
-    videoDuration,
-    activeBoard.id,
-    activeClass.id,
-    activeSubject,
-    activeChapter,
-    activeTopic,
-    completeTopic,
-    completedTopicIds
-  ]);
 
   // Formatter for time display
   const formatTime = (secs: number) => {
