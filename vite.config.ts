@@ -27,6 +27,9 @@ export default defineConfig({
   plugins: [react(), pdfRedirectPlugin()],
   server: {
     host: '0.0.0.0',
+    headers: {
+      'Cross-Origin-Opener-Policy': 'unsafe-none',
+    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:3000',

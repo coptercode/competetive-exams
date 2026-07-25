@@ -120,7 +120,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
         profile.optedSubjectId = activeClass?.subjects?.[0]?.id ?? "";
       }
 
-      useLmsStore.setState({
+        useLmsStore.setState({
         boards,
         profile,
         auth: {
@@ -131,6 +131,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ mode = "student" }) => {
           error: null,
         },
       });
+
+      // Load specific user's topic progress
+      useLmsStore.getState().loadProfileData(result.user.id);
 
       const { addNotification } = useLmsStore.getState();
       addNotification(

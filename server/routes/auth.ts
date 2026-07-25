@@ -400,7 +400,7 @@ router.post('/users', requireAuth, requireAdmin, async (req, res) => {
 });
 
 router.put('/users/:id', requireAuth, requireAdmin, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { email, password, firstName, lastName, role, boardId, classId, dept, bio, qualification, phoneNumber, location } = req.body;
 
   try {
@@ -473,7 +473,7 @@ router.put('/users/:id', requireAuth, requireAdmin, async (req, res) => {
 });
 
 router.delete('/users/:id', requireAuth, requireAdmin, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     const user = await prisma.user.findUnique({ where: { id } });
@@ -489,7 +489,7 @@ router.delete('/users/:id', requireAuth, requireAdmin, async (req, res) => {
 });
 
 router.post('/users/:id/activate', requireAuth, requireAdmin, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { paymentStatus, password, location } = req.body as {
     paymentStatus?: 'SUCCESS' | 'PENDING';
     password?: string;
@@ -559,21 +559,23 @@ router.post('/users/:id/activate', requireAuth, requireAdmin, async (req, res) =
           const endDate = new Date();
           endDate.setDate(startDate.getDate() + 30);
 
+          const subStatus = paymentStatus === 'SUCCESS' ? 'ACTIVE' : 'PENDING';
           latestSub = await prisma.subscription.create({
             data: {
               studentId: student.id,
               planId: plan.id,
-              status: 'ACTIVE',
+              status: subStatus,
               startDate: startDate,
               endDate: endDate,
               nextBillingDate: endDate,
             }
           });
         } else {
-          // Update existing subscription to ACTIVE
+          // Update existing subscription status based on payment
+          const subStatus = paymentStatus === 'SUCCESS' ? 'ACTIVE' : 'PENDING';
           latestSub = await prisma.subscription.update({
             where: { id: latestSub.id },
-            data: { status: 'ACTIVE' }
+            data: { status: subStatus }
           });
         }
 
@@ -607,14 +609,19 @@ router.post('/users/:id/activate', requireAuth, requireAdmin, async (req, res) =
     }
 
     // Now send the credentials email to student!
-    await sendSubscriptionConfirmationEmail(
-      user.email,
-      user.firstName,
-      user.lastName,
-      password,
-      user.role,
-      'Full Academic Access Pass'
-    );
+    try {
+      await sendSubscriptionConfirmationEmail(
+        user.email,
+        user.firstName,
+        user.lastName,
+        password,
+        user.role,
+        'Full Academic Access Pass'
+      );
+    } catch (emailError) {
+      console.warn('Failed to send subscription confirmation email:', emailError);
+      // We still want to return success for the activation even if email fails
+    }
 
     return res.json({ success: true, message: 'Account activated and email sent successfully.' });
   } catch (error: any) {

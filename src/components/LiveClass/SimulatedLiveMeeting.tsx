@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { useLmsStore } from "../../store/index";
 import { getApiBaseUrl } from "../../utils/apiBase";
+import { useUiStore } from "../../store/useUiStore";
 
 interface MockParticipant {
   identity: string;
@@ -139,7 +140,7 @@ export const SimulatedLiveMeeting = ({
           })
         });
         if (res.status === 403) {
-          alert("Access denied: You are not enrolled in the class for this meeting.");
+          useUiStore.getState().showAlert("Access denied: You are not enrolled in the class for this meeting.");
           joinLiveRoom(null);
           setView("student-dash");
           return;
@@ -204,7 +205,7 @@ export const SimulatedLiveMeeting = ({
       });
 
       if (res.status === 403) {
-        alert("Access denied: You are not enrolled in the class for this meeting.");
+        useUiStore.getState().showAlert("Access denied: You are not enrolled in the class for this meeting.");
         joinLiveRoom(null);
         setView("student-dash");
         return;
@@ -218,7 +219,7 @@ export const SimulatedLiveMeeting = ({
         // Apply host controls if they forced mute/video off
         const meOnServer = (data.participants || []).find((p: any) => p.identity === identity);
         if (!meOnServer && !isTeacher) {
-          alert("You have been kicked from the meeting by the host.");
+          useUiStore.getState().showAlert("You have been kicked from the meeting by the host.");
           joinLiveRoom(null);
           setView("student-dash");
           return;

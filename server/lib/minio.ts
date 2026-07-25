@@ -4,23 +4,30 @@ import fs from 'fs';
 import path from 'path';
 
 const endpointHost = process.env.MINIO_ENDPOINT || 'localhost';
-const endpointPort = process.env.MINIO_PORT || '9000';
+const endpointPort = process.env.MINIO_PORT;
 const useSSL = process.env.MINIO_USE_SSL === 'true';
 const protocol = useSSL ? 'https' : 'http';
-const endpoint = `${protocol}://${endpointHost}:${endpointPort}`;
+
+// If MINIO_ENDPOINT already contains http/https, use it directly (for Supabase/AWS)
+let endpoint = endpointHost;
+if (!endpoint.startsWith('http')) {
+  // Legacy MinIO format
+  endpoint = `${protocol}://${endpointHost}${endpointPort ? `:${endpointPort}` : ''}`;
+}
 
 const accessKeyId = process.env.MINIO_ACCESS_KEY || '';
 const secretAccessKey = process.env.MINIO_SECRET_KEY || '';
 const bucketName = process.env.MINIO_BUCKET || 'lms-files';
+const region = process.env.MINIO_REGION || 'us-east-1';
 
 export const minioClient = new S3Client({
-  region: 'us-east-1', // MinIO requires region, us-east-1 is standard fallback
+  region,
   endpoint,
   credentials: {
     accessKeyId,
     secretAccessKey,
   },
-  forcePathStyle: true, // Required for MinIO local connection
+  forcePathStyle: true, // Required for MinIO/Supabase local connection
 });
 
 export const MINIO_BUCKET = bucketName;
@@ -38,6 +45,7 @@ const extensionToContentType: Record<string, string> = {
   '.zip': 'application/zip',
   '.m3u8': 'application/vnd.apple.mpegurl',
   '.ts': 'video/mp2t',
+  '.md': 'text/markdown',
   '.mpd': 'application/dash+xml',
   '.key': 'application/octet-stream',
   '.json': 'application/json',
@@ -66,7 +74,12 @@ export async function uploadToMinio(
       }),
     );
     // Return the public access URL for the uploaded file
-    return `${endpoint}/${MINIO_BUCKET}/${encodeURIComponent(key)}`;
+    let publicEndpoint = endpoint;
+    if (endpoint.includes('.supabase.co') && endpoint.endsWith('/s3')) {
+      publicEndpoint = endpoint.replace('/s3', '/object/public');
+    }
+    const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+    return `${publicEndpoint}/${MINIO_BUCKET}/${encodedKey}`;
   } catch (err) {
     console.warn('MinIO upload failed, using local disk fallback:', err);
     const localPath = path.join(process.cwd(), 'uploads', key);

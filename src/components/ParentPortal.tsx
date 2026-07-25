@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLmsStore } from "../store/index";
 import { formatDeadlineIST } from "../utils/dateUtils";
+import { useUiStore } from "../store/useUiStore";
 import {
   User,
   BookOpen,
@@ -44,7 +45,7 @@ export const ParentPortal: React.FC = () => {
     setTimeout(() => {
       setFeedbackMsg("");
       setSentFeedback(false);
-      alert("Your message has been sent to the class coordinator.");
+      useUiStore.getState().showAlert("Your message has been sent to the class coordinator.");
     }, 1500);
   };
 

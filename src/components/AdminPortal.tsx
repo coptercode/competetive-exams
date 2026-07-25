@@ -1,7 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLmsStore } from "../store/index";
-import { authAPI } from "../services/api";
+import { authAPI, chapterLockAPI } from "../services/api";
 import { getApiBaseUrl } from "../utils/apiBase";
+import { useAdminAnalytics } from "../hooks/useAdminAnalytics";
+import { useAdminUsers } from "../hooks/useAdminUsers";
+import { AdminAnalytics } from "./Admin/AdminAnalytics";
+import { AdminUsers } from "./Admin/AdminUsers";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from 'recharts';
+import { useUiStore } from "../store/useUiStore";
 import {
   Plus,
   Settings,
@@ -125,109 +147,6 @@ Project stack:
 - Video player: Use Shaka Player
 - Authentication: Existing JWT/session authentication
 
-Goal:
-Protect course videos from direct downloading and unauthorized access.
-
-Implement the following:
-
-1. Video Storage Security
-- Do NOT serve raw MP4 files directly.
-- Convert uploaded videos into encrypted HLS/DASH streams.
-- Use FFmpeg for video processing.
-- Generate:
-  - .m3u8 playlists
-  - encrypted video segments
-  - encryption keys
-- Store processed videos inside MinIO.
-
-Folder structure:
-storage/
-  courses/
-    {courseId}/
-      {videoId}/
-        manifest.m3u8
-        segments/
-        keys/
-
-2. Backend DRM Access Layer
-Create a secure video access API.
-
-Add:
-GET /api/videos/:videoId/playback
-
-Flow:
-- Verify user authentication
-- Verify user is enrolled in the course
-- Generate a short-lived playback token
-- Return secure playback URL
-
-Token:
-- Expire after 10 minutes
-- Include:
-  userId
-  courseId
-  videoId
-  expiry
-
-3. Secure Streaming Endpoint
-Create:
-GET /api/videos/:videoId/stream/*
-
-Requirements:
-- Validate playback token
-- Reject expired tokens
-- Prevent unauthorized users
-- Add proper CORS protection
-- Prevent hotlinking
-
-4. Frontend Player
-Integrate Shaka Player.
-
-Create:
-components/DRMVideoPlayer.jsx
-
-Features:
-- Load secure playback URL
-- Request license/key endpoint
-- Handle errors
-- Show loading state
-- Show playback failure message
-
-5. Add Watermark Protection
-Add dynamic watermark overlay:
-
-Display:
-- Logged-in username
-- User ID
-- Current timestamp
-
-Watermark should:
-- Move position every few seconds
-- Be semi-transparent
-- Appear over video
-
-6. Database Changes
-
-Update Prisma schema.
-
-Add fields if needed:
-
-Video:
-- encryptedPath
-- manifestPath
-- drmEnabled
-- encryptionKeyId
-
-Create migration.
-
-7. Upload Pipeline
-
-When admin uploads a video:
-
-Flow:
-Upload MP4
-↓
-FFmpeg processing
 ↓
 Encrypt
 ↓
@@ -263,14 +182,356 @@ After implementation:
 - Provide commands to run migrations
 - Provide FFmpeg installation/setup steps`;
 
+// ─── ChaptersAccessTab ───────────────────────────────────────────────────────
+interface ChapterRow {
+  id: string;
+  title: string;
+  order: number;
+  unitId: string;
+  unitName: string;
+  isUnlocked: boolean;
+  unlockedAt: string | null;
+  unlockedBy: string | null;
+  overrideCount: number;
+}
+
+interface StudentOverrideRow {
+  studentId: string;
+  name: string;
+  email: string;
+  mode: "inherit" | "unlock" | "lock";
+  effectiveIsUnlocked: boolean;
+}
+
+const ChaptersAccessTab: React.FC<{ subjectId: string }> = ({ subjectId }) => {
+  const [chapters, setChapters] = useState<ChapterRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState<{ text: string; ok: boolean } | null>(null);
+
+  // Per-student panel state
+  const [panelChapter, setPanelChapter] = useState<ChapterRow | null>(null);
+  const [panelStudents, setPanelStudents] = useState<StudentOverrideRow[]>([]);
+  const [panelClassDefault, setPanelClassDefault] = useState(false);
+  const [panelLoading, setPanelLoading] = useState(false);
+  const [panelSearch, setPanelSearch] = useState("");
+  const [savingStudentId, setSavingStudentId] = useState<string | null>(null);
+
+  const showToast = (text: string, ok: boolean) => {
+    setToastMsg({ text, ok });
+    setTimeout(() => setToastMsg(null), 3500);
+  };
+
+  const fetchChapters = async () => {
+    if (!subjectId) { setChapters([]); return; }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await chapterLockAPI.getTeacherChapters(subjectId);
+      setChapters(data.chapters);
+    } catch (e: any) {
+      setError(e.message || "Failed to load chapters");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchChapters(); }, [subjectId]);
+
+  const handleToggle = async (chapter: ChapterRow) => {
+    const newVal = !chapter.isUnlocked;
+    // Warning if locking the only unlocked chapter for most of the class
+    const unlockedCount = chapters.filter(c => c.isUnlocked).length;
+    if (!newVal && unlockedCount === 1) {
+      const ok = window.confirm(
+        "⚠️ This will leave NO chapters unlocked by default for most students. Continue?\n\n(Students with personal 'Unlock' overrides will remain unlocked.)"
+      );
+      if (!ok) return;
+    }
+
+    // Optimistic update
+    setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isUnlocked: newVal } : c));
+    setTogglingId(chapter.id);
+    try {
+      await chapterLockAPI.updateChapterLockStatus(chapter.id, newVal);
+      showToast(`"${chapter.title}" is now ${newVal ? "Unlocked" : "Locked"} for the class.`, true);
+    } catch (e: any) {
+      // Revert optimistic update
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isUnlocked: chapter.isUnlocked } : c));
+      showToast(e.message || "Failed to update", false);
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const openPanel = async (chapter: ChapterRow) => {
+    setPanelChapter(chapter);
+    setPanelStudents([]);
+    setPanelLoading(true);
+    setPanelSearch("");
+    try {
+      const data = await chapterLockAPI.getStudentOverrides(chapter.id);
+      setPanelStudents(data.students);
+      setPanelClassDefault(data.classWideDefault);
+    } catch (e: any) {
+      showToast(e.message || "Failed to load students", false);
+      setPanelChapter(null);
+    } finally {
+      setPanelLoading(false);
+    }
+  };
+
+  const handleStudentMode = async (student: StudentOverrideRow, mode: "inherit" | "unlock" | "lock") => {
+    if (!panelChapter) return;
+    // Optimistic update
+    const prevStudents = panelStudents;
+    setPanelStudents(prev => prev.map(s => {
+      if (s.studentId !== student.studentId) return s;
+      const newEffective = mode === "inherit" ? panelClassDefault : mode === "unlock";
+      return { ...s, mode, effectiveIsUnlocked: newEffective };
+    }));
+    setSavingStudentId(student.studentId);
+    try {
+      await chapterLockAPI.setStudentOverride(panelChapter.id, student.studentId, mode);
+      showToast(`${student.name} → ${mode === "inherit" ? "Inherits class default" : mode === "unlock" ? "Unlocked (override)" : "Locked (override)"}`, true);
+      // Refresh override counts
+      fetchChapters();
+    } catch (e: any) {
+      setPanelStudents(prevStudents);
+      showToast(e.message || "Failed to update", false);
+    } finally {
+      setSavingStudentId(null);
+    }
+  };
+
+  const filteredStudents = panelStudents.filter(s =>
+    s.name.toLowerCase().includes(panelSearch.toLowerCase()) ||
+    s.email.toLowerCase().includes(panelSearch.toLowerCase())
+  );
+
+  if (!subjectId) {
+    return (
+      <div className="glass-card p-8 border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center min-h-[260px]">
+        <Lock className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
+        <p className="text-xs font-bold text-slate-600 dark:text-slate-400">Select a Board, Class, and Subject above to manage chapter access.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 animate-fade-in-up">
+      {/* Toast */}
+      {toastMsg && (
+        <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold border ${toastMsg.ok ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400"}`}>
+          {toastMsg.ok ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+          {toastMsg.text}
+        </div>
+      )}
+
+      <div className="glass-card border-slate-200 dark:border-white/5 overflow-hidden">
+        {/* Header */}
+        <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
+          <div>
+            <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
+              <Lock className="w-4 h-4 text-emerald-500" /> Chapter Access Control
+            </h4>
+            <p className="text-[10px] text-slate-500 mt-0.5">Toggle class-wide access or set per-student exceptions.</p>
+          </div>
+          <button onClick={fetchChapters} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-400 transition-colors">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          </button>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <RefreshCw className="w-6 h-6 animate-spin text-slate-400" />
+          </div>
+        ) : error ? (
+          <div className="p-6 text-center text-xs text-red-500 font-semibold">{error}</div>
+        ) : chapters.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <BookOpen className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
+            <p className="text-xs text-slate-500 font-semibold">No chapters found for this subject.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100 dark:divide-white/5">
+            {chapters.map(chapter => {
+              const isToggling = togglingId === chapter.id;
+              return (
+                <div key={chapter.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                  {/* Left: Title */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{chapter.title}</p>
+                    <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      {chapter.unitName !== "Core Syllabus" ? chapter.unitName : "Core Syllabus"} · Chapter #{chapter.order}
+                    </p>
+                  </div>
+
+                  {/* Center: override count badge */}
+                  <div className="flex items-center gap-3 mr-4">
+                    {chapter.overrideCount > 0 && (
+                      <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1">
+                        <Users className="w-2.5 h-2.5" />
+                        {chapter.overrideCount} override{chapter.overrideCount !== 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Right: Toggle + Manage */}
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    {/* Class-wide toggle */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        disabled={isToggling}
+                        onClick={() => handleToggle(chapter)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none ${chapter.isUnlocked ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"} ${isToggling ? "opacity-50 cursor-wait" : "cursor-pointer"}`}
+                        title={chapter.isUnlocked ? "Click to lock for class" : "Click to unlock for class"}
+                      >
+                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${chapter.isUnlocked ? "translate-x-4" : "translate-x-0.5"}`} />
+                      </button>
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wider w-14 ${chapter.isUnlocked ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500"}`}>
+                        {isToggling ? "Saving…" : chapter.isUnlocked ? "Unlocked" : "Locked"}
+                      </span>
+                    </div>
+
+                    {/* Manage students button */}
+                    <button
+                      onClick={() => openPanel(chapter)}
+                      className="px-3 py-1.5 rounded-lg text-[10px] font-bold border border-brand-royal/20 bg-brand-royal/5 text-brand-royal dark:text-blue-300 hover:bg-brand-royal/10 transition-colors flex items-center gap-1"
+                    >
+                      <Users className="w-3 h-3" />
+                      Manage students
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Per-Student Override Panel (modal) */}
+      {panelChapter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-lg max-h-[85vh] flex flex-col">
+            {/* Panel Header */}
+            <div className="px-5 pt-5 pb-4 border-b border-slate-100 dark:border-white/5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Manage Student Access</h3>
+                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{panelChapter.title}</p>
+                  <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full mt-1.5 ${panelClassDefault ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-200 dark:bg-slate-800 text-slate-500 border border-slate-300 dark:border-slate-700"}`}>
+                    Class default: {panelClassDefault ? "Unlocked" : "Locked"}
+                  </span>
+                </div>
+                <button
+                  onClick={() => { setPanelChapter(null); fetchChapters(); }}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="mt-3 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search students…"
+                  value={panelSearch}
+                  onChange={e => setPanelSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-brand-royal/40 focus:ring-1 focus:ring-brand-royal/20"
+                />
+              </div>
+            </div>
+
+            {/* Student List */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+              {panelLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <RefreshCw className="w-5 h-5 animate-spin text-slate-400" />
+                </div>
+              ) : filteredStudents.length === 0 ? (
+                <div className="py-10 text-center text-xs text-slate-400 font-semibold">
+                  {panelStudents.length === 0 ? "No students enrolled in this class." : "No students match your search."}
+                </div>
+              ) : (
+                filteredStudents.map(student => {
+                  const isSaving = savingStudentId === student.studentId;
+                  return (
+                    <div key={student.studentId} className={`p-3 rounded-xl border transition-colors ${student.mode !== "inherit" ? "bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/20" : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-white/5"}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        {/* Student info */}
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{student.name}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{student.email}</p>
+                          <span className={`text-[9px] font-extrabold uppercase tracking-wider ${student.effectiveIsUnlocked ? "text-emerald-600" : "text-red-500"}`}>
+                            {student.effectiveIsUnlocked ? "✓ Unlocked" : "✗ Locked"}
+                            {" "}
+                            <span className="font-normal normal-case text-slate-400">
+                              ({student.mode === "inherit" ? "class default" : "override"})
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* 3-way segmented control */}
+                        <div className={`flex bg-slate-200 dark:bg-slate-700 rounded-lg p-0.5 gap-0.5 ${isSaving ? "opacity-50 pointer-events-none" : ""}`}>
+                          {(["inherit", "unlock", "lock"] as const).map(mode => (
+                            <button
+                              key={mode}
+                              onClick={() => handleStudentMode(student, mode)}
+                              className={`px-2.5 py-1 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition-all ${student.mode === mode
+                                ? mode === "unlock"
+                                  ? "bg-emerald-500 text-white shadow-sm"
+                                  : mode === "lock"
+                                    ? "bg-red-500 text-white shadow-sm"
+                                    : "bg-white dark:bg-slate-600 text-slate-700 dark:text-white shadow-sm"
+                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                              }`}
+                              title={
+                                mode === "inherit" ? "Follow class default" :
+                                mode === "unlock" ? "Force-unlock for this student" :
+                                "Force-lock for this student"
+                              }
+                            >
+                              {mode === "inherit" ? "Inherit" : mode === "unlock" ? "Unlock" : "Lock"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Panel footer */}
+            <div className="px-5 py-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+              <p className="text-[10px] text-slate-400 font-medium">
+                {panelStudents.length} student{panelStudents.length !== 1 ? "s" : ""} · {panelStudents.filter(s => s.mode !== "inherit").length} override{panelStudents.filter(s => s.mode !== "inherit").length !== 1 ? "s" : ""}
+              </p>
+              <button
+                onClick={() => { setPanelChapter(null); fetchChapters(); }}
+                className="px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── component ───────────────────────────────────────────────────────────────
 export const AdminPortal: React.FC = () => {
   const { boards, addBoard, addClass, addSubject, activeView, setView, profile } = useLmsStore();
 
   // ── User Management State ──
-  const [usersList, setUsersList] = useState<any[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
-  const [usersError, setUsersError] = useState("");
+  const { usersList, loadingUsers, usersError, setUsersError, fetchUsers } = useAdminUsers(activeView);
   const [editingUser, setEditingUser] = useState<any>(null);
 
   // Form State
@@ -306,53 +567,31 @@ export const AdminPortal: React.FC = () => {
   // Teacher Registration Form State
   const [teacherFullName, setTeacherFullName] = useState("");
   const [teacherPhone, setTeacherPhone] = useState("");
-  const [teacherSubjectArea, setTeacherSubjectArea] = useState("Mathematics");
+  const [teacherSubjectArea, setTeacherSubjectArea] = useState("");
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherTempPassword, setTeacherTempPassword] = useState("");
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const res = await fetch(getApiBaseUrl() + '/api/subjects/distinct');
+        const data = await res.json();
+        setAvailableSubjects(data);
+        if (data.length > 0) {
+          setTeacherSubjectArea(data[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch available subjects:", err);
+      }
+    };
+    fetchSubjects();
+  }, []);
   const [creatingTeacher, setCreatingTeacher] = useState(false);
   const [teacherError, setTeacherError] = useState("");
 
-  // ── Analytics & Graph State ──
-  const [analyticsData, setAnalyticsData] = useState<any>({
-    activeSubscriptionsCount: 0,
-    monthlyActiveSubscriptions: Array(12).fill(0),
-    regionalDistribution: [],
-    totalRevenue: 45000000,
-    serverUptime: 0,
-    databaseQueries: 145000
-  });
-  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
-  const [liveUptime, setLiveUptime] = useState<number>(0);
-  const [liveQueries, setLiveQueries] = useState<number>(145000);
+  const { analyticsData, liveUptime, liveQueries, fetchAnalytics } = useAdminAnalytics(activeView);
 
-  // Helper to format live uptime duration
-  const formatUptimeDuration = (seconds: number) => {
-    if (!seconds || seconds <= 0) return "0s";
-    const d = Math.floor(seconds / (3600 * 24));
-    const h = Math.floor((seconds % (3600 * 24)) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-
-    const parts = [];
-    if (d > 0) parts.push(`${d}d`);
-    if (h > 0 || d > 0) parts.push(`${h}h`);
-    if (m > 0 || h > 0 || d > 0) parts.push(`${m}m`);
-    parts.push(`${s}s`);
-
-    return parts.join(" ");
-  };
-
-  // Helper to format revenue in Crores/Lakhs/Rupees dynamically
-  const formatRevenue = (rev: number) => {
-    if (rev === undefined || rev === null) return "₹0";
-    if (rev >= 10000000) {
-      return `₹${(rev / 10000000).toFixed(2)} Crores`;
-    }
-    if (rev >= 100000) {
-      return `₹${(rev / 100000).toFixed(2)} Lakhs`;
-    }
-    return `₹${rev.toLocaleString()}`;
-  };
 
   const handleCopyPrompt = () => {
     try {
@@ -377,69 +616,6 @@ export const AdminPortal: React.FC = () => {
         "Failed to copy prompt to clipboard.",
         "alert"
       );
-    }
-  };
-
-  const fetchAnalytics = async () => {
-    try {
-      setLoadingAnalytics(true);
-      const data = await authAPI.getAdminAnalytics();
-      setAnalyticsData(data);
-      if (data.serverUptime !== undefined) setLiveUptime(data.serverUptime);
-      if (data.databaseQueries !== undefined) setLiveQueries(data.databaseQueries);
-    } catch (err) {
-      console.warn("Failed to fetch admin analytics:", err);
-    } finally {
-      setLoadingAnalytics(false);
-    }
-  };
-
-  useEffect(() => {
-    if (activeView === "admin-analytics" || activeView === "admin-users" || activeView === "admin-regional-distribution") {
-      fetchAnalytics();
-    }
-  }, [activeView]);
-
-  // Live ticking hook for real-time uptime and database queries updates
-  useEffect(() => {
-    if (activeView !== "admin-analytics") return;
-
-    const interval = setInterval(() => {
-      setLiveUptime((prev) => prev + 1);
-      setLiveQueries((prev) => {
-        const jitter = Math.floor(Math.random() * 3) + 1; // +1 to +3 queries
-        return prev + jitter;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [activeView]);
-
-  // Periodic backend polling hook
-  useEffect(() => {
-    if (activeView !== "admin-analytics" && activeView !== "admin-users" && activeView !== "admin-regional-distribution") return;
-
-    const pollInterval = setInterval(() => {
-      authAPI.getAdminAnalytics().then((data) => {
-        setAnalyticsData(data);
-        if (data.serverUptime !== undefined) setLiveUptime(data.serverUptime);
-        if (data.databaseQueries !== undefined) setLiveQueries(data.databaseQueries);
-      }).catch((err) => console.warn("Background analytics poll failed:", err));
-    }, 20000); // Poll every 20 seconds
-
-    return () => clearInterval(pollInterval);
-  }, [activeView]);
-
-  const fetchUsers = async () => {
-    setLoadingUsers(true);
-    setUsersError("");
-    try {
-      const data = await authAPI.getUsers();
-      setUsersList(data);
-    } catch (err: any) {
-      setUsersError("Failed to fetch users from database.");
-    } finally {
-      setLoadingUsers(false);
     }
   };
 
@@ -470,12 +646,6 @@ export const AdminPortal: React.FC = () => {
       setActivationLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (activeView === "admin-users" || activeView === "admin-teachers") {
-      fetchUsers();
-    }
-  }, [activeView]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -588,7 +758,7 @@ export const AdminPortal: React.FC = () => {
   };
 
   const handleDeleteUser = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+    if (!(await useUiStore.getState().showConfirm("Are you sure you want to delete this user?"))) return;
     setUsersError("");
     try {
       await authAPI.deleteUser(id);
@@ -612,7 +782,7 @@ export const AdminPortal: React.FC = () => {
   const [upBoardId, setUpBoardId] = useState("");
   const [upClassId, setUpClassId] = useState("");
   const [upSubjectId, setUpSubjectId] = useState("");
-  const [uploadTab, setUploadTab] = useState<"notes" | "assignments" | "videos">("notes");
+  const [uploadTab, setUploadTab] = useState<"notes" | "assignments" | "videos" | "chapters">("notes");
 
   // notes form
   const [noteTitle, setNoteTitle] = useState("");
@@ -1024,8 +1194,8 @@ export const AdminPortal: React.FC = () => {
             </div>
           </div>
 
-          {/* Notes / Assignments / Videos tabs */}
-          <div className="flex gap-3">
+          {/* Notes / Assignments / Videos / Chapters tabs */}
+          <div className="flex gap-3 flex-wrap">
             <button onClick={() => setUploadTab("notes")}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${uploadTab === "notes" ? "bg-brand-royal text-white border-brand-royal shadow-md" : "bg-white dark:bg-slate-950 text-slate-600 border-slate-300 dark:border-white/10 hover:border-brand-royal/40"}`}>
               <BookOpen className="w-3.5 h-3.5" /> Notes &amp; PDFs
@@ -1040,6 +1210,10 @@ export const AdminPortal: React.FC = () => {
                 <Video className="w-3.5 h-3.5" /> Video Lectures
               </button>
             )}
+            <button onClick={() => setUploadTab("chapters")}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${uploadTab === "chapters" ? "bg-emerald-600 text-white border-emerald-600 shadow-md" : "bg-white dark:bg-slate-950 text-slate-600 border-slate-300 dark:border-white/10 hover:border-emerald-500/40"}`}>
+              <Lock className="w-3.5 h-3.5" /> Chapters Access
+            </button>
           </div>
 
           {/* ── Notes Tab ──────────────────────────────────────────────────── */}
@@ -1066,7 +1240,7 @@ export const AdminPortal: React.FC = () => {
                       ) : (
                         <p className="text-xs text-slate-500">Click to select PDF</p>
                       )}
-                      <input ref={noteFileRef} type="file" accept=".pdf" className="hidden" onChange={(e) => {
+                      <input ref={noteFileRef} type="file" accept=".pdf,.md" className="hidden" onChange={(e) => {
                         const file = e.target.files?.[0] || null;
                         if (file) {
                           if (!file.name.toLowerCase().endsWith('.pdf')) {
@@ -1381,147 +1555,25 @@ export const AdminPortal: React.FC = () => {
                 </div>
               </div>
 
-              {/* DRM Prompt Assistance Card */}
-              <div className="glass-card p-5 border-slate-200 dark:border-white/5 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-3">
-                  <h4 className="text-xs font-bold text-slate-700 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-brand-royal" /> AI Assistant DRM Video Protection Guide
-                  </h4>
-                  <button
-                    onClick={handleCopyPrompt}
-                    className="px-3 py-1.5 bg-brand-royal hover:bg-brand-royal/90 text-white text-[10px] font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    Copy Prompt
-                  </button>
-                </div>
-                <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400 font-sans">
-                  <p>
-                    Want to implement industry-grade secure DRM video protection in your LMS? You can copy the engineering prompt below and feed it directly to <strong>Anti-gravity</strong> or another AI coding agent to implement the secure streaming layer.
-                  </p>
-                  <pre className="p-4 bg-slate-900 text-slate-100 rounded-xl text-[10px] font-mono whitespace-pre-wrap max-h-96 overflow-y-auto border border-white/10 select-all">
-                    {drmPromptText}
-                  </pre>
-                </div>
-              </div>
+
             </div>
+          )}
+
+          {/* ── Chapters Access Tab ─────────────────────────────────────────── */}
+          {uploadTab === "chapters" && (
+            <ChaptersAccessTab subjectId={upSubjectId} />
           )}
         </div>
       )}
 
       {/* ── ANALYTICS DASHBOARD ───────────────────────────────────────────── */}
       {activeView === "admin-analytics" && (
-        <div className="space-y-6 animate-fade-in-up">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: "Active Subscriptions", value: `${analyticsData.activeSubscriptionsCount || 0} Scholars`, icon: Users, color: "text-blue-500" },
-              { label: "Total Platform Revenue", value: formatRevenue(analyticsData.totalRevenue), icon: DollarSign, color: "text-emerald-500" },
-              { label: "Server Uptime", value: `99.98% (${formatUptimeDuration(liveUptime)})`, icon: Activity, color: "text-violet-500" },
-              { label: "Database Queries", value: liveQueries.toLocaleString(), icon: Database, color: "text-indigo-500" },
-            ].map((stat, idx) => {
-              const Icon = stat.icon;
-              return (
-                <div key={idx} className="glass-card p-5 border-slate-200 dark:border-white/5 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] text-slate-600 dark:text-slate-500 font-bold uppercase tracking-wider block">{stat.label}</span>
-                    <span className="text-lg font-extrabold text-slate-900 dark:text-white mt-1 block">{stat.value}</span>
-                  </div>
-                  <div className={`w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 flex items-center justify-center ${stat.color}`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 glass-card p-6 border-slate-200 dark:border-white/5">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h4 className="text-base font-bold text-slate-900 dark:text-white">Monthly Active Registrations</h4>
-                </div>
-                <div className="text-[10px] font-bold text-brand-violet dark:text-brand-violet-light bg-violet-500/10 px-2 py-0.5 rounded border border-brand-violet/20">+12.4% QoQ Growth</div>
-              </div>
-              <div className="h-80 w-full flex items-end pt-4 border-b border-slate-200 dark:border-white/5 relative">
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 150" preserveAspectRatio="none">
-                  <path 
-                    d={(() => {
-                      const monthlyCounts = analyticsData.monthlyActiveSubscriptions || Array(12).fill(0);
-                      const janToJun = monthlyCounts.slice(0, 6);
-                      const maxVal = Math.max(...janToJun, 1);
-                      const points = janToJun.map((val: number, idx: number) => {
-                        const x = (idx * 2 + 1) * (400 / 12);
-                        const y = 135 - (val / maxVal) * 110;
-                        return [x, y];
-                      });
-                      
-                      const getPath = (pts: number[][]) => {
-                        return pts.reduce((acc, pt, i, a) => {
-                          if (i === 0) return `M ${pt[0]},${pt[1]}`;
-                          const prev = a[i - 1];
-                          const next = a[i + 1] || pt;
-                          const prevPrev = a[i - 2] || prev;
-                          
-                          const cp1X = prev[0] + (pt[0] - prevPrev[0]) * 0.16;
-                          const cp1Y = prev[1] + (pt[1] - prevPrev[1]) * 0.16;
-                          const cp2X = pt[0] - (next[0] - prev[0]) * 0.16;
-                          const cp2Y = pt[1] - (next[1] - prev[1]) * 0.16;
-                          
-                          return `${acc} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${pt[0]},${pt[1]}`;
-                        }, "");
-                      };
-                      return getPath(points);
-                    })()} 
-                    fill="none" 
-                    stroke="url(#grad)" 
-                    strokeWidth="3.5" 
-                    strokeLinecap="round" 
-                  />
-                  <defs>
-                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#3b82f6" /><stop offset="50%" stopColor="#7c3aed" /><stop offset="100%" stopColor="#ec4899" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="w-full flex text-[9px] text-slate-600 dark:text-slate-500 font-bold mb-[-20px] relative z-10">
-                  {["Jan","Feb","Mar","Apr","May","Jun"].map((m) => (
-                    <span key={m} className="flex-1 text-center">{m}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card p-5 border-slate-200 dark:border-white/5 space-y-4 flex flex-col justify-between">
-              <div>
-                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-400 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-2">Regional Distribution</h4>
-                <div className="space-y-3 mt-4">
-                  {analyticsData.regionalDistribution && analyticsData.regionalDistribution.length > 0 ? (
-                    analyticsData.regionalDistribution.slice(0, 5).map((r: any, i: number) => (
-                      <div key={i} className="space-y-1 text-xs">
-                        <div className="flex justify-between text-[11px]">
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">{r.state}</span>
-                          <span className="font-bold text-slate-900 dark:text-white font-mono">{r.percentage}</span>
-                        </div>
-                        <div className="w-full h-1 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden">
-                          <div className="h-full bg-brand-violet" style={{ width: r.percentage }} />
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-10 text-xs text-slate-500">
-                      No regional registrations found in database.
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => setView("admin-regional-distribution")}
-                className="w-full py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors uppercase tracking-wider active:scale-95"
-              >
-                View Detailed Breakdown
-              </button>
-            </div>
-          </div>
-        </div>
+        <AdminAnalytics
+          analyticsData={analyticsData}
+          liveUptime={liveUptime}
+          liveQueries={liveQueries}
+          setView={setView}
+        />
       )}
 
       {/* ── USER MANAGEMENT (STUDENTS) ────────────────────────────────────────── */}
@@ -2007,9 +2059,9 @@ export const AdminPortal: React.FC = () => {
                   onChange={(e) => setTeacherSubjectArea(e.target.value)}
                   className="w-full bg-slate-550 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs sm:text-sm text-slate-800 dark:text-white focus:outline-none focus:border-brand-royal"
                 >
-                  <option value="Mathematics">Mathematics</option>
-                  <option value="Physics">Physics</option>
-                  <option value="Chemistry">Chemistry</option>
+                  {availableSubjects.map((subject) => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
                 </select>
               </div>
 

@@ -41,9 +41,14 @@ router.get('/live-class/token', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Access denied: Meeting does not exist' });
     }
     const student = await prisma.student.findUnique({
-      where: { id: req.auth!.userId }
+      where: { id: req.auth!.userId },
+      include: { class: true }
     });
-    if (!student || student.classId !== liveClass.subject.classId) {
+    const fullLiveClass = await prisma.liveClass.findUnique({
+      where: { id: liveClass.id },
+      include: { subject: { include: { class: true } } }
+    });
+    if (!student || !fullLiveClass || student.class?.name !== fullLiveClass.subject.class.name) {
       return res.status(403).json({ error: 'Access denied: You are not enrolled in this class' });
     }
   }
@@ -227,10 +232,18 @@ router.get('/live-class/mock/verify', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Access denied: Meeting does not exist' });
     }
     const student = await prisma.student.findUnique({
-      where: { id: req.auth!.userId }
+      where: { id: req.auth!.userId },
+      include: { class: true }
     });
-    if (!student || student.classId !== liveClass.subject.classId) {
-      return res.status(403).json({ error: 'Access denied: You are not enrolled in this class' });
+    
+    // Find the live class's full subject with class info to compare names
+    const fullLiveClass = await prisma.liveClass.findUnique({
+      where: { id: liveClass.id },
+      include: { subject: { include: { class: true } } }
+    });
+
+    if (!student || !fullLiveClass || student.class?.name !== fullLiveClass.subject.class.name) {
+      return res.status(403).json({ error: 'Access denied: You are not enrolled in the class for this meeting.' });
     }
   }
 
@@ -269,9 +282,14 @@ router.post('/live-class/mock/join', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Access denied: Meeting does not exist' });
     }
     const student = await prisma.student.findUnique({
-      where: { id: req.auth!.userId }
+      where: { id: req.auth!.userId },
+      include: { class: true }
     });
-    if (!student || student.classId !== liveClass.subject.classId) {
+    const fullLiveClass = await prisma.liveClass.findUnique({
+      where: { id: liveClass.id },
+      include: { subject: { include: { class: true } } }
+    });
+    if (!student || !fullLiveClass || student.class?.name !== fullLiveClass.subject.class.name) {
       return res.status(403).json({ error: 'Access denied: You are not enrolled in this class' });
     }
   }
@@ -341,9 +359,14 @@ router.post('/live-class/mock/sync', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Access denied: Meeting does not exist' });
     }
     const student = await prisma.student.findUnique({
-      where: { id: req.auth!.userId }
+      where: { id: req.auth!.userId },
+      include: { class: true }
     });
-    if (!student || student.classId !== liveClass.subject.classId) {
+    const fullLiveClass = await prisma.liveClass.findUnique({
+      where: { id: liveClass.id },
+      include: { subject: { include: { class: true } } }
+    });
+    if (!student || !fullLiveClass || student.class?.name !== fullLiveClass.subject.class.name) {
       return res.status(403).json({ error: 'Access denied: You are not enrolled in this class' });
     }
   }
@@ -783,13 +806,14 @@ router.get('/live-classes', requireAuth, async (req, res) => {
 
 // Update Status of a Live Class
 router.patch('/live-class/:id/status', requireAuth, async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { status } = req.body;
 
   let dbStatus: any = 'UPCOMING';
   if (status === 'Live') dbStatus = 'LIVE';
   else if (status === 'Completed') dbStatus = 'COMPLETED';
   else if (status === 'Upcoming') dbStatus = 'UPCOMING';
+  else if (status === 'Cancelled') dbStatus = 'CANCELLED';
 
   try {
     const updated = await prisma.liveClass.update({

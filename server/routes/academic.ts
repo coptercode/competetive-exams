@@ -5,6 +5,21 @@ import { optionalAuth } from '../middleware/auth.js';
 
 const router = Router();
 
+// Get distinct subject names
+router.get('/subjects/distinct', async (req, res) => {
+  try {
+    const subjects = await prisma.subject.findMany({
+      select: { name: true },
+      distinct: ['name'],
+      orderBy: { name: 'asc' },
+    });
+    res.json(subjects.map(s => s.name));
+  } catch (error) {
+    console.error('Failed to fetch distinct subjects:', error);
+    res.status(500).json({ error: 'Failed to fetch distinct subjects' });
+  }
+});
+
 const topicInclude = (studentId?: string) => ({
   orderBy: { sortOrder: 'asc' as const },
   include: {

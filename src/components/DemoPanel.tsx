@@ -171,6 +171,9 @@ export const DemoPanel: React.FC = () => {
         },
       });
 
+      // Load specific user's topic progress
+      useLmsStore.getState().loadProfileData(result.user.id);
+
       addNotification(
         "Simulation Active",
         `Switched user session to simulated ${role.toUpperCase()} role successfully.`,

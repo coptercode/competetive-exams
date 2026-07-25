@@ -4,7 +4,7 @@ import EmbeddedPostgres from 'embedded-postgres';
 import pg from 'pg';
 
 const root = process.cwd();
-const pgDir = path.join(root, '.pgdata');
+const pgDir = path.join(root, '.pgdata2');
 
 async function canConnect(url: string): Promise<boolean> {
   try {

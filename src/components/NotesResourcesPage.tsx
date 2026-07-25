@@ -9,20 +9,22 @@ const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
   let imageUrl = "";
   let bgColor = "bg-white";
 
+  const baseUrl = "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public";
+
   if (titleLower.includes("physics")) {
-    imageUrl = "/physics.png";
+    imageUrl = `${baseUrl}/physics.png`;
     bgColor = "bg-[#fdfbf7]";
   } else if (titleLower.includes("chemistry")) {
-    imageUrl = "/chemistry.png";
+    imageUrl = `${baseUrl}/chemistry.png`;
     bgColor = "bg-white";
   } else if (titleLower.includes("biology")) {
-    imageUrl = "/biology.png";
+    imageUrl = `${baseUrl}/biology.png`;
     bgColor = "bg-white";
   } else if (titleLower.includes("science")) {
-    imageUrl = "/science.png";
+    imageUrl = `${baseUrl}/science.png`;
     bgColor = "bg-white";
   } else if (titleLower.includes("math")) {
-    imageUrl = "/maths.png";
+    imageUrl = `${baseUrl}/maths.png`;
     bgColor = "bg-[#faf0e6]";
   }
 
@@ -73,20 +75,22 @@ const ChapterCover: React.FC<{ subjectTitle: string; chapterTitle: string }> = (
   let imageUrl = "";
   let bgColor = "bg-white";
 
+  const baseUrl = "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public";
+
   if (cTitleLower.includes("physics") || sTitleLower.includes("physics")) {
-    imageUrl = "/physics.png";
+    imageUrl = `${baseUrl}/physics.png`;
     bgColor = "bg-[#fdfbf7]";
   } else if (cTitleLower.includes("chemistry") || sTitleLower.includes("chemistry")) {
-    imageUrl = "/chemistry.png";
+    imageUrl = `${baseUrl}/chemistry.png`;
     bgColor = "bg-white";
   } else if (cTitleLower.includes("biology") || sTitleLower.includes("biology")) {
-    imageUrl = "/biology.png";
+    imageUrl = `${baseUrl}/biology.png`;
     bgColor = "bg-white";
   } else if (cTitleLower.includes("science") || sTitleLower.includes("science")) {
-    imageUrl = "/science.png";
+    imageUrl = `${baseUrl}/science.png`;
     bgColor = "bg-white";
   } else if (cTitleLower.includes("math") || sTitleLower.includes("math")) {
-    imageUrl = "/maths.png";
+    imageUrl = `${baseUrl}/maths.png`;
     bgColor = "bg-[#faf0e6]";
   }
 

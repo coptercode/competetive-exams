@@ -73,7 +73,7 @@ export const TeacherDashboard: React.FC = () => {
       fetchMeetings();
       fetchNotesCount();
       fetchAssignments();
-    }, 6000);
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 

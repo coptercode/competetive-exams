@@ -1,11 +1,15 @@
-import { HelpCircle, Trophy, AlertCircle } from "lucide-react";
+import { HelpCircle, Trophy, AlertCircle, Lock } from "lucide-react";
 import { generateQuiz } from "../utils/quizGenerator";
 import React, { useState, useRef, useEffect } from "react";
 import { useLmsStore } from "../store/index";
 import type { Topic, Chapter, Subject } from "../store/types";
 import { getChapterContent, getSubjectType } from "../store/curriculumData";
-import { quizAPI } from "../services/api";
+
+import { getApiBaseUrl } from "../utils/apiBase";
+import { useUiStore } from "../store/useUiStore";
 import { DRMVideoPlayer } from "./DRMVideoPlayer";
+import { CustomYouTubePlayer } from "./CustomYouTubePlayer";
+import { quizAPI, chapterLockAPI } from "../services/api";
 
 const getTopicThumbnail = (subjectName: string = "", chapterName: string = "", topicName: string = ""): string => {
   const subj = subjectName.toLowerCase();
@@ -98,6 +102,10 @@ import {
   Youtube
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import remarkGfm from 'remark-gfm';
 import { getVideoLinkForTopic } from "../utils/videoLinks";
 import { getPdfLinkForTopic } from "../utils/pdfLinks";
 import { getYoutubeLinkForTopic } from "../utils/youtubeLinks";
@@ -177,19 +185,43 @@ export const CourseLearningPage: React.FC = () => {
 
 
 
+  const activeBoard = boards.find((b) => b.id === profile.selectedBoardId) || boards[0];
+  const activeClass = activeBoard?.classes?.find((c) => c.id === profile.selectedClassId) || activeBoard?.classes?.[0];
+  const activeSubject = activeClass?.subjects.find((s) => s.id === activeSubjectId) || activeClass?.subjects[0];
+  const activeChapter = activeSubject?.chapters.find((c) => c.id === activeChapterId) || activeSubject?.chapters[0];
+  const activeTopic = activeChapter?.topics.find((t) => t.id === activeTopicId) || activeChapter?.topics[0];
+
   const [expandedChapterId, setExpandedChapterId] = useState<string | null>(null);
+
+  // ── Chapter access state (server-resolved effective access per student) ──
+  const [chapterAccessMap, setChapterAccessMap] = useState<Record<string, boolean>>({});
+
+  // Fetch chapter access on mount and whenever the active subject changes
+  useEffect(() => {
+    const subjectId = activeSubject?.id;
+    if (!subjectId || profile?.role?.toLowerCase() !== 'student') {
+      // For non-students (teachers/admins), all chapters are accessible
+      setChapterAccessMap({});
+      return;
+    }
+    chapterLockAPI.getStudentChapterAccess(subjectId)
+      .then(data => {
+        const map: Record<string, boolean> = {};
+        data.chapters.forEach(ch => { map[ch.id] = ch.isUnlocked; });
+        setChapterAccessMap(map);
+      })
+      .catch(err => {
+        console.warn('[chapter-lock] Failed to fetch chapter access:', err.message);
+        // On error, don't lock anything — fail open so students aren't blocked
+        setChapterAccessMap({});
+      });
+  }, [activeSubject?.id, profile?.role]);
 
   useEffect(() => {
     if (activeChapterId) {
       setExpandedChapterId(activeChapterId);
     }
   }, [activeChapterId]);
-
-  const activeBoard =
-    boards.find((b) => b.id === profile.selectedBoardId) || boards[0];
-  const activeClass =
-    activeBoard?.classes?.find((c) => c.id === profile.selectedClassId) ||
-    activeBoard?.classes?.[0];
 
   if (!activeBoard || !activeClass) {
     return (
@@ -199,18 +231,14 @@ export const CourseLearningPage: React.FC = () => {
     );
   }
 
-  const activeSubject =
-    activeClass?.subjects.find((s) => s.id === activeSubjectId) ||
-    activeClass?.subjects[0];
-  const activeChapter =
-    activeSubject?.chapters.find((c) => c.id === activeChapterId) ||
-    activeSubject?.chapters[0];
-  const activeTopic =
-    activeChapter?.topics.find((t) => t.id === activeTopicId) ||
-    activeChapter?.topics[0];
-
   const youtubeId = getYouTubeId(activeTopic?.videoUrl);
   const useDrmPlayer = activeTopic?.drmEnabled === true && !!activeTopic?.videoId;
+  const hasVideo = !!(
+    youtubeId || 
+    useDrmPlayer || 
+    getVideoLinkForTopic(activeTopic?.title) || 
+    (activeTopic?.videoUrl && activeTopic.videoUrl !== "https://www.w3schools.com/html/movie.mp4")
+  );
 
 
 
@@ -328,7 +356,7 @@ export const CourseLearningPage: React.FC = () => {
         setView("quiz-view");
       } catch (innerErr) {
         console.error("Fallback generation failed", innerErr);
-        alert("Failed to load or generate quiz.");
+        useUiStore.getState().showAlert("Failed to load or generate quiz.");
       }
     } finally {
       setIsLoadingQuiz(false);
@@ -417,6 +445,17 @@ export const CourseLearningPage: React.FC = () => {
           `You have successfully mastered "${activeTopic.title}" and gained 200 XP!`,
           "success",
         );
+        
+      // Auto navigate to next topic
+      let allTopics: { chapterId: string, topic: any }[] = [];
+      activeSubject.chapters.forEach(c => {
+        c.topics.forEach(t => allTopics.push({ chapterId: c.id, topic: t }));
+      });
+      const currentIdx = allTopics.findIndex(t => t.topic.id === activeTopic.id);
+      if (currentIdx !== -1 && currentIdx < allTopics.length - 1) {
+        const next = allTopics[currentIdx + 1];
+        setActiveCourseContext(activeSubject.id, next.chapterId, next.topic.id);
+      }
     }
   };
 
@@ -451,6 +490,22 @@ export const CourseLearningPage: React.FC = () => {
     setIsPlaying(true);
   };
 
+  const isTopicUnlocked = (topicId: string) => {
+    if (!activeSubject) return false;
+    const allTopics = activeSubject.chapters
+      .filter((c) => !c.title.startsWith("#"))
+      .flatMap(chapter => {
+        const cleanTopics = chapter.topics.filter(t => t.title !== chapter.title && !t.title.startsWith('#'));
+        return cleanTopics.length > 0 ? cleanTopics : chapter.topics;
+      });
+      
+    const currentIndex = allTopics.findIndex(t => t.id === topicId);
+    if (currentIndex <= 0) return true;
+    
+    const previousTopic = allTopics[currentIndex - 1];
+    return previousTopic.isCompleted || completedTopicIds.includes(previousTopic.id);
+  };
+
   if (!activeSubject) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-6 bg-slate-900 rounded-2xl border border-white/5">
@@ -475,12 +530,11 @@ export const CourseLearningPage: React.FC = () => {
           style={isFullscreen ? { aspectRatio: "auto", height: "100%", width: "100%" } : {}}
         >
           {youtubeId ? (
-            <iframe
-              src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0&rel=0`}
+            <CustomYouTubePlayer 
+              url={`https://www.youtube.com/watch?v=${youtubeId}`} 
               title={activeTopic?.title}
-              className="w-full h-full absolute inset-0 border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
+              onTimeUpdate={(t) => setCurrentTime(Math.floor(t))}
+              onEnded={handleMarkAsCompleted}
             />
           ) : useDrmPlayer ? (
             <DRMVideoPlayer
@@ -490,6 +544,7 @@ export const CourseLearningPage: React.FC = () => {
               onTimeUpdate={(t) => {
                 setCurrentTime(Math.floor(t));
               }}
+              onEnded={handleMarkAsCompleted}
             />
           ) : (
             <>
@@ -501,6 +556,13 @@ export const CourseLearningPage: React.FC = () => {
                     className="w-full h-full absolute inset-0 border-0 z-10" 
                     allow="autoplay; fullscreen" 
                     allowFullScreen
+                  />
+                ) : activeTopic?.videoUrl && activeTopic.videoUrl !== "https://www.w3schools.com/html/movie.mp4" ? (
+                  <video 
+                    src={activeTopic.videoUrl} 
+                    className="w-full h-full absolute inset-0 z-10 bg-black"
+                    controls
+                    onEnded={handleMarkAsCompleted}
                   />
                 ) : (
                   <div className="text-white text-lg font-medium z-10">Video is not added</div>
@@ -530,10 +592,15 @@ export const CourseLearningPage: React.FC = () => {
             {!(activeTopic?.isCompleted || (activeTopic && completedTopicIds.includes(activeTopic.id))) ? (
               <button
                 onClick={handleMarkAsCompleted}
-                className="flex items-center gap-2 bg-brand-royal hover:bg-brand-royal/90 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors shadow-lg shadow-brand-royal/20"
+                disabled={hasVideo}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-colors shadow-lg ${
+                  hasVideo 
+                    ? "bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none" 
+                    : "bg-brand-royal hover:bg-brand-royal/90 text-white shadow-brand-royal/20"
+                }`}
               >
                 <CheckCircle className="w-4 h-4" />
-                Mark as Completed
+                {hasVideo ? "Watch Video to Complete" : "Mark as Completed"}
               </button>
             ) : (
               <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
@@ -662,7 +729,7 @@ export const CourseLearningPage: React.FC = () => {
                               </div>
                             ) : mdContent ? (
                               <article className="prose dark:prose-invert max-w-none prose-headings:text-brand-royal dark:prose-headings:text-brand-royal-300 prose-a:text-brand-royal dark:prose-a:text-brand-royal-300 hover:prose-a:text-brand-royal/80 dark:hover:prose-a:text-brand-royal-400 prose-strong:text-slate-900 dark:prose-strong:text-white prose-code:text-amber-600 dark:prose-code:text-amber-300 prose-pre:bg-slate-100 dark:prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-200 dark:prose-pre:border-white/10">
-                                <ReactMarkdown>{mdContent}</ReactMarkdown>
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{mdContent}</ReactMarkdown>
                               </article>
                             ) : (
                               <div className="flex items-center justify-center w-full h-full">
@@ -887,79 +954,111 @@ export const CourseLearningPage: React.FC = () => {
             ) : (
               activeSubject.chapters
                 .filter((c) => !c.title.startsWith("#"))
-                .map((chapter) => {
+                .map((chapter, index) => {
                   const isChapterActive = activeChapterId === chapter.id;
                   const isExpanded = expandedChapterId === chapter.id;
-                  const firstTopic = chapter.topics[0];
+
+                  // Determine chapter-level lock state:
+                  // - If we have server-resolved data use it
+                  // - If map is empty (API not called yet) or chapter not in map, use default
+                  // Default: Teachers see everything (true). Students see only the first chapter by default, others are locked.
+                  const hasServerData = Object.keys(chapterAccessMap).length > 0;
+                  const defaultUnlocked = profile?.role?.toLowerCase() === "student" ? index === 0 : true;
+                  const isChapterUnlocked = hasServerData
+                    ? (chapterAccessMap[chapter.id] ?? defaultUnlocked)
+                    : defaultUnlocked;
+
                   return (
                     <div key={chapter.id} className="space-y-1">
-                      {/* Clickable Chapter Header Row */}
-                      <button
-                        onClick={() => {
-                          if (isExpanded) {
-                            setExpandedChapterId(null);
-                          } else {
-                            setExpandedChapterId(chapter.id);
-                          }
-                        }}
-                      className={`w-full py-2.5 px-3 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 font-bold ${
-                        isChapterActive
-                          ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300"
-                          : "border-transparent text-slate-700 dark:text-slate-300 hover:text-brand-royal hover:bg-brand-royal/5 dark:hover:bg-brand-royal/10"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <BookOpen className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
-                        <span className="truncate">{chapter.title}</span>
-                      </div>
-                      <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${isExpanded ? "rotate-90 text-brand-royal" : "text-slate-400"}`} />
-                    </button>
+                      {/* Chapter Header Row */}
+                      {isChapterUnlocked ? (
+                        <button
+                          onClick={() => {
+                            if (isExpanded) {
+                              setExpandedChapterId(null);
+                            } else {
+                              setExpandedChapterId(chapter.id);
+                            }
+                          }}
+                          className={`w-full py-2.5 px-3 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 font-bold ${
+                            isChapterActive
+                              ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300"
+                              : "border-transparent text-slate-700 dark:text-slate-300 hover:text-brand-royal hover:bg-brand-royal/5 dark:hover:bg-brand-royal/10"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 truncate">
+                            <BookOpen className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
+                            <span className="truncate">{chapter.title}</span>
+                          </div>
+                          <ChevronRight className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${isExpanded ? "rotate-90 text-brand-royal" : "text-slate-400"}`} />
+                        </button>
+                      ) : (
+                        /* Locked chapter — not clickable, shows lock icon + tooltip */
+                        <div
+                          title="Locked — ask your teacher to unlock this chapter."
+                          className="w-full py-2.5 px-3 rounded-none text-left text-xs border border-transparent flex items-center justify-between gap-2 font-bold opacity-50 cursor-not-allowed select-none text-slate-500 dark:text-slate-500"
+                        >
+                          <div className="flex items-center gap-2 truncate">
+                            <Lock className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
+                            <span className="truncate">{chapter.title}</span>
+                          </div>
+                          <Lock className="w-3 h-3 flex-shrink-0 text-slate-400" />
+                        </div>
+                      )}
 
-                    {/* Topics list - only shown when chapter is active */}
-                    {isExpanded && (
-                      <div className="space-y-0.5 ml-3 border-l border-brand-royal/20 pl-2">
-                        {(() => {
-                          const cleanTopics = chapter.topics.filter(t => t.title !== chapter.title && !t.title.startsWith('#'));
-                          const displayTopics = cleanTopics.length > 0 ? cleanTopics : chapter.topics;
-                          
-                          return displayTopics.map((topic) => {
-                            const isTopicActive = activeTopic?.id === topic.id;
-                            return (
-                              <button
-                                key={topic.id}
-                                onClick={() =>
-                                  setActiveCourseContext(
-                                    activeSubject.id,
-                                    chapter.id,
-                                    topic.id,
-                                  )
-                                }
-                                className={`w-full py-2 px-2.5 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 ${
-                                  isTopicActive
-                                    ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300 font-semibold"
-                                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
-                                }`}
-                              >
-                                <div className="flex items-center gap-2 truncate">
-                                  {(topic.isCompleted || completedTopicIds.includes(topic.id)) ? (
-                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-                                  ) : (
-                                    <div className="w-3.5 h-3.5 rounded-full border border-slate-400 dark:border-slate-600 flex-shrink-0" />
-                                  )}
-                                  <span className="truncate">{topic.title}</span>
-                                </div>
-                                <span className="text-[10px] text-slate-500 dark:text-slate-500 font-mono font-medium flex-shrink-0">
-                                  {topic.duration}
-                                </span>
-                              </button>
-                            );
-                          });
-                        })()}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
+                      {/* Topics list - only shown when chapter is expanded AND unlocked */}
+                      {isExpanded && isChapterUnlocked && (
+                        <div className="space-y-0.5 ml-3 border-l border-brand-royal/20 pl-2">
+                          {(() => {
+                            const cleanTopics = chapter.topics.filter(t => t.title !== chapter.title && !t.title.startsWith('#'));
+                            const displayTopics = cleanTopics.length > 0 ? cleanTopics : chapter.topics;
+                            
+                            return displayTopics.map((topic) => {
+                              const isTopicActive = activeTopic?.id === topic.id;
+                              const isUnlocked = isTopicUnlocked(topic.id);
+                              return (
+                                <button
+                                  key={topic.id}
+                                  disabled={!isUnlocked}
+                                  onClick={() => {
+                                    if (isUnlocked) {
+                                      setActiveCourseContext(
+                                        activeSubject.id,
+                                        chapter.id,
+                                        topic.id,
+                                      );
+                                    }
+                                  }}
+                                  className={`w-full py-2 px-2.5 rounded-none text-left text-xs transition-all border flex items-center justify-between gap-2 ${
+                                    !isUnlocked 
+                                      ? "opacity-50 cursor-not-allowed border-transparent text-slate-500" 
+                                      : isTopicActive
+                                        ? "border-brand-royal bg-brand-royal/10 text-brand-royal dark:text-blue-300 font-semibold"
+                                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2 truncate">
+                                    {!isUnlocked ? (
+                                      <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                                    ) : (topic.isCompleted || completedTopicIds.includes(topic.id)) ? (
+                                      <CheckCircle className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                                    ) : (
+                                      <div className="w-3.5 h-3.5 rounded-full border border-slate-400 dark:border-slate-600 flex-shrink-0" />
+                                    )}
+                                    <span className="truncate">{topic.title}</span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-500 font-mono font-medium flex-shrink-0">
+                                    {topic.duration}
+                                  </span>
+                                </button>
+                              );
+                            });
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
             )}
           </div>
         </div>

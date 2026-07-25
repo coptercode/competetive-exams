@@ -56,6 +56,7 @@ router.get('/assignments', requireAuth, async (req, res) => {
         submissions: studentId ? {
           where: { studentId: studentId },
           include: {
+            student: { include: { user: true } },
             feedback: {
               include: {
                 teacher: {
@@ -69,7 +70,11 @@ router.get('/assignments', requireAuth, async (req, res) => {
         } : {
           include: {
             student: { include: { user: true } },
-            feedback: true
+            feedback: {
+              include: {
+                teacher: { include: { user: true } }
+              }
+            }
           }
         }
       },
@@ -148,7 +153,7 @@ router.get('/assignments', requireAuth, async (req, res) => {
             status = 'Graded';
             grade = submission.feedback ? `${submission.feedback.marksObtained}/100` : undefined;
             feedback = submission.feedback?.comment || undefined;
-            teacherName = submission.feedback ? `${submission.feedback.teacher.user.firstName} ${submission.feedback.teacher.user.lastName}` : undefined;
+            teacherName = submission.feedback?.teacher?.user ? `${submission.feedback.teacher.user.firstName} ${submission.feedback.teacher.user.lastName}` : undefined;
           }
         }
 
@@ -224,8 +229,9 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
     }
 
     // Check deadline
+    const assignmentId = req.params.assignmentId as string;
     const assignment = await prisma.assignment.findUnique({
-      where: { id: req.params.assignmentId },
+      where: { id: assignmentId },
       include: {
         topic: {
           include: {
@@ -270,7 +276,7 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
       where: {
         studentId_assignmentId: {
           studentId: student.id,
-          assignmentId: req.params.assignmentId,
+          assignmentId: assignmentId,
         },
       },
       update: {
@@ -280,7 +286,7 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
       },
       create: {
         studentId: student.id,
-        assignmentId: req.params.assignmentId,
+        assignmentId: assignmentId,
         submissionUrl,
         submittedAt: new Date(),
       },
@@ -307,15 +313,16 @@ router.post('/assignments/submissions/:submissionId/grade', requireAuth, async (
     }
 
     const marks = parseFloat(marksObtained);
+    const submissionId = req.params.submissionId as string;
     const feedback = await prisma.assignmentFeedback.upsert({
-      where: { submissionId: req.params.submissionId },
+      where: { submissionId: submissionId },
       update: {
         marksObtained: marks,
         comment,
         passed: marks >= 40,
       },
       create: {
-        submissionId: req.params.submissionId,
+        submissionId: submissionId,
         teacherId: teacher.id,
         marksObtained: marks,
         comment,
@@ -324,7 +331,7 @@ router.post('/assignments/submissions/:submissionId/grade', requireAuth, async (
     });
 
     await prisma.assignmentSubmission.update({
-      where: { id: req.params.submissionId },
+      where: { id: submissionId },
       data: { status: 'GRADED' }
     });
 
@@ -337,8 +344,9 @@ router.post('/assignments/submissions/:submissionId/grade', requireAuth, async (
 
 router.get('/students/:studentId/submissions', requireAuth, async (req, res) => {
   try {
+    const studentId = req.params.studentId as string;
     const submissions = await prisma.assignmentSubmission.findMany({
-      where: { studentId: req.params.studentId },
+      where: { studentId: studentId },
       include: { assignment: true },
       orderBy: { submittedAt: 'desc' },
     });

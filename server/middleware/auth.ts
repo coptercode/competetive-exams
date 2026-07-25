@@ -2,6 +2,9 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'eduverse-dev-secret';
+if (JWT_SECRET === 'eduverse-dev-secret') {
+  console.warn("⚠️ WARNING: Using default JWT_SECRET. Do not use this in production!");
+}
 
 export interface AuthPayload {
   userId: string;

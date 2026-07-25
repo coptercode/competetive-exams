@@ -170,6 +170,7 @@ export interface AuthState {
 export interface LMSStore {
   auth: AuthState;
   setAuth: (auth: Partial<AuthState>) => void;
+  loadProfileData: (profileId: string) => void;
   logout: () => void;
 
   activeView: string;
@@ -217,6 +218,7 @@ export interface LMSStore {
 
   bookmarks: Bookmark[];
   notes: any[];
+  fetchNotes: () => Promise<void>;
   addBookmark: (
     bookmark: Omit<Bookmark, "id" | "timestamp">,
     timestamp: string,

@@ -224,10 +224,45 @@
   outline: 1px solid #4f46e5;
 }
 
+
 .nexora-timepicker .react-time-picker__clock,
 .nexora-timepicker .react-time-picker__clear-button,
 .nexora-timepicker .react-time-picker__clock-button {
   display: none !important;
 }
 
+@media print {
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background-color: white !important;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  #printable-note, #printable-note * {
+    visibility: visible;
+  }
+  
+  #printable-note {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: black !important;
+  }
+  
+  #printable-note * {
+    color: black !important;
+  }
 
+  /* Keep code blocks readable */
+  #printable-note pre {
+    background-color: #f3f4f6 !important;
+    border: 1px solid #e5e7eb !important;
+  }
+}

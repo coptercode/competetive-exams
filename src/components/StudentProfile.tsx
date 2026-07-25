@@ -1,5 +1,6 @@
 import React from "react";
 import { useLmsStore } from "../store/index";
+import { useUiStore } from "../store/useUiStore";
 import {
   Award,
   Heart,
@@ -238,8 +239,8 @@ export const StudentProfile: React.FC = () => {
 
             <button
               onClick={() =>
-                alert(
-                  "Billing Management interface is mocked for this prototype demonstration.",
+                useUiStore.getState().showAlert(
+                  "Billing Management interface is mocked for this prototype demonstration."
                 )
               }
               className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-white/5 hover:border-slate-300 hover:bg-slate-200 dark:hover:bg-slate-950 text-slate-800 dark:text-white text-xs font-semibold transition-all active:scale-95"
