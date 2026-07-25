@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { startDatabase } from './lib/db.js';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
 import authRoutes from './routes/auth.js';
@@ -27,7 +29,22 @@ await runChapterLockMigration();
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
-app.use(cors());
+app.use(helmet());
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
@@ -40,7 +57,13 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'eduverse-api' });
 });
 
-app.use('/api/auth', authRoutes);
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: { error: 'Too many requests, please try again later.' }
+});
+
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api', academicRoutes);
 app.use('/api', courseRoutes);
 app.use('/api', quizRoutes);

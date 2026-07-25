@@ -1028,8 +1028,14 @@ function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [setView, auth.isAuthenticated, token, profile]);
 
+  const isInitialMount = React.useRef(true);
+
   // Keep URL hash in sync with activeView and course context
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     const fullHash = window.location.hash.replace(/^#\/?/, "");
     const hashParts = fullHash.split("/");
     const currentHash = hashParts[0].split("?")[0] || "landing";

@@ -133,6 +133,10 @@ router.post('/tutor', requireAuth, async (req, res) => {
 
   // Helper to query Pollinations AI as a free public fallback
   const queryPollinations = async (): Promise<string | null> => {
+    if (process.env.NODE_ENV === 'production' && process.env.ENABLE_AI_FALLBACK !== 'true') {
+      console.warn('Pollinations AI fallback is disabled in production to protect student data. Set ENABLE_AI_FALLBACK=true to enable.');
+      return null;
+    }
     try {
       console.log('Attempting Pollinations AI fallback...');
       const response = await fetch("https://text.pollinations.ai/", {
@@ -222,7 +226,7 @@ router.post('/tutor', requireAuth, async (req, res) => {
     for (const modelName of tutorModels) {
       try {
         const model = genAI.getGenerativeModel({
-          model: modelName,
+          model: modelName as string,
           systemInstruction: 'You are an encouraging, expert AI Personal Tutor for a student. Keep your explanations clear, structured, and easy to understand. Use Markdown formatting. If the student asks a math/science question, explain step-by-step. If they ask a coding question, write clean code with comments. Always maintain a helpful, teacher-like tone.',
         });
 

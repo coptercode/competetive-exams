@@ -176,7 +176,9 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
   setCurrentTopic: (topic: Topic) => set({ currentTopic: topic }),
 
   profile: initialProfile,
+  setProfile: (profile) => set({ profile }),
   boards: [],
+  setBoards: (boards) => set({ boards }),
   assignments: defaultAssignments,
   quizzes: defaultQuizzes,
   activeQuizId: null,

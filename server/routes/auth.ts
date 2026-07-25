@@ -7,17 +7,14 @@ import { generateSecurePassword, sendCredentialsEmail, sendSubscriptionConfirmat
 
 const router = Router();
 
-// In-memory store for OTPs (email -> { otp, expiresAt })
-const passwordResetStore = new Map<string, { otp: string; expiresAt: number }>();
-
 // Dev-only helper: return OTP for testing (only available when not in production)
 router.get('/debug/otp', async (req, res) => {
   if (process.env.NODE_ENV === 'production') return res.status(404).end();
   const { email } = req.query as { email?: string };
   if (!email) return res.status(400).json({ error: 'Email is required' });
-  const record = passwordResetStore.get(email.toLowerCase());
+  const record = await prisma.passwordResetOTP.findUnique({ where: { email: email.toLowerCase() } });
   if (!record) return res.status(404).json({ error: 'No OTP for this email' });
-  return res.json({ email: email.toLowerCase(), otp: record.otp, expiresAt: record.expiresAt });
+  return res.json({ email: email.toLowerCase(), otp: record.otp, expiresAt: record.expiresAt.getTime() });
 });
 
 async function loadUser(email: string) {
@@ -50,11 +47,8 @@ router.get('/check-email', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body as { email?: string; password?: string };
-  if (password) {
-    const charCodes = Array.from(password).map(c => c.charCodeAt(0)).join(', ');
-    console.log(`[server] Login attempt: email="${email}", passwordLength=${password.length}, charCodes=[${charCodes}]`);
-  } else {
-    console.log(`[server] Login attempt: email="${email}", password=undefined`);
+  if (!password) {
+    console.warn(`[server] Login attempt: email="${email}", password=undefined`);
   }
   if (!email || !password) {
     console.warn(`[server] Login failed: Missing email or password in request body`);
@@ -694,12 +688,14 @@ router.get('/admin-analytics', requireAuth, requireAdmin, async (req, res) => {
       prisma.subscription.count()
     ]);
     const totalRecords = userCount + studentCount + teacherCount + courseCount + videoCount + quizCount + submissionCount + paymentCount + subCount;
-    // 145000 base + (15 queries per record) + (1.8 queries per second of process runtime)
-    const databaseQueries = 145000 + (totalRecords * 15) + Math.floor(serverUptime * 1.8);
+    const revenueAggregation = await prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: 'SUCCESS' }
+    });
+    const totalRevenue = Number(revenueAggregation._sum.amount || 0);
 
-    // Platform Revenue: base 0, and add 20000 for each user.
-    const totalRevenue = userCount * 20000;
-
+    // Live Queries doesn't have a real tracking mechanism, so we'll just track total records as a metric instead of faking it
+    const databaseQueries = totalRecords;
     return res.json({
       activeSubscriptionsCount,
       monthlyActiveSubscriptions: monthlyCounts,
@@ -714,11 +710,17 @@ router.get('/admin-analytics', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/logout', (_req, res) => {
+router.post('/logout', requireAuth, async (req, res) => {
+  if (req.auth && req.auth.jti) {
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days max for token
+    await prisma.revokedToken.upsert({
+      where: { jti: req.auth.jti },
+      update: {},
+      create: { jti: req.auth.jti, expiresAt }
+    });
+  }
   res.json({ success: true });
 });
-
-export default router;
 
 // Forgot password: send OTP
 router.post('/forgot-password', async (req, res) => {
@@ -730,8 +732,13 @@ router.post('/forgot-password', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-    passwordResetStore.set(email.toLowerCase(), { otp, expiresAt });
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    
+    await prisma.passwordResetOTP.upsert({
+      where: { email: email.toLowerCase() },
+      update: { otp, expiresAt },
+      create: { email: email.toLowerCase(), otp, expiresAt }
+    });
 
     const sent = await sendOtpEmail(email.toLowerCase(), otp);
     if (!sent) return res.status(500).json({ error: 'Failed to send OTP' });
@@ -749,10 +756,10 @@ router.post('/verify-otp', async (req, res) => {
   if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
 
   try {
-    const record = passwordResetStore.get(email.toLowerCase());
+    const record = await prisma.passwordResetOTP.findUnique({ where: { email: email.toLowerCase() } });
     if (!record) return res.status(400).json({ error: 'No OTP requested for this email' });
-    if (record.expiresAt < Date.now()) {
-      passwordResetStore.delete(email.toLowerCase());
+    if (record.expiresAt.getTime() < Date.now()) {
+      await prisma.passwordResetOTP.delete({ where: { email: email.toLowerCase() } });
       return res.status(400).json({ error: 'OTP expired' });
     }
     if (record.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
@@ -770,10 +777,10 @@ router.post('/reset-password', async (req, res) => {
   if (!email || !otp || !newPassword) return res.status(400).json({ error: 'Missing required fields' });
 
   try {
-    const record = passwordResetStore.get(email.toLowerCase());
+    const record = await prisma.passwordResetOTP.findUnique({ where: { email: email.toLowerCase() } });
     if (!record) return res.status(400).json({ error: 'No OTP requested for this email' });
-    if (record.expiresAt < Date.now()) {
-      passwordResetStore.delete(email.toLowerCase());
+    if (record.expiresAt.getTime() < Date.now()) {
+      await prisma.passwordResetOTP.delete({ where: { email: email.toLowerCase() } });
       return res.status(400).json({ error: 'OTP expired' });
     }
     if (record.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
@@ -784,11 +791,13 @@ router.post('/reset-password', async (req, res) => {
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
 
-    passwordResetStore.delete(email.toLowerCase());
+    await prisma.passwordResetOTP.delete({ where: { email: email.toLowerCase() } });
     return res.json({ success: true, message: 'Password reset successful' });
   } catch (err: any) {
     console.error('Reset password error:', err);
     return res.status(500).json({ error: err.message || 'Failed to reset password' });
   }
 });
+
+export default router;
 

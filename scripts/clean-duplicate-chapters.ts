@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 
+if (process.env.CONFIRM_DESTRUCTIVE !== 'yes') {
+  console.error('ERROR: This is a destructive script. You must set CONFIRM_DESTRUCTIVE=yes to run it.');
+  process.exit(1);
+}
+
 const prisma = new PrismaClient();
 
 function getBaseName(name: string) {

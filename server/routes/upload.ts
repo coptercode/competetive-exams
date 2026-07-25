@@ -5,6 +5,17 @@ import { uploadToMinio, buildStorageKey, deleteFromMinio, minioClient, MINIO_BUC
 import { processVideoForDrm, isFfmpegAvailable } from '../lib/drm-processor.js';
 import { prisma } from '../lib/prisma.js';
 import { ListObjectsV2Command, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { fileTypeFromBuffer } from 'file-type';
+
+async function validateMagicBytes(buffer: Buffer, declaredMimeType: string) {
+  if (declaredMimeType === 'text/markdown') return; // Cannot check magic bytes for text reliably
+  const type = await fileTypeFromBuffer(buffer);
+  if (!type || type.mime !== declaredMimeType) {
+    // some quicktime files might be detected as mp4 or vice versa by file-type, allow generic video matches
+    if (declaredMimeType.startsWith('video/') && type?.mime.startsWith('video/')) return;
+    throw new Error(`Invalid file content. Magic bytes mismatch (got ${type?.mime || 'unknown'}, expected ${declaredMimeType}).`);
+  }
+}
 
 const router = Router();
 
@@ -138,6 +149,8 @@ router.post(
       if (!req.file || !subjectId || !title) {
         return res.status(400).json({ error: 'file, subjectId, and title are required' });
       }
+
+      await validateMagicBytes(req.file.buffer, req.file.mimetype);
 
       // Find a topic to attach the note to (first topic in subject)
       const topic = await prisma.topic.findFirst({
@@ -280,6 +293,8 @@ router.post(
       let fileUrl: string | null = null;
 
       if (req.file) {
+        await validateMagicBytes(req.file.buffer, req.file.mimetype);
+
         const key = buildStorageKey(
           'assignment',
           classTitle || 'general',
@@ -612,6 +627,8 @@ router.post(
       let fileUrl = videoUrl || '';
 
       if (req.file && !enableDrm) {
+        await validateMagicBytes(req.file.buffer, req.file.mimetype);
+
         const key = buildStorageKey(
           'video',
           classTitle || 'general',
@@ -626,6 +643,7 @@ router.post(
           fileUrl = `/uploads/${key}`;
         }
       } else if (req.file && enableDrm) {
+        await validateMagicBytes(req.file.buffer, req.file.mimetype);
         // Original kept in MinIO via DRM pipeline; videoUrl stores internal reference only
         fileUrl = `drm-pending://${req.file.originalname}`;
       }
