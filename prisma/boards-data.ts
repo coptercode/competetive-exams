@@ -1,784 +1,565 @@
-import { tnsbBoardComplete } from './tnsb-data';
-import { icseBoardComplete } from './icse-data';
-import { cbseBoardComplete } from './cbse-data';
+// Competitive Exam Categories and Exam Programs Data
 
-export const tnsbBoard = [
+export interface ExamTopic {
+  id: string;
+  title: string;
+  content: string;
+  duration: string;
+  videoUrl?: string;
+  pdfUrl?: string;
+}
+
+export interface ExamChapter {
+  id: string;
+  title: string;
+  topics: ExamTopic[];
+}
+
+export interface ExamSubject {
+  id: string;
+  title: string;
+  color?: string;
+  chapters: ExamChapter[];
+}
+
+export interface ExamBatch {
+  id: string;
+  title: string;
+  subjects: ExamSubject[];
+}
+
+export interface ExamCategory {
+  id: string;
+  title: string;
+  code?: string;
+  classes: ExamBatch[];
+}
+
+export const initialBoards: ExamCategory[] = [
   {
-    id: "tnsb",
-    title: "Tamil Nadu State Board",
+    id: "engineering",
+    title: "Engineering Entrance Exams",
+    code: "ENGG",
     classes: [
       {
-        id: "class-12",
-        title: "Class 12",
+        id: "jee-main",
+        title: "JEE Main 2026 Batch",
         subjects: [
           {
-            id: "maths-12-v1",
-            title: "Mathematics Volume 1",
+            id: "jee-physics",
+            title: "Physics",
+            color: "from-blue-600 to-indigo-700",
+            chapters: [
+              {
+                id: "jee-phy-ch1",
+                title: "Mechanics & Kinematics",
+                topics: [
+                  {
+                    id: "jee-phy-ch1-t1",
+                    title: "Laws of Motion & Friction",
+                    content: "Newton's laws, impulse, momentum, static and kinetic friction equations.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "jee-phy-ch1-t2",
+                    title: "Work, Power & Energy",
+                    content: "Work-energy theorem, conservative forces, potential energy curves.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "jee-phy-ch2",
+                title: "Electrodynamics & Magnetism",
+                topics: [
+                  {
+                    id: "jee-phy-ch2-t1",
+                    title: "Electrostatics & Capacitance",
+                    content: "Coulomb's law, Gauss theorem, electric potential, parallel plate capacitors.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "jee-chemistry",
+            title: "Chemistry",
+            color: "from-emerald-600 to-teal-700",
+            chapters: [
+              {
+                id: "jee-chem-ch1",
+                title: "Physical Chemistry",
+                topics: [
+                  {
+                    id: "jee-chem-ch1-t1",
+                    title: "Mole Concept & Stoichiometry",
+                    content: "Atomic mass, molarity, molality, limiting reagent problems.",
+                    duration: "20m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "jee-chem-ch2",
+                title: "Organic Chemistry",
+                topics: [
+                  {
+                    id: "jee-chem-ch2-t1",
+                    title: "General Organic Chemistry (GOC)",
+                    content: "Inductive effect, resonance, hyperconjugation, reaction intermediates.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "jee-mathematics",
+            title: "Mathematics",
+            color: "from-rose-600 to-pink-700",
+            chapters: [
+              {
+                id: "jee-math-ch1",
+                title: "Calculus & Functions",
+                topics: [
+                  {
+                    id: "jee-math-ch1-t1",
+                    title: "Limits, Continuity & Differentiability",
+                    content: "L'Hopital's rule, continuity conditions, derivative rules.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "jee-advanced",
+        title: "JEE Advanced Target Batch",
+        subjects: [
+          {
+            id: "jee-adv-physics",
+            title: "Advanced Physics",
+            color: "from-purple-600 to-indigo-800",
+            chapters: [
+              {
+                id: "jee-adv-phy-ch1",
+                title: "Rotational Dynamics & Optics",
+                topics: [
+                  {
+                    id: "jee-adv-phy-t1",
+                    title: "Torque & Moment of Inertia",
+                    content: "Parallel axis theorem, rolling without slipping, angular momentum conservation.",
+                    duration: "45m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "medical",
+    title: "Medical Entrance Exams",
+    code: "MED",
+    classes: [
+      {
+        id: "neet-ug",
+        title: "NEET UG Super Batch",
+        subjects: [
+          {
+            id: "neet-biology",
+            title: "Biology (Botany & Zoology)",
+            color: "from-green-600 to-emerald-700",
+            chapters: [
+              {
+                id: "neet-bio-ch1",
+                title: "Human Physiology & Genetics",
+                topics: [
+                  {
+                    id: "neet-bio-t1",
+                    title: "Principles of Inheritance & Variation",
+                    content: "Mendelian genetics, pedigree analysis, chromosomal disorders.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "neet-physics",
+            title: "Physics for Medical",
             color: "from-sky-600 to-blue-700",
             chapters: [
               {
-                id: "maths-12-v1-ch1",
-                title: "Chapter 1: Applications of Matrices and Determinants",
+                id: "neet-phy-ch1",
+                title: "Ray Optics & Modern Physics",
                 topics: [
                   {
-                    id: "cl12-maths-v1-ch1-t1",
-                    title: "Adjoint and Inverse",
-                    content: "Adjoint calculation, properties of inverse, solving systems.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                  {
-                    id: "cl12-maths-v1-ch1-t2",
-                    title: "Rank of Matrix",
-                    content: "Row echelon form, rank evaluation, consistency tests.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                  {
-                    id: "cl12-maths-v1-ch1-t3",
-                    title: "Cramer's & Gauss Rules",
-                    content: "Determinants method, gaussian elimination back-substitution.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "class-11",
-        title: "Class 11",
-        subjects: [
-          {
-            id: "maths-11-v1",
-            title: "Mathematics",
-            chapters: [
-              {
-                id: "maths-11-ch1",
-                title: "Chapter 1: Sets and Functions",
-                topics: [
-                  {
-                    id: "cl11-maths-ch1-t1",
-                    title: "Sets Basics",
-                    content: "Introduction to sets and operations.",
-                    duration: "10m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "class-10",
-        title: "Class 10",
-        subjects: [
-          {
-            id: "maths-10-v1",
-            title: "Mathematics",
-            chapters: [
-              {
-                id: "maths-10-ch1",
-                title: "Chapter 1: Number Systems",
-                topics: [
-                  {
-                    id: "cl10-maths-ch1-t1",
-                    title: "Real Numbers",
-                    content: "Fundamental number system concepts.",
-                    duration: "10m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "biology-10-v1",
-            title: "Biology",
-            chapters: [
-              {
-                id: "bio-10-ch1",
-                title: "Chapter 1: Plant Anatomy and Plant Physiology",
-                topics: [
-                  {
-                    id: "cl10-bio-ch1-t1",
-                    title: "Nutrition in Plants",
-                    content: "Learn about the various modes of nutrition in plants.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "physics-10-v1",
-            title: "Physics",
-            chapters: [
-              {
-                id: "phy-10-ch1",
-                title: "Chapter 1: Laws of Motion",
-                topics: [
-                  {
-                    id: "cl10-phy-ch1-t1",
-                    title: "Force and Motion",
-                    content: "Introduction to Newton's laws of motion.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "chemistry-10-v1",
-            title: "Chemistry",
-            chapters: [
-              {
-                id: "chem-10-ch1",
-                title: "Chapter 1: Atoms and Molecules",
-                topics: [
-                  {
-                    id: "cl10-chem-ch1-t1",
-                    title: "Structure of Atom",
-                    content: "Understanding the basic structure of an atom.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "class-9",
-        title: "Class 9",
-        subjects: [
-          {
-            id: "maths-9-v1",
-            title: "Mathematics",
-            chapters: [
-              {
-                id: "maths-9-ch1",
-                title: "Chapter 1: Set Language",
-                topics: [
-                  {
-                    id: "cl9-maths-ch1-t1",
-                    title: "Introduction to Sets",
-                    content: "Basic set theory concepts.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-              {
-                id: "maths-9-ch2",
-                title: "Chapter 2: Real Numbers",
-                topics: [
-                  {
-                    id: "cl9-maths-ch2-t1",
-                    title: "Rational Numbers",
-                    content: "Rational numbers and properties.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-              {
-                id: "maths-9-ch3",
-                title: "Chapter 3: Algebra",
-                topics: [
-                  {
-                    id: "cl9-maths-ch3-t1",
-                    title: "Polynomials",
-                    content: "Algebraic expressions and polynomials.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-              {
-                id: "maths-9-ch4",
-                title: "Chapter 4: Geometry",
-                topics: [
-                  {
-                    id: "cl9-maths-ch4-t1",
-                    title: "Geometry Basics",
-                    content: "Basics of geometry.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                  {
-                    id: "cl9-maths-ch4-t2",
-                    title: "Triangles",
-                    content: "Properties of triangles.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                  {
-                    id: "cl9-maths-ch4-t3",
-                    title: "Quadrilaterals",
-                    content: "Properties of quadrilaterals.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                  {
-                    id: "cl9-maths-ch4-t4",
-                    title: "Circles",
-                    content: "Properties of circles.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-              {
-                id: "maths-9-ch5",
-                title: "Chapter 5: Coordinate Geometry",
-                topics: [
-                  {
-                    id: "cl9-maths-ch5-t1",
-                    title: "Cartesian System",
-                    content: "Understanding the Cartesian plane.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-              {
-                id: "maths-9-ch6",
-                title: "Chapter 6: Trigonometry",
-                topics: [
-                  {
-                    id: "cl9-maths-ch6-t1",
-                    title: "Trigonometric Ratios",
-                    content: "Introduction to trigonometric ratios.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-              {
-                id: "maths-9-ch7",
-                title: "Chapter 7: Mensuration",
-                topics: [
-                  {
-                    id: "cl9-maths-ch7-t1",
-                    title: "Heron's Formula",
-                    content: "Calculating the area of a triangle using Heron's formula.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "science-9-v1",
-            title: "Science",
-            chapters: [
-              {
-                id: "sci-9-ch1",
-                title: "Chapter 1: Measurement",
-                topics: [
-                  {
-                    id: "cl9-sci-ch1-t1",
-                    title: "Physical Quantities",
-                    content: "Introduction to physical quantities and units.",
-                    duration: "15m",
-                    videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                    id: "neet-phy-t1",
+                    title: "Refraction & Lenses",
+                    content: "Snell's law, lens formula, optical instruments.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
+  {
+    id: "civil_services",
+    title: "Civil Services (UPSC)",
+    code: "UPSC",
+    classes: [
+      {
+        id: "upsc-prelims",
+        title: "UPSC Prelims GS & CSAT",
+        subjects: [
+          {
+            id: "upsc-polity",
+            title: "Indian Polity & Governance",
+            color: "from-amber-600 to-orange-700",
+            chapters: [
+              {
+                id: "upsc-pol-ch1",
+                title: "Constitutional Framework",
+                topics: [
+                  {
+                    id: "upsc-pol-t1",
+                    title: "Preamble & Fundamental Rights",
+                    content: "Articles 12 to 35, basic structure doctrine, landmark judicial rulings.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "upsc-history",
+            title: "Modern History & Indian Culture",
+            color: "from-red-600 to-rose-700",
+            chapters: [
+              {
+                id: "upsc-hist-ch1",
+                title: "Indian National Movement",
+                topics: [
+                  {
+                    id: "upsc-hist-t1",
+                    title: "Freedom Movement (1857-1947)",
+                    content: "Revolt of 1857, Moderate and Extremist phases, Non-Cooperation Movement.",
+                    duration: "45m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "upsc-mains",
+        title: "UPSC Mains Answer Writing Batch",
+        subjects: [
+          {
+            id: "upsc-gs3",
+            title: "General Studies Paper III",
+            color: "from-indigo-600 to-violet-700",
+            chapters: [
+              {
+                id: "upsc-gs3-ch1",
+                title: "Economy & Security",
+                topics: [
+                  {
+                    id: "upsc-gs3-t1",
+                    title: "Indian Economic Growth & Budgeting",
+                    content: "Fiscal deficit, monetary policy, infrastructure development models.",
+                    duration: "50m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "tnpsc",
+    title: "Tamil Nadu Public Service Commission",
+    code: "TNPSC",
+    classes: [
+      {
+        id: "tnpsc-group-1",
+        title: "TNPSC Group 1 Officer Batch",
+        subjects: [
+          {
+            id: "tnpsc-general-studies",
+            title: "General Studies & Aptitude",
+            color: "from-cyan-600 to-blue-700",
+            chapters: [
+              {
+                id: "tnpsc-gs-ch1",
+                title: "Tamil Nadu History, Culture & Heritage",
+                topics: [
+                  {
+                    id: "tnpsc-gs-t1",
+                    title: "Sangam Age to Modern Tamil Nadu",
+                    content: "Sangam literature, Dravidian movement, socio-cultural reforms.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnpsc-group-2",
+        title: "TNPSC Group 2 / 2A Executive Batch",
+        subjects: [
+          {
+            id: "tnpsc-p2-gs",
+            title: "General Tamil & General Studies",
+            color: "from-teal-600 to-green-700",
+            chapters: [
+              {
+                id: "tnpsc-p2-ch1",
+                title: "Development Administration in TN",
+                topics: [
+                  {
+                    id: "tnpsc-p2-t1",
+                    title: "Human Development Indicators in TN",
+                    content: "State welfare schemes, e-governance initiatives in Tamil Nadu.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnpsc-group-4-vao",
+        title: "TNPSC Group 4 & VAO Integrated Batch",
+        subjects: [
+          {
+            id: "tnpsc-g4-aptitude",
+            title: "Mental Ability & General Studies",
+            color: "from-purple-600 to-indigo-700",
+            chapters: [
+              {
+                id: "tnpsc-g4-ch1",
+                title: "Simplification & Percentage",
+                topics: [
+                  {
+                    id: "tnpsc-g4-t1",
+                    title: "HCF, LCM & Ratio Problems",
+                    content: "Shortcuts for competitive mental ability questions.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "banking",
+    title: "Banking Exams",
+    code: "BANK",
+    classes: [
+      {
+        id: "sbi-ibps-po",
+        title: "SBI & IBPS PO / Clerk Achievers Batch",
+        subjects: [
+          {
+            id: "bank-quant",
+            title: "Quantitative Aptitude",
+            color: "from-yellow-600 to-amber-700",
+            chapters: [
+              {
+                id: "bank-quant-ch1",
+                title: "Data Interpretation & Arithmetic",
+                topics: [
+                  {
+                    id: "bank-quant-t1",
+                    title: "Pie Charts, Tables & Caselets",
+                    content: "Fast DI techniques, approximation tricks, quadratic equations.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "bank-reasoning",
+            title: "Reasoning Ability",
+            color: "from-violet-600 to-purple-700",
+            chapters: [
+              {
+                id: "bank-reas-ch1",
+                title: "Puzzles & Seating Arrangement",
+                topics: [
+                  {
+                    id: "bank-reas-t1",
+                    title: "Circular & Floor Based Puzzles",
+                    content: "Linear, circular, matrix puzzles, syllogisms and blood relations.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "ssc",
+    title: "Staff Selection Commission (SSC)",
+    code: "SSC",
+    classes: [
+      {
+        id: "ssc-cgl-chsl",
+        title: "SSC CGL / CHSL / MTS Target Batch",
+        subjects: [
+          {
+            id: "ssc-maths",
+            title: "Quantitative Ability (Advanced Maths)",
+            color: "from-blue-600 to-cyan-700",
+            chapters: [
+              {
+                id: "ssc-math-ch1",
+                title: "Geometry & Trigonometry",
+                topics: [
+                  {
+                    id: "ssc-math-t1",
+                    title: "Triangle Properties & Heights-Distances",
+                    content: "Centroid, circumcenter, incenter theorems, trigonometric ratios.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "ssc-english",
+            title: "English Language & Comprehension",
+            color: "from-emerald-600 to-teal-700",
+            chapters: [
+              {
+                id: "ssc-eng-ch1",
+                title: "Grammar & Vocabulary",
+                topics: [
+                  {
+                    id: "ssc-eng-t1",
+                    title: "Error Spotting & Cloze Test",
+                    content: "Subject-verb agreement, idioms, phrases, reading comprehension.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "railway",
+    title: "Railway Recruitment Board",
+    code: "RRB",
+    classes: [
+      {
+        id: "rrb-ntpc-group-d",
+        title: "RRB NTPC & Group D Batch",
+        subjects: [
+          {
+            id: "rrb-science",
+            title: "General Science & Awareness",
+            color: "from-rose-600 to-red-700",
+            chapters: [
+              {
+                id: "rrb-sci-ch1",
+                title: "Physics & Chemistry Fundamentals",
+                topics: [
+                  {
+                    id: "rrb-sci-t1",
+                    title: "Periodic Table & Electricity",
+                    content: "Elements, Ohm's law, circuits, key general science questions.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "defence",
+    title: "Defence Exams",
+    code: "DEFENCE",
+    classes: [
+      {
+        id: "nda-cds-afcat",
+        title: "NDA / CDS / AFCAT Warriors Batch",
+        subjects: [
+          {
+            id: "def-gat",
+            title: "General Ability Test & Military Awareness",
+            color: "from-slate-700 to-zinc-900",
+            chapters: [
+              {
+                id: "def-gat-ch1",
+                title: "Current Affairs & Strategic Knowledge",
+                topics: [
+                  {
+                    id: "def-gat-t1",
+                    title: "Indian Defence Forces & Exercises",
+                    content: "Joint military exercises, missile systems, international defense pacts.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 ];
 
-export const cbseBoard = {
-  id: "cbse",
-  title: "CBSE Board",
-  classes: [
-    {
-      id: "class-12",
-      title: "Class 12",
-      subjects: [
-        {
-          id: "maths-12-cbse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "cbse-maths-12-ch1",
-              title: "Chapter 1: Relations and Functions",
-              topics: [
-                {
-                  id: "cbse-maths-12-ch1-t1",
-                  title: "Relations and Functions",
-                  content: "Domain and range of relations and functions.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "class-11",
-      title: "Class 11",
-      subjects: [
-        {
-          id: "maths-11-cbse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "cbse-maths-11-ch1",
-              title: "Chapter 1: Sets",
-              topics: [
-                {
-                  id: "cbse-maths-11-ch1-t1",
-                  title: "Introduction to Sets",
-                  content: "Basic set theory concepts.",
-                  duration: "12m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "biology-11-cbse",
-          title: "Biology",
-          chapters: [
-            {
-              id: "cbse-bio-11-ch1",
-              title: "Chapter 1: The Living World",
-              topics: [
-                {
-                  id: "cbse-bio-11-ch1-t1",
-                  title: "Diversity in the Living World",
-                  content: "What is living? Biodiversity, need for classification.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "physics-11-cbse",
-          title: "Physics",
-          chapters: [
-            {
-              id: "cbse-phy-11-ch1",
-              title: "Chapter 1: Physical World",
-              topics: [
-                {
-                  id: "cbse-phy-11-ch1-t1",
-                  title: "Scope and Excitement of Physics",
-                  content: "What is Physics? Scope and excitement.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "chemistry-11-cbse",
-          title: "Chemistry",
-          chapters: [
-            {
-              id: "cbse-chem-11-ch1",
-              title: "Chapter 1: Some Basic Concepts of Chemistry",
-              topics: [
-                {
-                  id: "cbse-chem-11-ch1-t1",
-                  title: "Importance of Chemistry",
-                  content: "General introduction and importance of Chemistry.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "class-10",
-      title: "Class 10",
-      subjects: [
-        {
-          id: "maths-10-cbse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "cbse-maths-10-ch1",
-              title: "Chapter 1: Number Systems",
-              topics: [
-                {
-                  id: "cbse-maths-10-ch1-t1",
-                  title: "Real Numbers",
-                  content: "Real numbers and their properties.",
-                  duration: "10m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "class-9",
-      title: "Class 9",
-      subjects: [
-        {
-          id: "maths-9-cbse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "cbse-maths-9-ch1",
-              title: "Chapter 1: Number Systems",
-              topics: [
-                {
-                  id: "cbse-maths-9-ch1-t1",
-                  title: "Rational and Irrational Numbers",
-                  content: "Real numbers and their properties.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "science-9-cbse",
-          title: "Science",
-          chapters: [
-            {
-              id: "cbse-sci-9-ch1",
-              title: "Chapter 1: Matter in Our Surroundings",
-              topics: [
-                {
-                  id: "cbse-sci-9-ch1-t1",
-                  title: "Physical Nature of Matter",
-                  content: "Characteristics of particles of matter.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
-export const icseBoard = {
-  id: "icse",
-  title: "ICSE Board",
-  classes: [
-    {
-      id: "class-12",
-      title: "Class 12",
-      subjects: [
-        {
-          id: "maths-12-icse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "icse-maths-12-ch1",
-              title: "Chapter 1: Co-ordinate Geometry",
-              topics: [
-                {
-                  id: "icse-maths-12-ch1-t1",
-                  title: "Straight Lines",
-                  content: "Slope and intercept of straight lines.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "physics-12-icse",
-          title: "Physics",
-          chapters: [
-            {
-              id: "icse-phy-12-ch1",
-              title: "Chapter 1: Physical World",
-              topics: [
-                {
-                  id: "icse-phy-12-ch1-t1",
-                  title: "Scope and Excitement of Physics",
-                  content: "What is Physics? Scope and excitement.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "chemistry-12-icse",
-          title: "Chemistry",
-          chapters: [
-            {
-              id: "icse-chem-12-ch1",
-              title: "Chapter 1: Solid State",
-              topics: [
-                {
-                  id: "icse-chem-12-ch1-t1",
-                  title: "Introduction to Solid State",
-                  content: "Characteristics of solid state.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "biology-12-icse",
-          title: "Biology",
-          chapters: [
-            {
-              id: "icse-bio-12-ch1",
-              title: "Chapter 1: Reproduction",
-              topics: [
-                {
-                  id: "icse-bio-12-ch1-t1",
-                  title: "Reproduction in Organisms",
-                  content: "Reproduction, a characteristic feature of all organisms.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "class-11",
-      title: "Class 11",
-      subjects: [
-        {
-          id: "maths-11-icse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "icse-maths-11-ch1",
-              title: "Chapter 1: Algebra",
-              topics: [
-                {
-                  id: "icse-maths-11-ch1-t1",
-                  title: "Polynomials",
-                  content: "Polynomial basics and operations.",
-                  duration: "12m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "physics-11-icse",
-          title: "Physics",
-          chapters: [
-            {
-              id: "icse-phy-11-ch1",
-              title: "Chapter 1: Physical World",
-              topics: [
-                {
-                  id: "icse-phy-11-ch1-t1",
-                  title: "Scope and Excitement of Physics",
-                  content: "What is Physics? Scope and excitement.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "chemistry-11-icse",
-          title: "Chemistry",
-          chapters: [
-            {
-              id: "icse-chem-11-ch1",
-              title: "Chapter 1: Some Basic Concepts of Chemistry",
-              topics: [
-                {
-                  id: "icse-chem-11-ch1-t1",
-                  title: "Importance of Chemistry",
-                  content: "General introduction and importance of Chemistry.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "biology-11-icse",
-          title: "Biology",
-          chapters: [
-            {
-              id: "icse-bio-11-ch1",
-              title: "Chapter 1: The Living World",
-              topics: [
-                {
-                  id: "icse-bio-11-ch1-t1",
-                  title: "Diversity in the Living World",
-                  content: "What is living? Biodiversity, need for classification.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "class-10",
-      title: "Class 10",
-      subjects: [
-        {
-          id: "maths-10-icse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "icse-maths-10-ch1",
-              title: "Chapter 1: Number Systems",
-              topics: [
-                {
-                  id: "icse-maths-10-ch1-t1",
-                  title: "Integers and Fractions",
-                  content: "Basic number properties.",
-                  duration: "10m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "biology-10-icse",
-          title: "Biology",
-          chapters: [
-            {
-              id: "icse-bio-10-ch1",
-              title: "Chapter 1: Plant Anatomy and Plant Physiology",
-              topics: [
-                {
-                  id: "icse-bio-10-ch1-t1",
-                  title: "Nutrition in Plants",
-                  content: "Learn about the various modes of nutrition in plants.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "physics-10-icse",
-          title: "Physics",
-          chapters: [
-            {
-              id: "icse-phy-10-ch1",
-              title: "Chapter 1: Force and Work",
-              topics: [
-                {
-                  id: "icse-phy-10-ch1-t1",
-                  title: "Turning Forces",
-                  content: "Moment of a force and equilibrium.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "chemistry-10-icse",
-          title: "Chemistry",
-          chapters: [
-            {
-              id: "icse-chem-10-ch1",
-              title: "Chapter 1: Periodic Table",
-              topics: [
-                {
-                  id: "icse-chem-10-ch1-t1",
-                  title: "Periodic Properties",
-                  content: "Trends in periodic properties.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "class-9",
-      title: "Class 9",
-      subjects: [
-        {
-          id: "maths-9-icse",
-          title: "Mathematics",
-          chapters: [
-            {
-              id: "icse-maths-9-ch1",
-              title: "Chapter 1: Numbers",
-              topics: [
-                {
-                  id: "icse-maths-9-ch1-t1",
-                  title: "Number Systems",
-                  content: "Integers, rational and irrational numbers.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "science-9-icse",
-          title: "Science",
-          chapters: [
-            {
-              id: "icse-sci-9-ch1",
-              title: "Chapter 1: Matter in Our Surroundings",
-              topics: [
-                {
-                  id: "icse-sci-9-ch1-t1",
-                  title: "Physical Nature of Matter",
-                  content: "Characteristics of particles of matter.",
-                  duration: "15m",
-                  videoUrl: "https://www.w3schools.com/html/movie.mp4",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
-export const initialBoards = [tnsbBoardComplete, cbseBoardComplete, icseBoardComplete];
+export const tnsbBoard = initialBoards;
+export const tnsbBoardComplete = initialBoards[3];
+export const cbseBoardComplete = initialBoards[0];
+export const icseBoardComplete = initialBoards[1];

@@ -44,6 +44,8 @@ import { ContactSupportPage } from "./components/ContactSupportPage";
 import { SecureNotesPreview } from "./components/SecureNotesPreview";
 import { TeacherUploadedNotesPage } from "./components/TeacherUploadedNotesPage";
 import { GlobalModals } from "./components/GlobalModals";
+import { GlobalSearchModal } from "./components/GlobalSearchModal";
+import { QuestionBankManager } from "./components/QuestionBankManager";
 import { getISTDate } from "./utils/dateUtils";
 
 function RoomJoinFallback() {
@@ -443,10 +445,12 @@ function RoomJoinFallback() {
                     onChange={(e) => setFormData({ ...formData, classLevel: e.target.value })}
                     className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 px-3 py-2 text-xs focus:outline-none focus:border-brand-royal text-slate-800 dark:text-white"
                   >
-                    <option value="Class 12">Class 12</option>
-                    <option value="Class 11">Class 11</option>
-                    <option value="Class 10">Class 10</option>
-                    <option value="Class 9">Class 9</option>
+                    <option value="JEE Main 2026 Batch">JEE Main 2026 Batch</option>
+                    <option value="NEET UG Super Batch">NEET UG Super Batch</option>
+                    <option value="UPSC Prelims Batch">UPSC Prelims Batch</option>
+                    <option value="TNPSC Group 1 Batch">TNPSC Group 1 Batch</option>
+                    <option value="SBI PO Batch">SBI PO Batch</option>
+                    <option value="SSC CGL Batch">SSC CGL Batch</option>
                   </select>
                 </div>
 
@@ -856,6 +860,7 @@ function RoomJoinFallback() {
 function App() {
   const { activeView, isDarkMode, setView, profile, boards, liveRoomState, auth, activeSubjectId, activeChapterId, activeTopicId } = useLmsStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const token = localStorage.getItem("auth_token");
 
   // Load academic structure from API when available
@@ -1072,6 +1077,8 @@ function App() {
         return <QuizInterface />;
       case "assignment-view":
         return <AssignmentPage />;
+      case "question-bank":
+        return <QuestionBankManager />;
       case "teacher-uploaded-notes":
         return <TeacherUploadedNotesPage />;
       case "given-grades":
@@ -1128,6 +1135,7 @@ function App() {
     <div
       className={`${isDarkMode ? "dark" : "light"} min-h-screen bg-white dark:bg-brand-navy-dark text-slate-800 dark:text-slate-100 transition-colors duration-300`}
     >
+      <GlobalSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       {shouldShowProtected ? (
         // Dashboard Shell structure
         <div className="flex min-h-screen">
@@ -1137,7 +1145,7 @@ function App() {
           />
 
           <div className="flex-1 flex flex-col min-h-screen max-w-full overflow-x-hidden">
-            <Header onToggleSidebar={() => setIsSidebarOpen(true)} />
+            <Header onToggleSidebar={() => setIsSidebarOpen(true)} onOpenSearch={() => setIsSearchOpen(true)} />
 
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
               {renderActiveScreen()}

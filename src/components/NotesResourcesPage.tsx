@@ -146,6 +146,18 @@ export const NotesResourcesPage: React.FC = () => {
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState<string>("all");
   const [selectedChapterFilter, setSelectedChapterFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMaterialType, setSelectedMaterialType] = useState<string>("All Materials");
+
+  const materialTypes = [
+    "All Materials",
+    "PDF Notes",
+    "Videos",
+    "Mind Maps",
+    "Formula Sheets",
+    "Cheat Sheets",
+    "Current Affairs",
+    "Previous Year Papers",
+  ];
 
   const activeBoard = boards.find((b) => b.id === profile.selectedBoardId) || boards[0];
   const activeClass = activeBoard?.classes?.find((c) => c.id === profile.selectedClassId) || activeBoard?.classes?.[0];
@@ -225,35 +237,44 @@ export const NotesResourcesPage: React.FC = () => {
       <div className="glass-card p-6 border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="text-[10px] text-brand-violet dark:text-brand-violet-light font-bold uppercase tracking-wider block">
-            Expert Study Notes
+            Coaching Institute Repository
           </span>
           <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-1">
-            Deep lectures and notes
+            Study Material & Previous Year Papers
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-            {selectedSubjectFilter === "all"
-              ? `Comprehensive ${getBoardSyllabusPhrase(activeBoard)} study guides, notes, and interactive learning modules.`
-              : `Study guides, formulas, and revision materials for ${selectedSubject?.title}.`}
+            Access curated PDFs, recorded video lectures, Mind Maps, Formula Sheets, Cheat Sheets, Current Affairs & PYQs.
           </p>
         </div>
-        
+
         {/* Search Input */}
         <div className="relative max-w-xs w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder={
-              selectedSubjectFilter === "all"
-                ? "Search subjects..."
-                : selectedChapterFilter === null
-                ? "Search chapters..."
-                : "Search topics..."
-            }
+            placeholder="Search study materials..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-xs focus:outline-none focus:border-brand-royal transition-colors"
           />
         </div>
+      </div>
+
+      {/* Material Type Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {materialTypes.map((mType) => (
+          <button
+            key={mType}
+            onClick={() => setSelectedMaterialType(mType)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+              selectedMaterialType === mType
+                ? "bg-brand-royal text-white border-brand-royal shadow-sm"
+                : "bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
+            }`}
+          >
+            {mType}
+          </button>
+        ))}
       </div>
       
       {/* Teacher Uploaded Notes CTA */}

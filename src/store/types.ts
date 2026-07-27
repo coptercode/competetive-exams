@@ -1,8 +1,8 @@
 // ========================================
-// DATABASE-ALIGNED TYPES
+// DATABASE-ALIGNED TYPES FOR COMPETITIVE EXAM PLATFORM
 // ========================================
 
-export type UserRole = "student" | "teacher" | "admin";
+export type UserRole = "student" | "teacher" | "admin" | "candidate" | "instructor" | "super_admin";
 export type NotificationType = "success" | "info" | "alert";
 export type AssignmentStatus = "Pending" | "Submitted" | "Graded";
 
@@ -42,6 +42,8 @@ export interface Profile {
   certificates: Certificate[];
   subjectArea?: string;
   phoneNumber?: string;
+  targetExam?: string;
+  batchName?: string;
 }
 
 export interface Topic {
@@ -84,6 +86,11 @@ export interface Board {
   classes: ClassLevel[];
 }
 
+// Aliases for Competitive Exam Terminology
+export type ExamCategory = Board;
+export type ExamBatch = ClassLevel;
+export type ExamProgram = Subject;
+
 export interface Bookmark {
   id: string;
   topicId: string;
@@ -110,6 +117,18 @@ export interface QuizQuestion {
   options: string[];
   correctAnswerIndex: number;
   explanation: string;
+  marks?: number;
+  negativeMarks?: number;
+  difficulty?: "Easy" | "Medium" | "Hard" | string;
+  subtopic?: string;
+  isPYQ?: boolean;
+  pyqYear?: number;
+  source?: string;
+  tags?: string[];
+  timeLimitSeconds?: number;
+  examCategory?: string;
+  subject?: string;
+  topic?: string;
 }
 
 export interface Quiz {
@@ -119,7 +138,13 @@ export interface Quiz {
   chapterId: string;
   durationMinutes: number;
   questions: QuizQuestion[];
+  testType?: "Chapter Test" | "Subject Test" | "Full-Length Test" | "Daily Test" | "Weekly Test" | "Grand Test" | "Previous Year Paper" | string;
+  testCategory?: string;
+  negativeMarkingRate?: number;
+  totalMarks?: number;
 }
+
+export type MockTest = Quiz;
 
 export interface QuizResultDetail {
   question: string;
@@ -127,6 +152,8 @@ export interface QuizResultDetail {
   correctAnswer: string;
   explanation: string;
   recommendedTopicId: string;
+  isCorrect?: boolean;
+  marksObtained?: number;
 }
 
 export interface QuizResult {
@@ -137,6 +164,10 @@ export interface QuizResult {
   timeTakenSeconds: number;
   date: string;
   incorrectAnswersDetails: QuizResultDetail[];
+  percentile?: number;
+  rank?: number;
+  accuracyPercentage?: number;
+  totalMarks?: number;
 }
 
 export interface Assignment {
@@ -158,6 +189,8 @@ export interface Assignment {
   teacherName?: string;
   fileUrl?: string;
 }
+
+export type PracticeTest = Assignment;
 
 export interface AuthState {
   isAuthenticated: boolean;

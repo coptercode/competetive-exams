@@ -31,38 +31,48 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { activeView, setView, profile, logout } = useLmsStore();
 
-  const studentLinks = [
-    { id: "student-dash", label: "Student Portal", icon: LayoutDashboard },
-    { id: "notes-resources", label: "Deep lectures and notes", icon: Notebook },
-    { id: "assignment-view", label: "Homework Space", icon: FileText },
-    { id: "webrtc-live", label: "Live Class (WebRTC)", icon: Tv },
-    { id: "ai-tutor", label: "AI Tutor Bot", icon: Brain },
+  const candidateLinks = [
+    { id: "student-dash", label: "Candidate Dashboard", icon: LayoutDashboard },
+    { id: "course-view", label: "Exam Programs", icon: BookOpen },
+    { id: "quiz-view", label: "Mock Tests Engine", icon: Trophy },
+    { id: "assignment-view", label: "Practice Tests Portal", icon: FileText },
+    { id: "notes-resources", label: "Study Material & PYQs", icon: Notebook },
+    { id: "webrtc-live", label: "Live Classes & Chat", icon: Tv },
+    { id: "ai-tutor", label: "AI Exam Prep Assistant", icon: Brain },
   ];
 
-  const teacherLinks = [
-    { id: "teacher-dash", label: "Teacher Dashboard", icon: LayoutDashboard },
-    { id: "admin-upload", label: "Contents and assignments", icon: Upload },
-    { id: "submissions", label: "Submissions", icon: FileText },
-    { id: "webrtc-live", label: "Start live session", icon: Tv },
+  const instructorLinks = [
+    { id: "teacher-dash", label: "Instructor Dashboard", icon: LayoutDashboard },
+    { id: "admin-upload", label: "Program Content Studio", icon: Upload },
+    { id: "question-bank", label: "Question Bank Manager", icon: Brain },
+    { id: "quiz-builder", label: "Mock Test Builder", icon: PenTool },
+    { id: "submissions", label: "Practice Test Evaluations", icon: FileText },
+    { id: "webrtc-live", label: "Schedule Live Class", icon: Tv },
   ];
 
-  const adminLinks = [
-    { id: "admin-analytics", label: "Platform Analytics", icon: BarChart3 },
-    { id: "admin-users", label: "Students info", icon: Users },
-    { id: "admin-teachers", label: "Teachers info", icon: Users },
-    { id: "drm-security", label: "DRM Video Shield", icon: Lock },
+  const superAdminLinks = [
+    { id: "admin-analytics", label: "Super Admin Control", icon: BarChart3 },
+    { id: "admin-structure", label: "Exam Categories & Batches", icon: BookOpen },
+    { id: "admin-users", label: "Candidates Registry", icon: Users },
+    { id: "admin-teachers", label: "Instructors Directory", icon: Users },
+    { id: "question-bank", label: "Question Bank Control", icon: Brain },
+    { id: "drm-security", label: "DRM Protection Console", icon: Lock },
   ];
 
   const getActiveLinks = () => {
-    switch (profile.role) {
-      case "teacher":
-        return teacherLinks;
-      case "admin":
-        return adminLinks;
-      case "student":
-      default:
-        return studentLinks;
+    if (profile.role === "teacher" || profile.role === "instructor") {
+      return instructorLinks;
     }
+    if (profile.role === "admin" || profile.role === "super_admin") {
+      return superAdminLinks;
+    }
+    return candidateLinks;
+  };
+
+  const getPortalLabel = () => {
+    if (profile.role === "admin" || profile.role === "super_admin") return "Super Admin Portal";
+    if (profile.role === "teacher" || profile.role === "instructor") return "Instructor Portal";
+    return "Candidate Portal";
   };
 
   const handleLinkClick = (id: string) => {
@@ -94,8 +104,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               className="flex items-center gap-2 cursor-pointer group"
             >
               <PlanetLogo className="w-8 h-8 group-hover:scale-105 transition-transform" />
-              <span className="font-extrabold font-display text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors whitespace-nowrap">
-                Nexora Learning
+              <span className="font-extrabold font-display text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors whitespace-nowrap">
+                Coaching Prep
               </span>
             </div>
 
@@ -108,9 +118,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Navigation Links list */}
-          <div className="px-4 pt-10 pb-6">
+          <div className="px-4 pt-6 pb-6">
             <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-4 px-3">
-              {profile.role} Portal
+              {getPortalLabel()}
             </span>
             <nav className="space-y-1">
               {getActiveLinks().map((link) => {
@@ -120,14 +130,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <button
                     key={link.id}
                     onClick={() => handleLinkClick(link.id)}
-                    className={`w-full py-2.5 px-3 rounded-xl text-sm transition-all flex items-center gap-3 font-medium border text-left ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-xs sm:text-sm transition-all flex items-center gap-3 font-medium border text-left ${
                       isActive
                         ? "bg-brand-royal/10 border-brand-royal/20 text-brand-royal dark:text-white font-semibold shadow-lg shadow-brand-royal/5"
                         : "bg-transparent border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
                     }`}
                   >
                     <IconComponent
-                      className={`w-5 h-5 ${isActive ? "text-brand-royal" : ""}`}
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? "text-brand-royal" : ""}`}
                     />
                     <span className="text-left">{link.label}</span>
                   </button>

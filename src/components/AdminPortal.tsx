@@ -1576,7 +1576,7 @@ export const AdminPortal: React.FC = () => {
         />
       )}
 
-      {/* ── USER MANAGEMENT (STUDENTS) ────────────────────────────────────────── */}
+      {/* ── USER MANAGEMENT (CANDIDATES) ────────────────────────────────────────── */}
       {activeView === "admin-users" && (
         <div className="space-y-6 animate-fade-in-up">
           {/* Header row */}
@@ -1586,7 +1586,7 @@ export const AdminPortal: React.FC = () => {
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Students info</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Candidates Registry</h2>
               </div>
             </div>
             
@@ -1605,7 +1605,7 @@ export const AdminPortal: React.FC = () => {
               className="premium-btn-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5 rounded-xl shadow-md hover:shadow-brand-royal/15 self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Student</span>
+              <span>Add Candidate</span>
             </button>
           </div>
 
@@ -1630,8 +1630,8 @@ export const AdminPortal: React.FC = () => {
                 onChange={(e) => setGradeFilter(e.target.value)}
                 className="w-full premium-input text-xs appearance-none pr-8 py-2.5 h-11 bg-white dark:bg-slate-950"
               >
-                <option value="All Grades">All Grades</option>
-                {["Class 9", "Class 10", "Class 11", "Class 12"].map((g) => (
+                <option value="All Grades">All Batches</option>
+                {["JEE Main 2026 Batch", "NEET UG Super Batch", "UPSC Prelims Batch", "TNPSC Group 1 Batch", "SBI PO Batch", "SSC CGL Batch"].map((g) => (
                   <option key={g} value={g}>{g}</option>
                 ))}
               </select>

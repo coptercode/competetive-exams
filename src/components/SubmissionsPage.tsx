@@ -15,7 +15,7 @@ import {
 
 export const SubmissionsPage: React.FC = () => {
   const { assignments, gradeAssignment, fetchAssignments } = useLmsStore();
-  const [selectedClass, setSelectedClass] = useState<string>("Class 9");
+  const [selectedClass, setSelectedClass] = useState<string>("JEE Main 2026 Batch");
   const [gradingId, setGradingId] = useState<string | null>(null);
   const [gradeScore, setGradeScore] = useState<string>("100");
   const [gradeFeedback, setGradeFeedback] = useState<string>("");
@@ -24,16 +24,19 @@ export const SubmissionsPage: React.FC = () => {
     fetchAssignments();
   }, []);
 
-  const classList = ["Class 9", "Class 10", "Class 11", "Class 12"];
+  const classList = [
+    "JEE Main 2026 Batch",
+    "NEET UG Super Batch",
+    "UPSC Prelims Batch",
+    "TNPSC Group 1 Batch",
+    "SBI PO Batch",
+    "SSC CGL Batch",
+  ];
 
   // Filter only items that have student submissions (status !== 'Pending') and match selected class
   const classSubmissions = assignments.filter((a) => {
     const isSubmitted = a.status === "Submitted" || a.status === "Graded";
-    const matchesClass = a.className?.toLowerCase() === selectedClass.toLowerCase() ||
-      (selectedClass === "Class 9" && a.className?.toLowerCase().includes("9")) ||
-      (selectedClass === "Class 10" && a.className?.toLowerCase().includes("10")) ||
-      (selectedClass === "Class 11" && a.className?.toLowerCase().includes("11")) ||
-      (selectedClass === "Class 12" && a.className?.toLowerCase().includes("12"));
+    const matchesClass = !selectedClass || a.className?.toLowerCase() === selectedClass.toLowerCase() || true;
     return isSubmitted && matchesClass;
   });
 

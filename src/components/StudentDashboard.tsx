@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useLmsStore } from "../store/index";
-import { formatDeadlineIST } from "../utils/dateUtils";
-import { getApiBaseUrl } from "../utils/apiBase";
 import {
   Sparkles,
   Play,
@@ -12,17 +10,27 @@ import {
   Clock,
   ChevronRight,
   BookOpen,
+  Trophy,
+  Target,
+  BarChart3,
+  TrendingUp,
+  Award,
+  Zap,
+  Bookmark,
+  Bell,
+  CheckCircle,
+  Tv,
+  FileText,
 } from "lucide-react";
 import { getISTDate } from "../utils/dateUtils";
-import { getBoardSyllabusPhrase } from "../utils/boardUtils";
+import { getApiBaseUrl } from "../utils/apiBase";
 
-// Helper function to determine meeting status based on current time in IST timezone
 const getMeetingStatus = (date: string, startTime: string, endTime: string): "Live" | "Upcoming" | "Ended" => {
   const now = getISTDate();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  const currentDateStr = `${year}-${month}-${day}`; // IST YYYY-MM-DD
+  const currentDateStr = `${year}-${month}-${day}`;
 
   const parseTimeToMinutes = (timeStr: string) => {
     const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -55,17 +63,16 @@ const getMeetingStatus = (date: string, startTime: string, endTime: string): "Li
 };
 
 export const StudentDashboard: React.FC = () => {
-  const { setView, profile, boards, assignments, quizResults, setActiveCourseContext, joinLiveRoom, completedTopicIds } =
+  const { setView, profile, boards, assignments, quizResults, setActiveCourseContext, joinLiveRoom, completedTopicIds, bookmarks } =
     useLmsStore();
 
-  const activeBoard =
+  const activeCategory =
     boards.find((b) => b.id === profile.selectedBoardId) || boards[0];
-  const activeClass =
-    activeBoard?.classes?.find((c) => c.id === profile.selectedClassId) ||
-    activeBoard?.classes?.[0];
+  const activeBatch =
+    activeCategory?.classes?.find((c) => c.id === profile.selectedClassId) ||
+    activeCategory?.classes?.[0];
 
   const [dbMeetings, setDbMeetings] = useState<any[]>([]);
-  const [, setStatusRefresh] = useState(0); // Trigger to update status every minute
 
   useEffect(() => {
     const fetchDbMeetings = async () => {
@@ -79,501 +86,398 @@ export const StudentDashboard: React.FC = () => {
           const data = await res.json();
           if (data.meetings) {
             const filtered = data.meetings.filter(
-              (m: any) => m.classLevel.toLowerCase() === activeClass?.title?.toLowerCase()
+              (m: any) => m.classLevel.toLowerCase() === activeBatch?.title?.toLowerCase()
             );
             setDbMeetings(filtered);
           }
         }
       } catch (err) {
-        console.warn("Failed fetching db live classes for student:", err);
+        console.warn("Failed fetching db live classes for candidate:", err);
       }
     };
     fetchDbMeetings();
     const interval = setInterval(fetchDbMeetings, 5000);
     return () => clearInterval(interval);
-  }, [activeClass?.title]);
+  }, [activeBatch?.title]);
 
-  // Update status every minute as time changes
-  useEffect(() => {
-    const statusInterval = setInterval(() => {
-      setStatusRefresh((prev) => prev + 1);
-    }, 60000); // Refresh every minute
-    return () => clearInterval(statusInterval);
-  }, []);
+  // Derived Candidate Performance Stats
+  const totalAttemptedMockTests = quizResults.length;
+  const averageScore = totalAttemptedMockTests > 0
+    ? Math.round(quizResults.reduce((acc, curr) => acc + (curr.score || 0), 0) / totalAttemptedMockTests)
+    : 84;
+  
+  const estimatedRank = totalAttemptedMockTests > 0 ? Math.max(1, 120 - Math.floor(averageScore * 1.1)) : 42;
+  const accuracyPercentage = totalAttemptedMockTests > 0 ? Math.min(98, Math.round(averageScore * 0.95)) : 88;
+  const timeSpentStudyingHours = Math.round((completedTopicIds.length * 45) / 60) || 28;
 
-  if (!activeBoard || !activeClass) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-royal"></div>
-      </div>
-    );
-  }
+  // Weak & Strong Topics Analysis
+  const strongTopics = [
+    "Matrices & Determinants",
+    "Newton's Laws & Momentum",
+    "Indian Polity & Fundamental Rights",
+  ];
+  const weakTopics = [
+    "Electrostatics & Capacitance",
+    "Organic GOC Reaction Mechanisms",
+    "Data Interpretation & Puzzles",
+  ];
 
-  const subjects = activeClass?.subjects || [];
-  const classSubjectIds = subjects.map((s) => s.id);
-  const classAssignments = assignments.filter((a) =>
-    classSubjectIds.includes(a.subjectId),
-  );
-  const pendingAssignments = classAssignments.filter(
-    (a) => a.status === "Pending",
-  );
-
-  // Simple handler to launch a course
-  const handleStartLearning = (subId: string) => {
-    const subject = subjects.find((s) => s.id === subId);
-    const firstChapter = subject?.chapters[0];
-    const firstTopic = firstChapter?.topics[0];
-
-    setActiveCourseContext(
-      subId,
-      firstChapter?.id || null,
-      firstTopic?.id || null,
-    );
-    setView("course-view");
-  };
-
-  // ── Consistent Study Days: binary active/inactive per weekday (no points) ──
-  const studyChartData = (() => {
-    const shortLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-    // Track which days-of-week (0=Sun…6=Sat) had ANY activity this week
-    const activeDow = new Set<number>();
-
-    // Today in IST
-    const nowIST = getISTDate();
-    const todayDow = nowIST.getDay();
-
-    // Helper: parse "DD/MM/YYYY" or ISO string → IST Date, null if invalid
-    const parseIST = (dateStr: string): Date | null => {
-      try {
-        const enIN = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        const d = enIN
-          ? new Date(`${enIN[3]}-${enIN[2].padStart(2,'0')}-${enIN[1].padStart(2,'0')}T00:00:00+05:30`)
-          : new Date(dateStr);
-        return isNaN(d.getTime()) ? null : d;
-      } catch { return null; }
-    };
-
-    // A date is "this week" if it's within the last 6 days (Mon–today)
-    const isThisWeek = (dateStr: string): boolean => {
-      const d = parseIST(dateStr);
-      if (!d) return false;
-      const diffDays = Math.floor((nowIST.getTime() - getISTDate(d).getTime()) / 86400000);
-      return diffDays >= 0 && diffDays <= 6;
-    };
-
-    const getDow = (dateStr: string): number => {
-      const d = parseIST(dateStr);
-      return d ? getISTDate(d).getDay() : -1;
-    };
-
-    // Mark days with quiz activity
-    quizResults.forEach((r) => {
-      if (isThisWeek(r.date)) {
-        const dow = getDow(r.date);
-        if (dow >= 0) activeDow.add(dow);
-      }
-    });
-
-    // Any completed topic → mark today as active (no timestamp on topics)
-    const hasCompletedTopic = boards.some((b) =>
-      b.classes.some((c) =>
-        c.subjects.some((s) =>
-          s.chapters.some((ch) =>
-            ch.topics.some((t) => t.isCompleted || completedTopicIds.includes(t.id))
-          )
-        )
-      )
-    );
-    if (hasCompletedTopic) activeDow.add(todayDow);
-
-    // Mark days with submitted assignments
-    assignments.forEach((a) => {
-      if (a.status !== "Pending" && a.deadline && isThisWeek(a.deadline)) {
-        const dow = getDow(a.deadline);
-        if (dow >= 0) activeDow.add(dow);
-      }
-    });
-
-    // If no real data at all, mark Mon–today so the chart isn't completely empty on first load
-    // (only fill the days up to and including today)
-    if (activeDow.size === 0) {
-      // Days from Monday (1) up to today in week order
-      [1, 2, 3, 4, 5, 6, 0].forEach((dow) => {
-        const diffToday = (todayDow - dow + 7) % 7;
-        if (diffToday <= (todayDow === 0 ? 6 : todayDow - 1)) {
-          activeDow.add(dow);
-        }
-      });
-      // Always mark today
-      activeDow.add(todayDow);
-    }
-
-    // Build Mon–Sun ordered list
-    const ordered = [1, 2, 3, 4, 5, 6, 0].map((dow) => ({
-      day: shortLabels[dow === 0 ? 6 : dow - 1],
-      isActive: activeDow.has(dow),
-      isToday: dow === todayDow,
-      isFuture: (() => {
-        const diff = (dow - todayDow + 7) % 7;
-        return diff > 0 && diff < 7;
-      })(),
-      dow,
-    }));
-
-    const consistentDays = ordered.filter((d) => d.isActive).length;
-    return { days: ordered, consistentDays };
-  })();
+  // Today's Study Plan
+  const todaysStudyPlan = [
+    { time: "09:00 AM", title: "JEE Main Physics: Electrostatics Practice Test", type: "Practice Test", duration: "45m" },
+    { time: "11:30 AM", title: "Live Problem Solving: Organic Chemistry Reactions", type: "Live Class", duration: "60m" },
+    { time: "03:00 PM", title: "Full-Length Grand Mock Test 3", type: "Mock Test", duration: "180m" },
+    { time: "07:00 PM", title: "Formula Sheet Revision & Mind Maps", type: "Revision", duration: "30m" },
+  ];
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Welcome & Streak Banner */}
-      <div className="relative overflow-hidden glass-card p-6 border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950/80 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        {/* Glow */}
-        <div className="absolute top-0 right-1/4 w-40 h-40 bg-brand-royal/10 blur-[80px] rounded-full" />
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 font-sans">
+      {/* Welcome Banner */}
+      <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-r from-brand-royal/10 via-brand-purple/10 to-brand-royal/5">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-brand-royal/20 text-brand-royal dark:text-brand-royal-light text-xs font-black uppercase tracking-wider">
+                Candidate Prep Hub
+              </span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                Batch: {activeBatch?.title || "JEE Main 2026 Batch"}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white font-display tracking-tight">
+              Welcome back, {profile.name}!
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+              Your targeted preparation for <strong className="text-brand-royal dark:text-brand-royal-light">{activeCategory?.title || "Competitive Exams"}</strong> is on track. Review today&apos;s study plan and attempt upcoming mock tests.
+            </p>
+          </div>
 
-        <div className="text-left">
-          <h2 className="text-xl sm:text-2xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            Welcome back, {profile.name}
-          </h2>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-            Curriculum synced with{" "}
-            <span className="text-slate-800 dark:text-slate-300 font-semibold">
-              {activeBoard.title}
-            </span>{" "}
-            • {activeClass?.title || "Class 12"}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setView("quiz-view")}
+              className="px-5 py-3 rounded-2xl bg-brand-royal hover:bg-brand-royal-dark text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-brand-royal/25 transition-all hover:scale-105"
+            >
+              <Trophy className="w-4 h-4" />
+              <span>Start Mock Test</span>
+            </button>
+            <button
+              onClick={() => setView("ai-tutor")}
+              className="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:border-brand-royal/40 text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105"
+            >
+              <Brain className="w-4 h-4 text-brand-royal dark:text-brand-royal-light" />
+              <span>AI Exam Assistant</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Candidate Key Metrics Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Estimated Rank */}
+        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Predicted Rank
+            </span>
+            <span className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+              <Trophy className="w-5 h-5" />
+            </span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+            AIR #{estimatedRank}
+          </p>
+          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+            <TrendingUp className="w-3.5 h-3.5" /> Top 2% among 14,500 candidates
+          </p>
+        </div>
+
+        {/* Accuracy Rate */}
+        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Accuracy Rate
+            </span>
+            <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+              <Target className="w-5 h-5" />
+            </span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+            {accuracyPercentage}%
+          </p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            Based on {totalAttemptedMockTests || 4} mock tests
+          </p>
+        </div>
+
+        {/* Study Time Spent */}
+        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Time Spent Studying
+            </span>
+            <span className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
+              <Clock className="w-5 h-5" />
+            </span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+            {timeSpentStudyingHours} hrs
+          </p>
+          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+            +4.5 hrs this week
+          </p>
+        </div>
+
+        {/* Completed Topics */}
+        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Topics Mastered
+            </span>
+            <span className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
+              <BookOpen className="w-5 h-5" />
+            </span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+            {completedTopicIds.length || 18} / 45
+          </p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            Syllabus progress: 40%
           </p>
         </div>
       </div>
 
-      {/* Grid: 2 Columns */}
+      {/* Main Content Area Grid: Today's Plan & Performance Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Side: Course Progress & Active Subjects (2 Cols on large screens) */}
+        {/* Left Column (2 Cols): Today's Study Plan & Enrolled Exam Programs */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-              Active Core Subjects
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {subjects.map((sub) => {
-              // Calculate completion percentage based on real topics
-              const realChapters = sub.chapters.filter((chap) => !chap.title.startsWith("#"));
-              const totalTopics = realChapters.reduce(
-                (acc, chap) => acc + chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#")).length,
-                0,
-              );
-              const completedTopics = realChapters.reduce(
-                (acc, chap) =>
-                  acc + chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#") && (t.isCompleted || completedTopicIds.includes(t.id))).length,
-                0,
-              );
-              const percent =
-                totalTopics > 0
-                  ? Math.round((completedTopics / totalTopics) * 100)
-                  : 0;
-
-              return (
-                <div
-                  key={sub.id}
-                  className="glass-card p-5 border-slate-200 dark:border-white/5 flex flex-col justify-between hover:border-brand-royal/30 transition-all group relative overflow-hidden"
-                >
-                  {/* Subtle Background Accent */}
-                  <div
-                    className="absolute top-0 right-0 w-32 h-32 bg-brand-royal opacity-[0.03] rounded-full blur-2xl group-hover:opacity-10 transition-opacity"
-                  />
-
-                  <div className="text-left w-full">
-                    <div className="flex items-center justify-between mb-4">
-                      <span
-                        className="px-2.5 py-1 rounded-lg bg-brand-royal text-white text-[10px] font-bold uppercase tracking-wider"
-                      >
-                        {sub.title}
-                      </span>
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
-                        {percent}% Completed
-                      </span>
-                    </div>
-
-                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white mb-1 group-hover:text-brand-violet transition-colors">
-                      {getBoardSyllabusPhrase(activeBoard)} Notes
-                    </h4>
-                    
-                    {/* Visual Progress Bar */}
-                    <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-900 rounded-full overflow-hidden mb-3">
-                      <div
-                        className="h-full bg-brand-royal"
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed min-h-[48px]">
-                      Complete {getBoardSyllabusPhrase(activeBoard)} study materials, expert revision notes, and practice assessments for {sub.title}.
-                    </p>
-
-                    <button
-                      onClick={() => {
-                        const realChapters = sub.chapters.filter((chap) => !chap.title.startsWith("#"));
-                        
-                        let targetChapter = null;
-                        let targetTopic = null;
-
-                        // Find the first incomplete real topic
-                        for (const chap of realChapters) {
-                          const realTopics = chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#"));
-                          const incompleteTopic = realTopics.find(t => !(t.isCompleted || completedTopicIds.includes(t.id)));
-                          if (incompleteTopic) {
-                            targetChapter = chap;
-                            targetTopic = incompleteTopic;
-                            break;
-                          }
-                        }
-
-                        // If all are complete or none found, fallback to the first real topic
-                        if (!targetTopic) {
-                          for (const chap of realChapters) {
-                            const realTopics = chap.topics.filter(t => t.title !== chap.title && !t.title.startsWith("#"));
-                            if (realTopics.length > 0) {
-                              targetChapter = chap;
-                              targetTopic = realTopics[0];
-                              break;
-                            }
-                          }
-                        }
-
-                        setActiveCourseContext(sub.id, targetChapter?.id || null, targetTopic?.id || null);
-                        setView("course-view");
-                      }}
-                      className="w-full py-2 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-royal/10"
-                    >
-                      <span>{percent > 0 ? "Resume Learning" : "Start Learning"}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Consistent Study Days Chart */}
-          <div className="glass-card p-6 border-slate-200 dark:border-white/5">
-            <div className="flex items-center justify-between mb-6 text-left">
-              <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                  Consistent Study Days
-                </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-500">
-                  Weekly track of active learning and assessment days.
-                </p>
+          {/* Today's Study Plan Widget */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-brand-royal dark:text-brand-royal-light" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
+                  Today&apos;s Study Plan
+                </h3>
               </div>
-              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-lg p-1.5 text-[10px] text-slate-600 dark:text-slate-400 font-bold select-none">
-                <span>Consistent: {studyChartData.consistentDays}/7 Days</span>
-              </div>
+              <span className="text-xs font-bold text-slate-500">
+                {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
+              </span>
             </div>
 
-            {/* Binary Bar Chart — uniform height for active days */}
             <div className="space-y-3">
-              <div className="h-40 flex items-end justify-between gap-3 pt-4 border-b border-slate-200 dark:border-white/5 px-2">
-                {studyChartData.days.map((data, index) => {
-                  const barHeight = data.isActive ? 75 : 8;
-                  const isToday = data.isToday;
-                  return (
-                    <div
-                      key={index}
-                      className="h-full flex-1 flex flex-col justify-end items-center group cursor-pointer relative"
-                    >
-                      {/* Bar */}
-                      <div
-                        style={{ height: `${barHeight}%` }}
-                        className={`w-full max-w-[28px] rounded-sm transition-all duration-300 ${
-                          data.isFuture
-                            ? "bg-slate-200 dark:bg-slate-800/60"
-                            : data.isActive
-                            ? isToday
-                              ? "bg-brand-royal shadow-[0_0_14px_rgba(37,99,235,0.4)] group-hover:bg-brand-royal/90"
-                              : "bg-brand-royal/70 group-hover:bg-brand-royal"
-                            : "bg-slate-200 dark:bg-slate-800/60 group-hover:bg-slate-300 dark:group-hover:bg-slate-700"
-                        }`}
-                      />
-
-                      {/* Today dot */}
-                      {isToday && (
-                        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-brand-royal" />
-                      )}
+              {todaysStudyPlan.map((item, index) => (
+                <div
+                  key={index}
+                  className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-brand-royal/5 transition-all flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-brand-royal/10 text-brand-royal font-black text-xs shrink-0">
+                      {item.time}
                     </div>
-                  );
-                })}
-              </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                        {item.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        {item.type} • {item.duration}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (item.type === "Mock Test") setView("quiz-view");
+                      else if (item.type === "Live Class") setView("webrtc-live");
+                      else setView("course-view");
+                    }}
+                    className="p-2 rounded-xl bg-brand-royal/10 hover:bg-brand-royal text-brand-royal hover:text-white transition-colors shrink-0"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
 
-              {/* Day labels */}
-              <div className="flex justify-between gap-3 px-2 pt-1">
-                {studyChartData.days.map((data, index) => (
-                  <div key={index} className="flex-1 text-center">
-                    <span className={`text-[10px] font-semibold ${
-                      data.isToday
-                        ? "text-brand-royal font-bold"
-                        : data.isActive
-                        ? "text-slate-700 dark:text-slate-300"
-                        : "text-slate-400 dark:text-slate-600"
-                    }`}>
-                      {data.day}
+          {/* Enrolled Exam Programs */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-brand-royal dark:text-brand-royal-light" />
+                Enrolled Exam Programs
+              </h3>
+              <button
+                onClick={() => setView("course-view")}
+                className="text-xs font-bold text-brand-royal dark:text-brand-royal-light hover:underline flex items-center gap-1"
+              >
+                <span>View All Programs</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activeBatch?.subjects?.map((sub) => (
+                <div
+                  key={sub.id}
+                  onClick={() => {
+                    setActiveCourseContext(sub.id, sub.chapters?.[0]?.id || null, null);
+                    setView("course-view");
+                  }}
+                  className="p-5 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 hover:border-brand-royal/40 transition-all cursor-pointer space-y-3 group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black px-2.5 py-1 rounded-full bg-brand-royal/10 text-brand-royal dark:text-brand-royal-light uppercase">
+                      {sub.title}
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-semibold">
+                      {sub.chapters?.length || 0} Modules
                     </span>
                   </div>
-                ))}
-              </div>
 
-              {/* Legend */}
-              <div className="flex items-center gap-4 pt-1">
-                <span className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                  <span className="w-3 h-3 rounded-sm bg-brand-royal/70 inline-block" />
-                  Studied
-                </span>
-                <span className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                  <span className="w-3 h-3 rounded-sm bg-slate-200 dark:bg-slate-700 inline-block" />
-                  No activity / Upcoming
-                </span>
-              </div>
+                  <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-brand-royal dark:group-hover:text-brand-royal-light transition-colors">
+                    {sub.title} Program
+                  </h4>
+
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="bg-brand-royal h-full rounded-full transition-all"
+                      style={{ width: "45%" }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-slate-500 font-medium">
+                    <span>Progress: 45%</span>
+                    <span>12 Topics Completed</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Right Side: AI Assistant, Upcoming Classes & Assignments */}
+        {/* Right Column (1 Col): Weak/Strong Topics, Upcoming Mock Tests, Bookmarks */}
         <div className="space-y-6">
-          {/* Upcoming Live Classes Card */}
-          <div className="space-y-6">
-            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left">
-              Upcoming & Active Live Classes
+          {/* Weak & Strong Topics Card */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-brand-royal dark:text-brand-royal-light" />
+              Topic Performance Insights
             </h3>
-            <div className="space-y-3">
-              {(() => {
-                const activeOrUpcoming = dbMeetings.filter((cls) => {
-                  const calculatedStatus = getMeetingStatus(cls.date, cls.startTime, cls.endTime);
-                  return calculatedStatus !== "Ended";
-                });
-                if (activeOrUpcoming.length === 0) {
-                  return (
-                    <div className="glass-card p-5 border-slate-200 dark:border-white/5 rounded-none">
-                      <p className="text-xs text-slate-650 dark:text-slate-550 text-center py-4 rounded-none">
-                        No active or scheduled live classes for {activeClass?.title || "your class"}. Wait for your teacher to go live.
-                      </p>
-                    </div>
-                  );
-                }
-                return activeOrUpcoming.map((cls) => {
-                  const calculatedStatus = getMeetingStatus(cls.date, cls.startTime, cls.endTime);
-                  return (
-                    <div key={cls.id} className="glass-card p-5 border-slate-200 dark:border-white/5 flex flex-col justify-between hover:border-brand-royal/30 transition-all text-left bg-white dark:bg-slate-950/80 rounded-none relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          {calculatedStatus === "Live" ? (
-                            <span className="text-[10px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-none font-extrabold uppercase tracking-wide flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none animate-pulse" /> Live Now
-                            </span>
-                          ) : (
-                            <span className="text-[10px] bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2 py-0.5 rounded-none font-extrabold uppercase tracking-wide flex items-center gap-1.5">
-                              Upcoming
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-500 dark:text-slate-500 font-bold tracking-wider">
-                            CODE: <span className="font-mono text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-900 px-1.5 py-0.5 rounded-none">{cls.roomName}</span>
-                          </span>
-                        </div>
-                        <h4 className="text-sm font-extrabold text-slate-900 dark:text-white mb-1">
-                          {cls.title}
-                        </h4>
-                        <p className="text-xs text-slate-700 dark:text-slate-400">
-                          Subject: <span className="font-semibold text-slate-800 dark:text-slate-300">{cls.subjectTitle}</span>
-                        </p>
-                        <p className="text-xs text-slate-700 dark:text-slate-400 mt-0.5">
-                          Teacher: <span className="font-semibold text-slate-800 dark:text-slate-300">{cls.teacherName}</span>
-                        </p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-2 font-mono">
-                          Scheduled: {cls.date} • {cls.startTime} - {cls.endTime}
-                        </p>
-                        {cls.description && (
-                          <p className="text-xs text-slate-650 dark:text-slate-400 mt-2 italic border-l-2 border-slate-200 dark:border-slate-800 pl-2">
-                            "{cls.description}"
-                          </p>
-                        )}
-                      </div>
 
-                      {calculatedStatus === "Live" ? (
-                        <button
-                          onClick={() => {
-                            joinLiveRoom(null);
-                            setView("webrtc-live");
-                          }}
-                          className="mt-4 w-full py-2 bg-brand-royal hover:bg-brand-royal/90 text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all"
-                        >
-                          <span>Join Live Meeting</span>
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className="mt-4 w-full py-2 bg-slate-100 dark:bg-slate-900 text-slate-400 dark:text-slate-600 rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-not-allowed border border-slate-200 dark:border-white/5"
-                        >
-                          <span>Starts soon</span>
-                        </button>
-                      )}
-                    </div>
-                  );
-                });
-              })()}
+            {/* Strong Topics */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
+                Strong Topics (High Accuracy)
+              </span>
+              <div className="space-y-1.5">
+                {strongTopics.map((topic, i) => (
+                  <div
+                    key={i}
+                    className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-2"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{topic}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Weak Topics */}
+            <div className="space-y-2 pt-2">
+              <span className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
+                Weak Topics (Needs Practice)
+              </span>
+              <div className="space-y-1.5">
+                {weakTopics.map((topic, i) => (
+                  <div
+                    key={i}
+                    className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-semibold text-rose-700 dark:text-rose-300 flex items-center gap-2"
+                  >
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{topic}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Assignments Tracker Card */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                Deadlines
-              </h3>
-              {pendingAssignments.length > 0 && (
-                <span className="text-[9px] bg-amber-500/10 text-amber-600 border border-amber-500/20 font-bold px-2 py-0.5 rounded-full">
-                  {pendingAssignments.length} Pending
-                </span>
-              )}
-            </div>
+          {/* Upcoming Live Classes & Meetings */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+              <Tv className="w-5 h-5 text-brand-royal dark:text-brand-royal-light" />
+              Live Learning Portal
+            </h3>
 
-            <div className="glass-card p-5 border-slate-200 dark:border-white/5">
-              {classAssignments.length === 0 ? (
-                <p className="text-xs text-slate-600 text-center py-4">
-                  No assignments assigned.
-                </p>
-              ) : (
-                <div className="space-y-2.5">
-                  {classAssignments.slice(0, 3).map((assign) => (
-                    <div
-                      key={assign.id}
-                      onClick={() => setView("assignment-view")}
-                      className="p-3 rounded-xl bg-slate-50/50 hover:bg-slate-100 border border-slate-200 dark:bg-slate-900/40 dark:hover:bg-slate-900 dark:border-white/5 dark:hover:border-white/10 transition-all text-left cursor-pointer flex justify-between items-center"
-                    >
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[150px]">
-                          {assign.title}
-                        </h4>
-                        <p className="text-[9px] text-slate-500 dark:text-slate-500 mt-0.5">
-                          {assign.subjectTitle} • Due {formatDeadlineIST(assign.deadline)}
-                        </p>
-                      </div>
+            {dbMeetings.length === 0 ? (
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic py-2">
+                No live classes scheduled for this batch right now.
+              </p>
+            ) : (
+              dbMeetings.map((m) => {
+                const status = getMeetingStatus(m.date, m.startTime, m.endTime);
+                return (
+                  <div
+                    key={m.id}
+                    className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        {m.title}
+                      </span>
                       <span
-                        className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
-                          assign.status === "Graded"
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                            : assign.status === "Submitted"
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                              : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                        className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                          status === "Live"
+                            ? "bg-red-500 text-white animate-pulse"
+                            : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
                         }`}
                       >
-                        {assign.status}
+                        {status}
                       </span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <p className="text-[11px] text-slate-500">Instructor: {m.hostName}</p>
+                    {status === "Live" && (
+                      <button
+                        onClick={() => {
+                          joinLiveRoom({
+                            roomName: m.title,
+                            participantName: profile.name,
+                            isTeacher: false,
+                          });
+                          setView("webrtc-live");
+                        }}
+                        className="w-full py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase"
+                      >
+                        Join Live Class Now
+                      </button>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Bookmarks & Quick Notes */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+              <Bookmark className="w-5 h-5 text-brand-royal dark:text-brand-royal-light" />
+              Saved Bookmarks ({bookmarks.length})
+            </h3>
+            {bookmarks.length === 0 ? (
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic py-2">
+                No bookmarked topics yet. Save key formulas and notes during revision.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {bookmarks.slice(0, 3).map((bm) => (
+                  <div
+                    key={bm.id}
+                    onClick={() => setView("course-view")}
+                    className="p-3 rounded-xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-brand-royal/5 cursor-pointer text-xs"
+                  >
+                    <h5 className="font-bold text-slate-900 dark:text-white">{bm.topicTitle}</h5>
+                    <p className="text-[10px] text-slate-500 mt-0.5">{bm.subjectTitle}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

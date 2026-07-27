@@ -356,26 +356,29 @@ async function main() {
 
   console.log('Admin seeded: admin@nexoralearning.com');
 
+  // 6. SEED MOCK TESTS (Competitive Exam Mock Tests)
   // ==========================================
-  // 6. SEED COURSES (no teacher reference — assigned by admin portal)
-  // ==========================================
-  console.log('Seeding Courses and Quiz Questions...');
+  console.log('Seeding Exam Programs and Mock Test Questions...');
 
-  // ==========================================
   const quizMath = await prisma.quiz.create({
     data: {
-      title: 'Matrices Basics Assessment',
-      description: 'Test your understanding of matrices and determinants properties.',
+      title: 'JEE Main Full-Length Mock Test 1',
+      description: 'Comprehensive mock test covering Physics, Chemistry & Mathematics with negative marking.',
       topicId: topicForQuiz.id,
-      passingScore: 80.0,
-      maxAttempts: 3,
-      timeLimitMinutes: 10,
+      passingScore: 60.0,
+      maxAttempts: 5,
+      timeLimitMinutes: 15,
+      testType: 'Full-Length Test',
+      testCategory: 'Engineering',
+      negativeMarkingRate: 0.25,
     },
   });
 
   const matricesQuestions = [
     {
       questionText: 'If A is a square matrix of order 3 and |A| = 5, what is the value of |adj A|?',
+      explanation: 'For a square matrix of order n, |adj A| = |A|^(n-1). Here n=3, so |adj A| = 5^(3-1) = 5^2 = 25.',
+      difficulty: 'Medium',
       options: [
         { optionText: '5', isCorrect: false },
         { optionText: '25', isCorrect: true },
@@ -385,6 +388,8 @@ async function main() {
     },
     {
       questionText: 'Which method is used for solving a system of linear equations using determinants?',
+      explanation: "Cramer's Rule uses determinants to solve systems of linear equations.",
+      difficulty: 'Easy',
       options: [
         { optionText: 'Gaussian Elimination', isCorrect: false },
         { optionText: 'Cramer\'s Rule', isCorrect: true },
@@ -394,6 +399,8 @@ async function main() {
     },
     {
       questionText: 'What is the determinant of a 2x2 identity matrix?',
+      explanation: 'The determinant of any identity matrix is always 1.',
+      difficulty: 'Easy',
       options: [
         { optionText: '1', isCorrect: true },
         { optionText: '0', isCorrect: false },
@@ -403,6 +410,8 @@ async function main() {
     },
     {
       questionText: 'If det(A) = 0, the matrix A is defined as:',
+      explanation: 'A matrix whose determinant is equal to zero is called a singular matrix.',
+      difficulty: 'Easy',
       options: [
         { optionText: 'Singular', isCorrect: true },
         { optionText: 'Non-singular', isCorrect: false },
@@ -412,56 +421,13 @@ async function main() {
     },
     {
       questionText: 'For a square matrix A, which operation yields the identity matrix?',
+      explanation: 'The product of a matrix and its inverse A * A^-1 = I.',
+      difficulty: 'Medium',
       options: [
         { optionText: 'A * A^-1', isCorrect: true },
         { optionText: 'A + A', isCorrect: false },
         { optionText: 'A - A', isCorrect: false },
         { optionText: 'A * A', isCorrect: false },
-      ],
-    },
-    {
-      questionText: 'What is the transpose of a symmetric matrix A?',
-      options: [
-        { optionText: 'A', isCorrect: true },
-        { optionText: '-A', isCorrect: false },
-        { optionText: 'A^-1', isCorrect: false },
-        { optionText: 'A^T', isCorrect: false },
-      ],
-    },
-    {
-      questionText: 'For any square matrix A, which of the following is always a symmetric matrix?',
-      options: [
-        { optionText: 'A + A^T', isCorrect: true },
-        { optionText: 'A - A^T', isCorrect: false },
-        { optionText: 'A * A^T', isCorrect: false },
-        { optionText: 'A^T', isCorrect: false },
-      ],
-    },
-    {
-      questionText: 'If a matrix has 12 elements, how many possible orders can it have?',
-      options: [
-        { optionText: '6', isCorrect: true },
-        { optionText: '12', isCorrect: false },
-        { optionText: '4', isCorrect: false },
-        { optionText: '3', isCorrect: false },
-      ],
-    },
-    {
-      questionText: 'A matrix in which all elements above or below the main diagonal are zero is called:',
-      options: [
-        { optionText: 'Diagonal matrix', isCorrect: true },
-        { optionText: 'Row matrix', isCorrect: false },
-        { optionText: 'Column matrix', isCorrect: false },
-        { optionText: 'Scalar matrix', isCorrect: false },
-      ],
-    },
-    {
-      questionText: 'If A and B are square matrices of the same order, then (AB)^-1 is equal to:',
-      options: [
-        { optionText: 'B^-1 A^-1', isCorrect: true },
-        { optionText: 'A^-1 B^-1', isCorrect: false },
-        { optionText: 'AB', isCorrect: false },
-        { optionText: 'BA', isCorrect: false },
       ],
     },
   ];
@@ -472,8 +438,11 @@ async function main() {
       data: {
         quizId: quizMath.id,
         questionText: qData.questionText,
+        explanation: qData.explanation,
+        difficulty: qData.difficulty,
         questionType: QuestionType.MCQ,
-        marks: 5.0,
+        marks: 4.0,
+        negativeMarks: 1.0,
         sortOrder: i + 1,
       },
     });

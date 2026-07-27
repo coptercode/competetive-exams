@@ -13,9 +13,10 @@ import {
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
+  onOpenSearch?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
+export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
   const {
     activeView,
     setView,
@@ -31,20 +32,21 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const viewTitles: Record<string, string> = {
-    "student-dash": "Student Portal",
-    "course-view": "Deep Learning Space",
-    "quiz-view": "Quiz Assessment",
-    "assignment-view": "Assignments Center",
-    "profile-view": "Academic Profile",
-    "teacher-dash": "Educator Dashboard",
-    "admin-upload": "Content Upload Studio",
-    "quiz-builder": "Assessment Constructor",
-    "admin-structure": "SaaS Registry & Structure",
-    "admin-analytics": "Platform Core Analytics",
-    "webrtc-live": "WebRTC Elite Classroom",
-    "ai-tutor": "AI Personal Tutor",
-    "drm-security": "DRM Security Console",
-    "parent-portal": "Parent Monitor Shield",
+    "student-dash": "Candidate Portal",
+    "course-view": "Exam Program Portal",
+    "quiz-view": "Mock Test Engine",
+    "assignment-view": "Practice Test Portal",
+    "profile-view": "Candidate Profile",
+    "teacher-dash": "Instructor Dashboard",
+    "admin-upload": "Program Content Studio",
+    "quiz-builder": "Mock Test Builder",
+    "admin-structure": "Exam Categories & Batches",
+    "admin-analytics": "Super Admin Analytics & Reports",
+    "webrtc-live": "Live Classroom Portal",
+    "ai-tutor": "AI Exam Prep Assistant",
+    "question-bank": "Question Bank Manager",
+    "drm-security": "DRM Video Protection",
+    "parent-portal": "Parent & Performance Monitor",
   };
 
   const handleNotifClick = () => {
@@ -52,6 +54,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     if (!showNotifMenu) {
       readAllNotifications();
     }
+  };
+
+  const displayRoleName = () => {
+    if (profile.role === "admin" || profile.role === "super_admin") return "Super Admin";
+    if (profile.role === "teacher" || profile.role === "instructor") return "Instructor";
+    return "Candidate";
   };
 
   return (
@@ -68,13 +76,24 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
         )}
         <div>
           <h1 className="text-xl font-bold font-display tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            {viewTitles[activeView] || "Nexora Learning"}
+            {viewTitles[activeView] || "Coaching Prep Portal"}
           </h1>
         </div>
       </div>
 
       {/* Top Navigation Options / Badges */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Global Search Button Trigger */}
+        {onOpenSearch && (
+          <button
+            onClick={onOpenSearch}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:border-brand-royal/40 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-all hover:scale-105"
+          >
+            <BookOpen className="w-4 h-4 text-brand-royal dark:text-brand-royal-light" />
+            <span className="hidden sm:inline">Search Platform</span>
+          </button>
+        )}
+
         {/* Notifications Bell Dropdown */}
         <div className="relative">
           <button
@@ -137,11 +156,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
         {/* User Card Dropdown (Quick exit to Landing) */}
         <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-white/10">
           <div className="hidden sm:block text-right">
-            <p className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
+            <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
               {profile.name}
             </p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-500 capitalize">
-              {profile.role}
+            <p className="text-[10px] text-brand-royal dark:text-brand-royal-light font-bold capitalize">
+              {displayRoleName()}
             </p>
           </div>
           <button

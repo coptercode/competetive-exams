@@ -47,38 +47,37 @@ export const LandingPage: React.FC = () => {
   const features = [
     {
       icon: Sparkles,
-      title: "Contextual AI Tutor",
-      desc: "Instant 24/7 explanations in mathematics and chemistry tailored to your textbook version, board standard, and learning speed.",
+      title: "AI Exam Prep Assistant",
+      desc: "Instant 24/7 problem solving, step-by-step math proofs, organic reaction mechanisms, and polity article references.",
     },
     {
       icon: Video,
-      title: "UHD WebRTC Classrooms",
-      desc: "Ultra-low latency streaming with active participant grids, digital whiteboards, and real-time screen shares.",
+      title: "Interactive Live Classes & DRM Video",
+      desc: "Ultra-low latency streaming with active participant grids, DRM video encryption, and interactive doubt resolution.",
     },
     {
       icon: BookOpen,
-      title: "Expert Notes",
-      desc: "Curated chapter notes, formula sheets, and physical worksheets mapped perfectly to your board exam curriculum for better learning.",
+      title: "Mock Tests & Question Bank",
+      desc: "Full-Length Mocks, PYQs, Chapter Tests with realistic timers, negative marking, instant percentiles, and AIR rank estimation.",
     },
   ];
 
   const testimonials = [
     {
       quote:
-        "Nexora Learning completely revolutionized my daughter's Class 12 prep. The physical kit, combined with the real-time AI tutor, justified every rupee of the premium subscription. She cleared her board exams with top marks.",
-      name: "Aditi Rao",
-      role: "Student, Class 12",
-      avatar: "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public/aditi_rao.png",
+        "The Full-Length Grand Mock Tests and instant percentile analysis helped me crack JEE Advanced with AIR 42! The negative marking practice was identical to the actual exam environment.",
+      author: "Siddharth Verma",
+      role: "Candidate (JEE Advanced AIR 42)",
       rating: 5,
+      avatar: "/kabir_mehta.png",
     },
     {
       quote:
-        "Using Nexora Learning helped me improve my academic performance dramatically. By practicing with the expert worksheets and chapter tests, my conceptual understanding became so strong that I went from 70% to scoring 98% in my Class 12 board exams.",
-      name: "Kabir Mehta",
-      role: "Student, Class 10",
-      avatar:
-        "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public/kabir_mehta.png",
+        "The TNPSC Group 1 study materials, Mind Maps, and daily practice tests made my preparation structured and effective. I cleared TNPSC Prelims on my first attempt!",
+      author: "Priya Murugan",
+      role: "Candidate (TNPSC Group 1 Officer Ranker)",
       rating: 5,
+      avatar: "/aditi_rao.png",
     },
   ];
 

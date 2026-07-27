@@ -521,15 +521,18 @@ model VideoWatchHistory {
 // ==========================================
 
 model Quiz {
-  id                String   @id @default(uuid()) @db.Uuid
-  title             String
-  description       String?
-  topicId           String   @map("topic_id") @db.Uuid
-  passingScore      Float    @default(40.0) @map("passing_score") // e.g. percent or raw marks
-  maxAttempts       Int      @default(3) @map("max_attempts")
-  timeLimitMinutes  Int      @default(30) @map("time_limit_minutes")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id                  String   @id @default(uuid()) @db.Uuid
+  title               String
+  description         String?
+  topicId             String   @map("topic_id") @db.Uuid
+  passingScore        Float    @default(40.0) @map("passing_score") // e.g. percent or raw marks
+  maxAttempts         Int      @default(3) @map("max_attempts")
+  timeLimitMinutes    Int      @default(30) @map("time_limit_minutes")
+  testType            String   @default("Subject Test") @map("test_type") // Chapter Test, Subject Test, Full-Length Test, Daily Test, Weekly Test, Grand Test, PYQ Paper
+  testCategory        String?  @map("test_category") // Engineering, Medical, Civil Services, TNPSC, Banking, SSC, Railway, Defence
+  negativeMarkingRate Float    @default(0.25) @map("negative_marking_rate")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
   topic        Topic                 @relation(fields: [topicId], references: [id], onDelete: Cascade)
   questions    QuizQuestion[]
@@ -540,13 +543,22 @@ model Quiz {
 }
 
 model QuizQuestion {
-  id           String       @id @default(uuid()) @db.Uuid
-  quizId       String       @map("quiz_id") @db.Uuid
-  questionText String       @map("question_text")
-  questionType QuestionType @default(MCQ) @map("question_type")
-  marks        Float        @default(1.0)
-  sortOrder    Int          @map("sort_order")
-  createdAt    DateTime     @default(now()) @map("created_at")
+  id               String       @id @default(uuid()) @db.Uuid
+  quizId           String       @map("quiz_id") @db.Uuid
+  questionText     String       @map("question_text")
+  questionType     QuestionType @default(MCQ) @map("question_type")
+  marks            Float        @default(1.0)
+  negativeMarks    Float        @default(0.25) @map("negative_marks")
+  explanation      String?      @map("explanation")
+  difficulty       String       @default("Medium") @map("difficulty") // Easy, Medium, Hard
+  subtopic         String?      @map("subtopic")
+  isPYQ            Boolean      @default(false) @map("is_pyq")
+  pyqYear          Int?         @map("pyq_year")
+  source           String?      @map("source")
+  tags             String?      @map("tags")
+  timeLimitSeconds Int          @default(60) @map("time_limit_seconds")
+  sortOrder        Int          @map("sort_order")
+  createdAt        DateTime     @default(now()) @map("created_at")
 
   quiz              Quiz                   @relation(fields: [quizId], references: [id], onDelete: Cascade)
   options           QuizOption[]

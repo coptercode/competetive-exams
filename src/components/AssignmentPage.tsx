@@ -130,7 +130,7 @@ export const AssignmentPage: React.FC = () => {
                 <span
                   className={`text-[10px] font-bold uppercase tracking-wider ${subjectTagColor}`}
                 >
-                  {activeAssign.subjectTitle} Homework Sheet
+                  {activeAssign.subjectTitle} Practice Problem Sheet
                 </span>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
                   {activeAssign.title}
@@ -158,7 +158,7 @@ export const AssignmentPage: React.FC = () => {
                 <Calendar className={`w-5 h-5 ${subjectIconColor}`} />
                 <div>
                   <span className="text-[9px] text-slate-600 dark:text-slate-500 font-bold uppercase">
-                    Due Date
+                    Submission Due Date
                   </span>
                   <p className="text-slate-800 dark:text-slate-200 font-semibold mt-0.5">
                     {formatDeadlineIST(activeAssign.deadline)}
@@ -170,10 +170,10 @@ export const AssignmentPage: React.FC = () => {
                 <FileText className={`w-5 h-5 ${subjectIconColor}`} />
                 <div>
                   <span className="text-[9px] text-slate-600 dark:text-slate-500 font-bold uppercase">
-                    Total Points
+                    Test Score Scale
                   </span>
                   <p className="text-slate-800 dark:text-slate-200 font-semibold mt-0.5">
-                    {activeAssign.points} Points Max
+                    {activeAssign.points} Marks Max
                   </p>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export const AssignmentPage: React.FC = () => {
             {/* Description */}
             <div className="space-y-2 text-slate-700 dark:text-slate-400 text-xs sm:text-sm leading-relaxed font-normal">
               <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">
-                Instructions
+                Practice Test Instructions
               </h4>
               <p>{activeAssign.description}</p>
             </div>
@@ -196,10 +196,10 @@ export const AssignmentPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-650 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      Assignment Reference File
+                      Practice Test Question Paper (PDF)
                     </span>
                     <p className="text-xs text-slate-800 dark:text-slate-200 font-semibold truncate max-w-[200px] sm:max-w-sm mt-0.5">
-                      {activeAssign.fileUrl.split('/').pop() || "assignment_reference.pdf"}
+                      {activeAssign.fileUrl.split('/').pop() || "practice_test_paper.pdf"}
                     </p>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ export const AssignmentPage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="px-4 py-2.5 rounded-xl bg-brand-royal text-white hover:bg-brand-royal/90 font-bold text-xs transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-brand-royal/15"
                 >
-                  Download
+                  Download Paper
                 </a>
               </div>
             )}
