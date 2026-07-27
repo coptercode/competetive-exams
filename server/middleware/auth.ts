@@ -1,14 +1,25 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { randomUUID } from 'crypto';
-import { getJwtSecret } from '../lib/env.js';
 import { prisma } from '../lib/prisma.js';
+import { randomUUID } from 'crypto';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'eduverse-dev-secret';
+
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env.JWT_SECRET || JWT_SECRET === 'eduverse-dev-secret' || JWT_SECRET === 'eduverse-dev-secret-change-in-production') {
+    throw new Error('FATAL: A strong JWT_SECRET must be provided in production');
+  }
+  if (!process.env.DATABASE_URL) {
+    throw new Error('FATAL: DATABASE_URL must be provided in production');
+  }
+} else if (JWT_SECRET === 'eduverse-dev-secret' || JWT_SECRET === 'eduverse-dev-secret-change-in-production') {
+  console.warn("⚠️ WARNING: Using default JWT_SECRET. Do not use this in production!");
+}
 
 export interface AuthPayload {
   userId: string;
   role: string;
   jti?: string;
-  exp?: number;
 }
 
 declare global {
@@ -19,8 +30,9 @@ declare global {
   }
 }
 
-export function signToken(payload: Pick<AuthPayload, 'userId' | 'role'>) {
-  return jwt.sign({ ...payload, jti: randomUUID() }, getJwtSecret(), { expiresIn: '7d' });
+export function signToken(payload: AuthPayload) {
+  const jti = randomUUID();
+  return jwt.sign({ ...payload, jti }, JWT_SECRET, { expiresIn: '7d' });
 }
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -32,14 +44,18 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
   try {
     const token = header.slice(7);
-    const payload = jwt.verify(token, getJwtSecret()) as AuthPayload;
-    if (payload.jti) {
-      const revoked = await prisma.revokedToken.findUnique({ where: { jti: payload.jti } });
+    const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
+    
+    if (decoded.jti) {
+      const revoked = await prisma.revokedToken.findUnique({
+        where: { jti: decoded.jti }
+      });
       if (revoked) {
         return res.status(401).json({ error: 'Token has been revoked' });
       }
     }
-    req.auth = payload;
+    
+    req.auth = decoded;
     next();
   } catch (err: any) {
     console.warn('requireAuth token verification failed:', err.message);
@@ -47,11 +63,23 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+export async function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {
     try {
-      req.auth = jwt.verify(header.slice(7), getJwtSecret()) as AuthPayload;
+      const token = header.slice(7);
+      const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
+      
+      if (decoded.jti) {
+        const revoked = await prisma.revokedToken.findUnique({
+          where: { jti: decoded.jti }
+        });
+        if (!revoked) {
+          req.auth = decoded;
+        }
+      } else {
+        req.auth = decoded;
+      }
     } catch {
       // ignore invalid token for public routes
     }

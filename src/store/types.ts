@@ -170,6 +170,7 @@ export interface AuthState {
 export interface LMSStore {
   auth: AuthState;
   setAuth: (auth: Partial<AuthState>) => void;
+  loadProfileData: (profileId: string) => void;
   logout: () => void;
 
   activeView: string;
@@ -190,7 +191,9 @@ export interface LMSStore {
   setCurrentTopic: (topic: Topic) => void;
 
   profile: Profile;
+  setProfile: (profile: Profile) => void;
   boards: Board[];
+  setBoards: (boards: Board[]) => void;
   assignments: Assignment[];
   submitAssignment: (assignmentId: string, file: File) => Promise<void>;
   gradeAssignment: (

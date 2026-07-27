@@ -6074,15 +6074,15 @@ export const cbseBoardComplete = {
                 },
                 {
                   "id": "t-cbse-11-Bio-ch13-sq1cr8-12-dy1oyu",
-                  "title": "Calvin Cycle (C₃ Cycle)",
-                  "content": "Study notes for Calvin Cycle (C₃ Cycle)",
+                  "title": "Calvin Cycle (C3 Cycle)",
+                  "content": "Study notes for Calvin Cycle (C3 Cycle)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-cbse-11-Bio-ch13-sq1cr8-13-ngk9jl",
-                  "title": "C₄ Pathway (Hatch and Slack Pathway)",
-                  "content": "Study notes for C₄ Pathway (Hatch and Slack Pathway)",
+                  "title": "C4 Pathway (Hatch and Slack Pathway)",
+                  "content": "Study notes for C4 Pathway (Hatch and Slack Pathway)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -6109,8 +6109,8 @@ export const cbseBoardComplete = {
                 },
                 {
                   "id": "t-cbse-11-Bio-ch13-sq1cr8-17-yjem5f",
-                  "title": "Comparison of C₃ and C₄ Plants",
-                  "content": "Study notes for Comparison of C₃ and C₄ Plants",
+                  "title": "Comparison of C3 and C4 Plants",
+                  "content": "Study notes for Comparison of C3 and C4 Plants",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -13510,8 +13510,8 @@ export const cbseBoardComplete = {
                 },
                 {
                   "id": "t-cbse-12-Che-ch4-obngf0-10-gi1v7s",
-                  "title": "Difference Between KMnO₄ and K₂Cr₂O₇",
-                  "content": "Study notes for Difference Between KMnO₄ and K₂Cr₂O₇",
+                  "title": "Difference Between KMnO4 and K2Cr2O₇",
+                  "content": "Study notes for Difference Between KMnO4 and K2Cr2O₇",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 }

@@ -1220,8 +1220,8 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "icse-s9-ch15-t2",
-                  "title": "Hydrogen (H₂)",
-                  "content": "Study material for Hydrogen (H₂)",
+                  "title": "Hydrogen (H2)",
+                  "content": "Study material for Hydrogen (H2)",
                   "duration": "15 mins",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -2712,7 +2712,7 @@ export const icseBoardComplete = {
             },
             {
               "id": "icse-c10-ch9",
-              "title": "Chapter 9 : Study of Compounds – Ammonia (NH₃)",
+              "title": "Chapter 9 : Study of Compounds – Ammonia (NH3)",
               "topics": [
                 {
                   "id": "icse-c10-ch9-t1",
@@ -2753,7 +2753,7 @@ export const icseBoardComplete = {
             },
             {
               "id": "icse-c10-ch10",
-              "title": "Chapter 10 : Study of Compounds – Nitric Acid (HNO₃)",
+              "title": "Chapter 10 : Study of Compounds – Nitric Acid (HNO3)",
               "topics": [
                 {
                   "id": "icse-c10-ch10-t1",
@@ -2876,7 +2876,7 @@ export const icseBoardComplete = {
             },
             {
               "id": "icse-c10-ch13",
-              "title": "Chapter 13 : Study of Compounds – Sulphuric Acid (H₂SO₄)",
+              "title": "Chapter 13 : Study of Compounds – Sulphuric Acid (H2SO4)",
               "topics": [
                 {
                   "id": "icse-c10-ch13-t1",
@@ -7472,8 +7472,8 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "icse-p12-ch14-t4",
-                  "title": "Alpha Radiation (α)",
-                  "content": "Study material for Alpha Radiation (α)",
+                  "title": "Alpha Radiation (Alpha)",
+                  "content": "Study material for Alpha Radiation (Alpha)",
                   "duration": "15 mins",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },

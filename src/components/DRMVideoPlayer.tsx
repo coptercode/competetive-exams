@@ -7,6 +7,7 @@ interface DRMVideoPlayerProps {
   videoId: string;
   title?: string;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
+  onEnded?: () => void;
   containerRef?: React.RefObject<HTMLDivElement>;
 }
 
@@ -25,6 +26,7 @@ export const DRMVideoPlayer: React.FC<DRMVideoPlayerProps> = ({
   videoId,
   title,
   onTimeUpdate,
+  onEnded,
   containerRef,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -161,6 +163,7 @@ export const DRMVideoPlayer: React.FC<DRMVideoPlayerProps> = ({
         disablePictureInPicture
         playsInline
         title={title}
+        onEnded={onEnded}
       />
 
       {!loading && !error && (

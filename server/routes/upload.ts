@@ -1,12 +1,59 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth, requireAdmin, requireAdminOrTeacher } from '../middleware/auth.js';
-import { uploadToMinio, buildStorageKey, deleteFromMinio } from '../lib/minio.js';
+import { uploadToMinio, buildStorageKey, deleteFromMinio, minioClient, MINIO_BUCKET } from '../lib/minio.js';
 import { processVideoForDrm, isFfmpegAvailable } from '../lib/drm-processor.js';
 import { prisma } from '../lib/prisma.js';
-import { matchesDeclaredType } from '../lib/fileSignature.js';
+import { ListObjectsV2Command, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { fileTypeFromBuffer } from 'file-type';
+
+async function validateMagicBytes(buffer: Buffer, declaredMimeType: string) {
+  if (declaredMimeType === 'text/markdown') return; // Cannot check magic bytes for text reliably
+  const type = await fileTypeFromBuffer(buffer);
+  if (!type || type.mime !== declaredMimeType) {
+    // some quicktime files might be detected as mp4 or vice versa by file-type, allow generic video matches
+    if (declaredMimeType.startsWith('video/') && type?.mime.startsWith('video/')) return;
+    throw new Error(`Invalid file content. Magic bytes mismatch (got ${type?.mime || 'unknown'}, expected ${declaredMimeType}).`);
+  }
+}
 
 const router = Router();
+
+// TEMPORARY REPAIR ENDPOINT
+router.get('/fix-supabase-md', async (req, res) => {
+  try {
+    const listCommand = new ListObjectsV2Command({ Bucket: MINIO_BUCKET });
+    const listResponse = await minioClient.send(listCommand);
+    const mdFiles = (listResponse.Contents || []).filter((item: any) => item.Key && item.Key.endsWith('.md'));
+
+    const results = [];
+    for (const file of mdFiles) {
+      const getCommand = new GetObjectCommand({ Bucket: MINIO_BUCKET, Key: file.Key });
+      const getResponse = await minioClient.send(getCommand);
+      const content = await getResponse.Body?.transformToString();
+      
+      if (!content) continue;
+      // Aggressive replacement to fix concatenated tables
+      const fixedContent = content.replace(/\|[\s\u200B]*\|/g, '|\n|');
+      
+      if (fixedContent !== content) {
+        const putCommand = new PutObjectCommand({
+          Bucket: MINIO_BUCKET,
+          Key: file.Key,
+          Body: fixedContent,
+          ContentType: "text/markdown",
+        });
+        await minioClient.send(putCommand);
+        results.push(`Fixed: ${file.Key}`);
+      } else {
+        results.push(`Skipped (OK): ${file.Key}`);
+      }
+    }
+    res.json({ success: true, results });
+  } catch (err: any) {
+    res.status(500).json({ error: String(err) });
+  }
+});
 
 // Use memory storage so we can pipe directly to R2
 const upload = multer({
@@ -23,6 +70,7 @@ const upload = multer({
       'video/quicktime',
       'video/x-matroska',
       'application/zip',
+      'text/markdown',
     ];
     if (allowed.includes(file.mimetype)) {
       cb(null, true);
@@ -102,9 +150,7 @@ router.post(
         return res.status(400).json({ error: 'file, subjectId, and title are required' });
       }
 
-      if (!matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
-        return res.status(400).json({ error: 'File content does not match its declared type' });
-      }
+      await validateMagicBytes(req.file.buffer, req.file.mimetype);
 
       // Find a topic to attach the note to (first topic in subject)
       const topic = await prisma.topic.findFirst({
@@ -234,10 +280,6 @@ router.post(
         return res.status(400).json({ error: 'subjectId, title, and deadline are required' });
       }
 
-      if (req.file && !matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
-        return res.status(400).json({ error: 'File content does not match its declared type' });
-      }
-
       // Find a topic to attach the assignment to
       const topic = await prisma.topic.findFirst({
         where: { chapter: { unit: { subjectId } } },
@@ -251,6 +293,8 @@ router.post(
       let fileUrl: string | null = null;
 
       if (req.file) {
+        await validateMagicBytes(req.file.buffer, req.file.mimetype);
+
         const key = buildStorageKey(
           'assignment',
           classTitle || 'general',
@@ -340,10 +384,28 @@ router.get('/upload/notes', requireAuth, async (req, res) => {
 
   try {
     const notes = await prisma.courseNote.findMany({
-      where: { topic: { chapter: { unit: { subjectId } } } },
+      where: { 
+        topic: { chapter: { unit: { subjectId } } },
+        uploadedByUserId: { not: null }
+      },
       orderBy: { sortOrder: 'asc' },
     });
-    res.json({ notes });
+    const cleanedNotes = notes.map(n => {
+      let fileUrl = n.fileUrl;
+      if (fileUrl.includes('.supabase.co') && fileUrl.includes('/s3/')) {
+        fileUrl = fileUrl.replace('/s3/', '/object/public/');
+        // Fix wrongly encoded slashes in the path (e.g. bucket/notes%2Fclass-9%2Fmath)
+        const parts = fileUrl.split('/');
+        const lastPart = parts.pop();
+        if (lastPart && lastPart.includes('%2F')) {
+          parts.push(...lastPart.split('%2F'));
+          fileUrl = parts.join('/');
+        }
+      }
+      return { ...n, fileUrl };
+    });
+
+    res.json({ notes: cleanedNotes });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch notes' });
   }
@@ -378,6 +440,10 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
       }
     }
 
+    // Only show notes explicitly uploaded by a user (staff/teacher)
+    // Auto-generated curriculum notes will have uploadedByUserId as null
+    whereClause.uploadedByUserId = { not: null };
+
     const notes = await prisma.courseNote.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
@@ -398,14 +464,27 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
       },
     });
 
-    const enriched = notes.map((n) => ({
-      id: n.id,
-      title: n.title,
-      fileUrl: n.fileUrl,
-      uploadedByName: n.uploadedByName || 'Professor',
-      subjectTitle: n.subjectTitle || n.topic?.chapter?.unit?.subject?.name || 'General',
-      createdAt: n.createdAt,
-    }));
+    const enriched = notes.map((n) => {
+      let fileUrl = n.fileUrl;
+      if (fileUrl.includes('.supabase.co') && fileUrl.includes('/s3/')) {
+        fileUrl = fileUrl.replace('/s3/', '/object/public/');
+        // Fix wrongly encoded slashes
+        const parts = fileUrl.split('/');
+        const lastPart = parts.pop();
+        if (lastPart && lastPart.includes('%2F')) {
+          parts.push(...lastPart.split('%2F'));
+          fileUrl = parts.join('/');
+        }
+      }
+      return {
+        id: n.id,
+        title: n.title,
+        fileUrl,
+        uploadedByName: n.uploadedByName || 'Professor',
+        subjectTitle: n.subjectTitle || n.topic?.chapter?.unit?.subject?.name || 'General',
+        createdAt: n.createdAt,
+      };
+    });
 
     res.json({ notes: enriched });
   } catch (err) {
@@ -429,10 +508,23 @@ router.get('/upload/assignments', requireAuth, async (req, res) => {
     });
 
     const now = new Date();
-    const enriched = assignments.map((a) => ({
-      ...a,
-      isLocked: a.deadline ? a.deadline < now : false,
-    }));
+    const enriched = assignments.map((a) => {
+      let fileUrl = a.fileUrl || '';
+      if (fileUrl.includes('.supabase.co') && fileUrl.includes('/s3/')) {
+        fileUrl = fileUrl.replace('/s3/', '/object/public/');
+        const parts = fileUrl.split('/');
+        const lastPart = parts.pop();
+        if (lastPart && lastPart.includes('%2F')) {
+          parts.push(...lastPart.split('%2F'));
+          fileUrl = parts.join('/');
+        }
+      }
+      return {
+        ...a,
+        fileUrl,
+        isLocked: a.deadline ? a.deadline < now : false,
+      };
+    });
 
     res.json({ assignments: enriched });
   } catch (err) {
@@ -517,10 +609,6 @@ router.post(
         return res.status(400).json({ error: 'Either file or videoUrl is required' });
       }
 
-      if (req.file && !matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
-        return res.status(400).json({ error: 'File content does not match its declared type' });
-      }
-
       const enableDrm = drmProtected === 'true' && !!req.file;
       if (enableDrm && !(await isFfmpegAvailable())) {
         return res.status(503).json({ error: 'FFmpeg is required for DRM processing but was not found on the server' });
@@ -539,6 +627,8 @@ router.post(
       let fileUrl = videoUrl || '';
 
       if (req.file && !enableDrm) {
+        await validateMagicBytes(req.file.buffer, req.file.mimetype);
+
         const key = buildStorageKey(
           'video',
           classTitle || 'general',
@@ -553,6 +643,7 @@ router.post(
           fileUrl = `/uploads/${key}`;
         }
       } else if (req.file && enableDrm) {
+        await validateMagicBytes(req.file.buffer, req.file.mimetype);
         // Original kept in MinIO via DRM pipeline; videoUrl stores internal reference only
         fileUrl = `drm-pending://${req.file.originalname}`;
       }

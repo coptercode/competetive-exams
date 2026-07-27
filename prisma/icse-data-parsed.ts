@@ -1270,29 +1270,29 @@ export const icseBoardComplete = {
               "topics": [
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-0-a3121y",
-                  "title": "Hydrogen (H₂)",
-                  "content": "Study notes for Hydrogen (H₂)",
+                  "title": "Hydrogen (H2)",
+                  "content": "Study notes for Hydrogen (H2)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-1-v07nkt",
-                  "title": "Oxygen (O₂)",
-                  "content": "Study notes for Oxygen (O₂)",
+                  "title": "Oxygen (O2)",
+                  "content": "Study notes for Oxygen (O2)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-2-ybgwt3",
-                  "title": "Carbon Dioxide (CO₂)",
-                  "content": "Study notes for Carbon Dioxide (CO₂)",
+                  "title": "Carbon Dioxide (CO2)",
+                  "content": "Study notes for Carbon Dioxide (CO2)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-3-1m3hqz",
-                  "title": "Ammonia (NH₃)",
-                  "content": "Study notes for Ammonia (NH₃)",
+                  "title": "Ammonia (NH3)",
+                  "content": "Study notes for Ammonia (NH3)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -1305,15 +1305,15 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-5-2plh5o",
-                  "title": "Nitric Acid (HNO₃)",
-                  "content": "Study notes for Nitric Acid (HNO₃)",
+                  "title": "Nitric Acid (HNO3)",
+                  "content": "Study notes for Nitric Acid (HNO3)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-6-r43g4o",
-                  "title": "Sulphuric Acid (H₂SO₄)",
-                  "content": "Study notes for Sulphuric Acid (H₂SO₄)",
+                  "title": "Sulphuric Acid (H2SO4)",
+                  "content": "Study notes for Sulphuric Acid (H2SO4)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -1326,8 +1326,8 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "t-icse-9-Sci-ch15-hw6269-8-ltnebl",
-                  "title": "Calcium Hydroxide [Ca(OH)₂]",
-                  "content": "Study notes for Calcium Hydroxide [Ca(OH)₂]",
+                  "title": "Calcium Hydroxide [Ca(OH)2]",
+                  "content": "Study notes for Calcium Hydroxide [Ca(OH)2]",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 }
@@ -4807,8 +4807,8 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "t-icse-10-Che-ch4-cc5mxv-3-h5hl1j",
-                  "title": "Ammonium Hydroxide (NH₄OH) Test",
-                  "content": "Study notes for Ammonium Hydroxide (NH₄OH) Test",
+                  "title": "Ammonium Hydroxide (NH4OH) Test",
+                  "content": "Study notes for Ammonium Hydroxide (NH4OH) Test",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -5176,7 +5176,7 @@ export const icseBoardComplete = {
             },
             {
               "id": "icse-10-Che-ch9-zl6g5t",
-              "title": "Chapter 9: Study of Compounds – Ammonia (NH₃)",
+              "title": "Chapter 9: Study of Compounds – Ammonia (NH3)",
               "topics": [
                 {
                   "id": "t-icse-10-Che-ch9-zl6g5t-0-b1y5m0",
@@ -5238,7 +5238,7 @@ export const icseBoardComplete = {
             },
             {
               "id": "icse-10-Che-ch10-mqdf4d",
-              "title": "Chapter 10: Study of Compounds – Nitric Acid (HNO₃)",
+              "title": "Chapter 10: Study of Compounds – Nitric Acid (HNO3)",
               "topics": [
                 {
                   "id": "t-icse-10-Che-ch10-mqdf4d-0-phl9xv",
@@ -5480,7 +5480,7 @@ export const icseBoardComplete = {
             },
             {
               "id": "icse-10-Che-ch13-gdgy6x",
-              "title": "Chapter 13: Study of Compounds – Sulphuric Acid (H₂SO₄)",
+              "title": "Chapter 13: Study of Compounds – Sulphuric Acid (H2SO4)",
               "topics": [
                 {
                   "id": "t-icse-10-Che-ch13-gdgy6x-0-kaz40d",
@@ -6630,15 +6630,15 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "t-icse-11-Bio-ch13-1s37fy-5-ctcqyt",
-                  "title": "C₃ Pathway",
-                  "content": "Study notes for C₃ Pathway",
+                  "title": "C3 Pathway",
+                  "content": "Study notes for C3 Pathway",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-11-Bio-ch13-1s37fy-6-lux2p8",
-                  "title": "C₄ Pathway",
-                  "content": "Study notes for C₄ Pathway",
+                  "title": "C4 Pathway",
+                  "content": "Study notes for C4 Pathway",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -7999,15 +7999,15 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "t-icse-11-Che-ch8-6zlktk-8-caz65t",
-                  "title": "Heavy Water (D₂O)",
-                  "content": "Study notes for Heavy Water (D₂O)",
+                  "title": "Heavy Water (D2O)",
+                  "content": "Study notes for Heavy Water (D2O)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-11-Che-ch8-6zlktk-9-hcg5dz",
-                  "title": "Hydrogen Peroxide (H₂O₂)",
-                  "content": "Study notes for Hydrogen Peroxide (H₂O₂)",
+                  "title": "Hydrogen Peroxide (H2O2)",
+                  "content": "Study notes for Hydrogen Peroxide (H2O2)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -19071,22 +19071,22 @@ export const icseBoardComplete = {
                 },
                 {
                   "id": "t-icse-12-Phy-ch14-fdly1a-2-678ih5",
-                  "title": "Alpha Radiation (α)",
-                  "content": "Study notes for Alpha Radiation (α)",
+                  "title": "Alpha Radiation (Alpha)",
+                  "content": "Study notes for Alpha Radiation (Alpha)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-12-Phy-ch14-fdly1a-3-bdpok2",
-                  "title": "Beta Radiation (β)",
-                  "content": "Study notes for Beta Radiation (β)",
+                  "title": "Beta Radiation (Beta)",
+                  "content": "Study notes for Beta Radiation (Beta)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-icse-12-Phy-ch14-fdly1a-4-6axms1",
-                  "title": "Gamma Radiation (γ)",
-                  "content": "Study notes for Gamma Radiation (γ)",
+                  "title": "Gamma Radiation (Gamma)",
+                  "content": "Study notes for Gamma Radiation (Gamma)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },

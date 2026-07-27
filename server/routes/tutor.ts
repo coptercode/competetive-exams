@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { isPublicAiFallbackEnabled } from '../lib/env.js';
 
 const router = Router();
 
@@ -10,7 +9,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const isApiKeyValid = apiKey && (apiKey.startsWith('AIzaSy') || apiKey.startsWith('AQ.')) && apiKey !== 'your-gemini-api-key-here' && apiKey.trim() !== '';
 const genAI = isApiKeyValid ? new GoogleGenerativeAI(apiKey) : null;
 const tutorModels = Array.from(
-  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter((m): m is string => Boolean(m)))
+  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter(Boolean))
 );
 
 
@@ -132,12 +131,10 @@ router.post('/tutor', requireAuth, async (req, res) => {
     textQuestion = `[User attached file: ${attachment.name} (type: ${attachment.type})]\n\n${question}`;
   }
 
-  // Helper to query Pollinations AI as a free public fallback.
-  // This sends the student's question (and any attachment) to an unauthenticated
-  // third-party endpoint, so it's opt-in only — see ENABLE_PUBLIC_AI_FALLBACK.
+  // Helper to query Pollinations AI as a free public fallback
   const queryPollinations = async (): Promise<string | null> => {
-    if (!isPublicAiFallbackEnabled()) {
-      console.warn('Pollinations AI fallback is disabled (ENABLE_PUBLIC_AI_FALLBACK not set to true).');
+    if (process.env.NODE_ENV === 'production' && process.env.ENABLE_AI_FALLBACK !== 'true') {
+      console.warn('Pollinations AI fallback is disabled in production to protect student data. Set ENABLE_AI_FALLBACK=true to enable.');
       return null;
     }
     try {
@@ -229,7 +226,7 @@ router.post('/tutor', requireAuth, async (req, res) => {
     for (const modelName of tutorModels) {
       try {
         const model = genAI.getGenerativeModel({
-          model: modelName,
+          model: modelName as string,
           systemInstruction: 'You are an encouraging, expert AI Personal Tutor for a student. Keep your explanations clear, structured, and easy to understand. Use Markdown formatting. If the student asks a math/science question, explain step-by-step. If they ask a coding question, write clean code with comments. Always maintain a helpful, teacher-like tone.',
         });
 

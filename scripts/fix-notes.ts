@@ -8,7 +8,7 @@ async function main() {
   // Find all topics across all boards and classes
   const allTopics = await prisma.topic.findMany({
     include: {
-      courseNotes: true,
+      notes: true,
       chapter: {
         include: {
           unit: {
@@ -24,7 +24,7 @@ async function main() {
   let addedNotesCount = 0;
 
   for (const topic of allTopics) {
-    if (topic.courseNotes.length === 0) {
+    if (topic.notes.length === 0) {
       // Create a dummy note for this topic
       await prisma.courseNote.create({
         data: {

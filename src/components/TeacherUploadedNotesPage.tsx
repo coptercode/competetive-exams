@@ -184,7 +184,7 @@ export const TeacherUploadedNotesPage: React.FC = () => {
 
                 {/* Download Button */}
                 <a
-                  href={note.fileUrl.includes('?') ? `${note.fileUrl}&download=true` : `${note.fileUrl}?download=true`}
+                  href={note.fileUrl}
                   download
                   target="_blank"
                   rel="noopener noreferrer"

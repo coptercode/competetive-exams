@@ -3,7 +3,6 @@ import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
 import multer from 'multer';
 import { uploadToMinio, buildStorageKey } from '../lib/minio.js';
-import { matchesDeclaredType } from '../lib/fileSignature.js';
 
 const router = Router();
 
@@ -57,6 +56,7 @@ router.get('/assignments', requireAuth, async (req, res) => {
         submissions: studentId ? {
           where: { studentId: studentId },
           include: {
+            student: { include: { user: true } },
             feedback: {
               include: {
                 teacher: {
@@ -70,7 +70,11 @@ router.get('/assignments', requireAuth, async (req, res) => {
         } : {
           include: {
             student: { include: { user: true } },
-            feedback: true
+            feedback: {
+              include: {
+                teacher: { include: { user: true } }
+              }
+            }
           }
         }
       },
@@ -102,8 +106,8 @@ router.get('/assignments', requireAuth, async (req, res) => {
         } else {
           a.submissions.forEach(sub => {
             let status = 'Submitted';
-            let grade: string | undefined = undefined;
-            let feedback: string | undefined = undefined;
+            let grade = undefined;
+            let feedback = undefined;
             if (sub.status === 'GRADED') {
               status = 'Graded';
               grade = sub.feedback ? `${sub.feedback.marksObtained}/100` : undefined;
@@ -126,10 +130,7 @@ router.get('/assignments', requireAuth, async (req, res) => {
               submissionFile: sub.submissionUrl,
               grade: grade,
               feedback: feedback,
-              // `submissions`'s include shape is chosen at runtime (see the `studentId ? ... : ...`
-              // above); this branch always runs the `student`-included shape, but Prisma's
-              // generated type is a union TS can't narrow across a runtime ternary.
-              studentName: `${(sub as any).student.user.firstName} ${(sub as any).student.user.lastName}`,
+              studentName: `${sub.student.user.firstName} ${sub.student.user.lastName}`,
               submittedAt: sub.submittedAt ? sub.submittedAt.toISOString() : '',
               fileUrl: a.fileUrl || undefined
             });
@@ -139,10 +140,10 @@ router.get('/assignments', requireAuth, async (req, res) => {
         // For students, output a single item for the assignment with their submission info
         const submission = a.submissions?.[0];
         let status = 'Pending';
-        let submissionFile: string | undefined = undefined;
-        let grade: string | undefined = undefined;
-        let feedback: string | undefined = undefined;
-        let teacherName: string | undefined = undefined;
+        let submissionFile = undefined;
+        let grade = undefined;
+        let feedback = undefined;
+        let teacherName = undefined;
 
         if (submission) {
           submissionFile = submission.submissionUrl;
@@ -152,9 +153,7 @@ router.get('/assignments', requireAuth, async (req, res) => {
             status = 'Graded';
             grade = submission.feedback ? `${submission.feedback.marksObtained}/100` : undefined;
             feedback = submission.feedback?.comment || undefined;
-            // Same runtime-ternary-vs-static-type gap as above: this branch always runs the
-            // `feedback.teacher`-included shape.
-            teacherName = submission.feedback ? `${(submission.feedback as any).teacher.user.firstName} ${(submission.feedback as any).teacher.user.lastName}` : undefined;
+            teacherName = submission.feedback?.teacher?.user ? `${submission.feedback.teacher.user.firstName} ${submission.feedback.teacher.user.lastName}` : undefined;
           }
         }
 
@@ -230,8 +229,9 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
     }
 
     // Check deadline
+    const assignmentId = req.params.assignmentId as string;
     const assignment = await prisma.assignment.findUnique({
-      where: { id: req.params.assignmentId },
+      where: { id: assignmentId },
       include: {
         topic: {
           include: {
@@ -259,10 +259,6 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
       return res.status(400).json({ error: 'file is required' });
     }
 
-    if (!matchesDeclaredType(req.file.buffer, req.file.mimetype)) {
-      return res.status(400).json({ error: 'File content does not match its declared type' });
-    }
-
     const className = student.class?.name || 'general';
     const subjectName = assignment.topic.chapter.unit.subject.name || 'general';
 
@@ -280,7 +276,7 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
       where: {
         studentId_assignmentId: {
           studentId: student.id,
-          assignmentId: req.params.assignmentId,
+          assignmentId: assignmentId,
         },
       },
       update: {
@@ -290,7 +286,7 @@ router.post('/assignments/:assignmentId/submit', requireAuth, (req, res, next) =
       },
       create: {
         studentId: student.id,
-        assignmentId: req.params.assignmentId,
+        assignmentId: assignmentId,
         submissionUrl,
         submittedAt: new Date(),
       },
@@ -317,15 +313,16 @@ router.post('/assignments/submissions/:submissionId/grade', requireAuth, async (
     }
 
     const marks = parseFloat(marksObtained);
+    const submissionId = req.params.submissionId as string;
     const feedback = await prisma.assignmentFeedback.upsert({
-      where: { submissionId: req.params.submissionId },
+      where: { submissionId: submissionId },
       update: {
         marksObtained: marks,
         comment,
         passed: marks >= 40,
       },
       create: {
-        submissionId: req.params.submissionId,
+        submissionId: submissionId,
         teacherId: teacher.id,
         marksObtained: marks,
         comment,
@@ -334,7 +331,7 @@ router.post('/assignments/submissions/:submissionId/grade', requireAuth, async (
     });
 
     await prisma.assignmentSubmission.update({
-      where: { id: req.params.submissionId },
+      where: { id: submissionId },
       data: { status: 'GRADED' }
     });
 
@@ -346,12 +343,10 @@ router.post('/assignments/submissions/:submissionId/grade', requireAuth, async (
 });
 
 router.get('/students/:studentId/submissions', requireAuth, async (req, res) => {
-  if (req.auth!.role === 'STUDENT' && req.auth!.userId !== req.params.studentId) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
   try {
+    const studentId = req.params.studentId as string;
     const submissions = await prisma.assignmentSubmission.findMany({
-      where: { studentId: req.params.studentId },
+      where: { studentId: studentId },
       include: { assignment: true },
       orderBy: { submittedAt: 'desc' },
     });

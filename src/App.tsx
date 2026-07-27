@@ -32,7 +32,7 @@ import { AdminPortal } from "./components/AdminPortal";
 import { AITutor } from "./components/AITutor";
 import { SubmissionsPage } from "./components/SubmissionsPage";
 import { StudentGradesPage } from "./components/StudentGradesPage";
-import { RoomContainer } from "./components/LiveClass/RoomContainer";
+import { SimulatedLiveMeeting } from "./components/LiveClass/SimulatedLiveMeeting";
 import { getApiBaseUrl } from "./utils/apiBase";
 import { NotesResourcesPage } from "./components/NotesResourcesPage";
 import { ParentPortal } from "./components/ParentPortal";
@@ -43,6 +43,7 @@ import { TermsOfServicePage } from "./components/TermsOfServicePage";
 import { ContactSupportPage } from "./components/ContactSupportPage";
 import { SecureNotesPreview } from "./components/SecureNotesPreview";
 import { TeacherUploadedNotesPage } from "./components/TeacherUploadedNotesPage";
+import { GlobalModals } from "./components/GlobalModals";
 import { getISTDate } from "./utils/dateUtils";
 
 function RoomJoinFallback() {
@@ -56,6 +57,7 @@ function RoomJoinFallback() {
 
   // States for Teacher Calendar & Scheduling Workspace
   const [meetings, setMeetings] = useState<any[]>([]);
+  const [cancelMeetingTarget, setCancelMeetingTarget] = useState<any | null>(null);
   const today = getISTDate();
   const [calMonth, setCalMonth] = useState(today.getMonth()); // 0-indexed
   const [calYear, setCalYear] = useState(today.getFullYear());
@@ -292,6 +294,35 @@ function RoomJoinFallback() {
     } catch (err) {
       console.warn("Failed to complete live class:", err);
     }
+  };
+
+  const handleCancelMeeting = (m: any) => {
+    setCancelMeetingTarget(m);
+  };
+
+  const confirmCancelMeeting = async () => {
+    if (!cancelMeetingTarget) return;
+    
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/live-class/${cancelMeetingTarget.id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: "Cancelled" })
+      });
+
+      if (res.ok) {
+        fetchMeetings();
+      }
+    } catch (err) {
+      console.warn("Failed to cancel live class:", err);
+    }
+    setCancelMeetingTarget(null);
   };
 
   // Derive counts
@@ -741,9 +772,14 @@ function RoomJoinFallback() {
                         </div>
                         <div className="flex items-center gap-2">
                           {profile?.role === "teacher" && m.status === "Upcoming" && (
-                            <button onClick={() => handleGoLive(m)} className="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white font-extrabold text-[9px] uppercase tracking-wider transition active:scale-95 shrink-0 rounded">
-                              Go Live
-                            </button>
+                            <>
+                              <button onClick={() => handleCancelMeeting(m)} className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-[9px] uppercase tracking-wider transition active:scale-95 shrink-0 rounded">
+                                Cancel
+                              </button>
+                              <button onClick={() => handleGoLive(m)} className="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white font-extrabold text-[9px] uppercase tracking-wider transition active:scale-95 shrink-0 rounded">
+                                Go Live
+                              </button>
+                            </>
                           )}
                           {profile?.role === "teacher" && m.status === "Live" && (
                             <button onClick={() => handleCompleteMeeting(m)} className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[9px] uppercase tracking-wider transition active:scale-95 shrink-0 rounded">
@@ -788,6 +824,31 @@ function RoomJoinFallback() {
           })()}
         </div>
       </div>
+      
+      {cancelMeetingTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 dark:border-white/10 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2">Cancel Meeting?</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed font-medium">
+              Are you sure you want to cancel <strong>{cancelMeetingTarget.title || 'this session'}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button 
+                onClick={() => setCancelMeetingTarget(null)}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                Keep Meeting
+              </button>
+              <button 
+                onClick={confirmCancelMeeting}
+                className="px-4 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg shadow-red-500/20"
+              >
+                Yes, Cancel It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -826,7 +887,7 @@ function App() {
       fetchNotifs();
       fetchAssigns();
       fetchNotes();
-    }, 8000);
+    }, 60000);
     return () => clearInterval(interval);
   }, [profile?.id]);
 
@@ -967,8 +1028,14 @@ function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [setView, auth.isAuthenticated, token, profile]);
 
+  const isInitialMount = React.useRef(true);
+
   // Keep URL hash in sync with activeView and course context
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     const fullHash = window.location.hash.replace(/^#\/?/, "");
     const hashParts = fullHash.split("/");
     const currentHash = hashParts[0].split("?")[0] || "landing";
@@ -1032,7 +1099,7 @@ function App() {
         if (!liveRoomState) {
           return <RoomJoinFallback />;
         }
-        return <RoomContainer roomName={liveRoomState.roomName} participantName={liveRoomState.participantName} isTeacher={liveRoomState.isTeacher} />;
+        return <SimulatedLiveMeeting roomName={liveRoomState.roomName} participantName={liveRoomState.participantName} isTeacher={liveRoomState.isTeacher} />;
       case "forgot-password":
         return <ForgotPasswordPage />;
       case "reset-password":
@@ -1095,6 +1162,7 @@ function App() {
           {!isPublicPage && !auth.isAuthenticated && <LoginPage mode="all" />}
         </>
       )}
+      <GlobalModals />
     </div>
   );
 }

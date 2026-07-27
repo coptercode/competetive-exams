@@ -4206,8 +4206,8 @@ export const cbseBoardComplete = {
                 },
                 {
                   "id": "cbse-b11-ch10-t5",
-                  "title": "(A) G₁ Phase (First Gap Phase)",
-                  "content": "Study material for (A) G₁ Phase (First Gap Phase)",
+                  "title": "(A) G1 Phase (First Gap Phase)",
+                  "content": "Study material for (A) G1 Phase (First Gap Phase)",
                   "duration": "15 mins",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLmsStore } from "../store/index";
+import { useUiStore } from "../store/useUiStore";
 import {
   ArrowRight,
   ShieldCheck,
@@ -25,10 +26,11 @@ export const LandingPage: React.FC = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
+  const baseUrl = "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public";
   const heroImages = [
-    "/hero_slide_1.png?v=2",
-    "/hero_slide_2.png?v=2",
-    "/hero_slide_3.png?v=2",
+    `${baseUrl}/hero_slide_1.png?v=2`,
+    `${baseUrl}/hero_slide_2.png?v=2`,
+    `${baseUrl}/hero_slide_3.png?v=2`,
   ];
 
   useEffect(() => {
@@ -64,19 +66,19 @@ export const LandingPage: React.FC = () => {
     {
       quote:
         "Nexora Learning completely revolutionized my daughter's Class 12 prep. The physical kit, combined with the real-time AI tutor, justified every rupee of the premium subscription. She cleared her board exams with top marks.",
-      author: "Aditi Rao",
-      role: "Parent of Shreya Rao (Class 12)",
-      rating: 4.5,
-      avatar: "/aditi_rao.png",
+      name: "Aditi Rao",
+      role: "Student, Class 12",
+      avatar: "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public/aditi_rao.png",
+      rating: 5,
     },
     {
       quote:
         "Using Nexora Learning helped me improve my academic performance dramatically. By practicing with the expert worksheets and chapter tests, my conceptual understanding became so strong that I went from 70% to scoring 98% in my Class 12 board exams.",
-      author: "Kabir Mehta",
-      role: "Class 12 Student",
-      rating: 5,
+      name: "Kabir Mehta",
+      role: "Student, Class 10",
       avatar:
-        "/kabir_mehta.png",
+        "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public/kabir_mehta.png",
+      rating: 5,
     },
   ];
 
@@ -201,9 +203,9 @@ export const LandingPage: React.FC = () => {
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center w-full">
           {/* Left Column: Headline and CTAs */}
           <div className="lg:col-span-6 text-center lg:text-left flex flex-col items-center lg:items-start">
-            
+
             {/* Sparkle Badge */}
-            <div 
+            <div
               className="inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-slate-50 border border-slate-200/80 text-slate-650 text-[10px] font-bold uppercase tracking-wider mb-6 hover:bg-slate-100 transition-colors duration-200"
               style={{ borderRadius: "20px" }}
             >
@@ -220,7 +222,7 @@ export const LandingPage: React.FC = () => {
                 Built for Academic Excellence.
               </span>
             </h1>
-            
+
             <p className="text-base sm:text-[17px] text-slate-500 mb-8 max-w-xl leading-relaxed">
               Nexora combines high-fidelity WebRTC classrooms, personal 24/7 AI tutor guidance, and board-mapped curriculum resources into a seamless, modern workspace. Designed to help Grade 9–12 scholars achieve conceptual mastery and score higher in their final exams.
             </p>
@@ -241,10 +243,10 @@ export const LandingPage: React.FC = () => {
           <div className="lg:col-span-6 flex items-center justify-center w-full relative">
             {/* Ambient background glow inside right column */}
             <div className="absolute w-[80%] h-[80%] bg-gradient-to-tr from-brand-royal/10 to-brand-violet/10 blur-3xl opacity-60 -z-10 animate-pulse-slow" />
-            
+
             <div className="relative w-full max-w-[540px] lg:max-w-none">
               {/* Outer Card with curved border resembling a premium desktop application */}
-              <div 
+              <div
                 className="border border-slate-200/50 bg-white/90 backdrop-blur-md p-3.5 shadow-2xl hover:shadow-[0_32px_80px_-24px_rgba(15,23,42,0.14)] hover:scale-[1.005] transition-all duration-500"
                 style={{ borderRadius: "24px" }}
               >
@@ -267,9 +269,9 @@ export const LandingPage: React.FC = () => {
                       </svg>
                     </div>
                   </div>
-                  
+
                   {/* Mock URL bar */}
-                  <div 
+                  <div
                     className="flex-1 max-w-[240px] mx-4 bg-slate-50 border border-slate-100 text-center py-0.5 text-[9px] text-slate-400 font-medium tracking-wide flex items-center justify-center gap-1 select-none"
                     style={{ borderRadius: "6px" }}
                   >
@@ -286,8 +288,8 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div 
-                  className="bg-slate-50 border border-slate-100 overflow-hidden shadow-inner flex items-center justify-center p-0 relative h-[280px] sm:h-[360px] md:h-[400px] lg:h-[420px]" 
+                <div
+                  className="bg-slate-50 border border-slate-100 overflow-hidden shadow-inner flex items-center justify-center p-0 relative h-[280px] sm:h-[360px] md:h-[400px] lg:h-[420px]"
                   style={{ borderRadius: "16px" }}
                 >
                   <img
@@ -319,10 +321,11 @@ export const LandingPage: React.FC = () => {
 
         {/* Single Feature Carousel */}
         {(() => {
+          const baseUrl = "https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public";
           const images = [
-            "/feat_ai_tutor.png?v=5",
-            "/feat_webrtc.png?v=3",
-            "/feat_expert_notes.png?v=7",
+            `${baseUrl}/feat_ai_tutor.png?v=5`,
+            `${baseUrl}/feat_webrtc.png?v=3`,
+            `${baseUrl}/feat_expert_notes.png?v=7`,
           ];
           const feat = features[activeFeature];
           const Icon = feat.icon;
@@ -337,7 +340,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-full lg:w-[420px] shrink-0 space-y-6">
                   <div className="w-12 h-12 rounded-xl bg-brand-royal/5 flex items-center justify-center text-brand-royal border border-brand-royal/10 overflow-hidden">
                     {feat.title === "Contextual AI Tutor" ? (
-                      <img src="/feat_ai_tutor_icon.png" alt="AI Tutor" className="w-full h-full object-cover" />
+                      <img src="https://vrpbukzwbzjjlkdamkjp.supabase.co/storage/v1/object/public/lms-files/Public/feat_ai_tutor_icon.png" alt="AI Tutor" className="w-full h-full object-cover" />
                     ) : (
                       <Icon className="w-6 h-6" />
                     )}
@@ -377,11 +380,10 @@ export const LandingPage: React.FC = () => {
                         <button
                           key={i}
                           onClick={() => setActiveFeature(i)}
-                          className={`rounded-full transition-all duration-300 ${
-                            i === activeFeature
+                          className={`rounded-full transition-all duration-300 ${i === activeFeature
                               ? "w-5 h-2 bg-brand-royal"
                               : "w-2 h-2 bg-slate-300 hover:bg-slate-400"
-                          }`}
+                            }`}
                           aria-label={`Go to feature ${i + 1}`}
                         />
                       ))}
@@ -424,14 +426,14 @@ export const LandingPage: React.FC = () => {
         {(() => {
           const test = testimonials[activeTestimonial];
           return (
-            <div 
+            <div
               className="relative max-w-4xl mx-auto border border-slate-200/80 bg-gradient-to-br from-white to-slate-50/50 p-8 sm:p-12 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
               style={{ borderRadius: "24px" }}
             >
               {/* Background ambient light blobs inside the card */}
               <div className="absolute top-0 right-0 w-48 h-48 bg-brand-royal/5 blur-3xl pointer-events-none" style={{ borderRadius: "50%" }} />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-violet/5 blur-3xl pointer-events-none" style={{ borderRadius: "50%" }} />
-              
+
               {/* Giant background quotation mark */}
               <div className="absolute right-8 top-4 text-[160px] font-serif text-slate-150/70 select-none pointer-events-none leading-none">
                 “
@@ -444,16 +446,16 @@ export const LandingPage: React.FC = () => {
                     <img
                       key={activeTestimonial}
                       src={test.avatar}
-                      alt={test.author}
+                      alt={test.name}
                       className="w-28 h-28 object-cover border-4 border-white shadow-md animate-fade-in-up"
                       style={{ borderRadius: "50%" }}
                     />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-base font-bold text-slate-900">{test.author}</h4>
+                    <h4 className="text-base font-bold text-slate-900">{test.name}</h4>
                     <p className="text-xs text-slate-500 font-medium leading-tight">{test.role}</p>
                   </div>
-                  
+
                   {/* Arrows */}
                   <div className="flex items-center gap-2 mt-2">
                     <button
@@ -483,7 +485,7 @@ export const LandingPage: React.FC = () => {
                       {test.quote}
                     </p>
                   </div>
-                  
+
                   {/* Rating / Quality Badge */}
                   <div className="flex items-center gap-3 mt-8 pt-6 border-t border-slate-100">
                     <div className="flex gap-0.5">
@@ -511,14 +513,14 @@ export const LandingPage: React.FC = () => {
 
       {/* Ready to Get Started Overlay Banner */}
       <section className="relative z-20 max-w-6xl mx-auto px-6 -mb-24">
-        <div 
+        <div
           className="relative overflow-hidden bg-gradient-to-r from-brand-violet to-brand-royal text-white px-8 py-10 sm:py-12 sm:px-16 shadow-2xl"
           style={{ borderRadius: "24px" }}
         >
           {/* Halftone dotted patterns on sides */}
           <div className="absolute top-0 left-0 w-32 h-full opacity-10 bg-[radial-gradient(#ffffff_1.5px,transparent_1.5px)] [background-size:8px_8px] pointer-events-none" />
           <div className="absolute bottom-0 right-0 w-48 h-full opacity-15 bg-[radial-gradient(#ffffff_1.5px,transparent_1.5px)] [background-size:6px_6px] pointer-events-none" />
-          
+
           <div className="absolute -top-12 -left-12 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none" />
           <div className="absolute -bottom-16 -right-16 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -545,7 +547,7 @@ export const LandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="relative z-10 bg-brand-navy-dark pt-36 pb-12 px-6 font-sans text-slate-400">
         <div className="max-w-6xl mx-auto space-y-12">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 text-left">
             {/* Column 1: Logo & Desc */}
             <div className="md:col-span-4 space-y-5">
@@ -561,7 +563,7 @@ export const LandingPage: React.FC = () => {
               <p className="text-xs text-slate-450 leading-relaxed max-w-sm">
                 The ultimate academic platform for Class 9–12 Scholars. Empowering students with 24/7 AI tutoring, UHD interactive classrooms, and board-ready physical kits.
               </p>
-              
+
               {/* Social Icons removed as per request */}
             </div>
 
@@ -631,23 +633,23 @@ export const LandingPage: React.FC = () => {
               <p className="text-xs text-slate-450 leading-relaxed">
                 Stay updated with the latest exam tips, product updates, and syllabus changes.
               </p>
-              
-              <form 
+
+              <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  alert("Successfully subscribed to newsletter!");
+                  useUiStore.getState().showAlert("Successfully subscribed to newsletter!");
                 }}
                 className="flex items-center w-full max-w-sm overflow-hidden"
                 style={{ borderRadius: "8px" }}
               >
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   placeholder="Enter email address"
                   className="bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs px-4 py-3.5 focus:outline-none focus:border-brand-royal flex-1 min-w-0"
                   required
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="bg-brand-violet hover:bg-purple-700 text-white text-xs font-bold px-6 py-3.5 transition-colors uppercase tracking-wider shrink-0"
                 >
                   Join

@@ -3929,8 +3929,8 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-11-Bio-ch10-g58bmp-2-pz4at4",
-                  "title": "G₁ Phase (Gap 1 Phase)",
-                  "content": "Study notes for G₁ Phase (Gap 1 Phase)",
+                  "title": "G1 Phase (Gap 1 Phase)",
+                  "content": "Study notes for G1 Phase (Gap 1 Phase)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -3943,8 +3943,8 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-11-Bio-ch10-g58bmp-4-g5ha8n",
-                  "title": "G₂ Phase (Gap 2 Phase)",
-                  "content": "Study notes for G₂ Phase (Gap 2 Phase)",
+                  "title": "G2 Phase (Gap 2 Phase)",
+                  "content": "Study notes for G2 Phase (Gap 2 Phase)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -4660,8 +4660,8 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-11-Bio-ch14-lkqder-17-0puecq",
-                  "title": "Transport of CO₂",
-                  "content": "Study notes for Transport of CO₂",
+                  "title": "Transport of CO2",
+                  "content": "Study notes for Transport of CO2",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -14604,8 +14604,8 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-12-Che-ch2-b5gs3d-8-1xeikt",
-                  "title": "Diborane (B₂H₆)",
-                  "content": "Study notes for Diborane (B₂H₆)",
+                  "title": "Diborane (B2H6)",
+                  "content": "Study notes for Diborane (B2H6)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -14715,15 +14715,15 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-12-Che-ch3-luze4d-4-2jx4f8",
-                  "title": "Ammonia (NH₃)",
-                  "content": "Study notes for Ammonia (NH₃)",
+                  "title": "Ammonia (NH3)",
+                  "content": "Study notes for Ammonia (NH3)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
                 {
                   "id": "t-tnsb-12-Che-ch3-luze4d-5-per4xn",
-                  "title": "Nitric Acid (HNO₃)",
-                  "content": "Study notes for Nitric Acid (HNO₃)",
+                  "title": "Nitric Acid (HNO3)",
+                  "content": "Study notes for Nitric Acid (HNO3)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -14736,8 +14736,8 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-12-Che-ch3-luze4d-7-j0rbnm",
-                  "title": "Phosphine (PH₃)",
-                  "content": "Study notes for Phosphine (PH₃)",
+                  "title": "Phosphine (PH3)",
+                  "content": "Study notes for Phosphine (PH3)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },
@@ -14764,8 +14764,8 @@ export const initialBoards = [{
                 },
                 {
                   "id": "t-tnsb-12-Che-ch3-luze4d-11-mqgxmf",
-                  "title": "Sulphuric Acid (H₂SO₄)",
-                  "content": "Study notes for Sulphuric Acid (H₂SO₄)",
+                  "title": "Sulphuric Acid (H2SO4)",
+                  "content": "Study notes for Sulphuric Acid (H2SO4)",
                   "duration": "15m",
                   "videoUrl": "https://www.w3schools.com/html/movie.mp4"
                 },

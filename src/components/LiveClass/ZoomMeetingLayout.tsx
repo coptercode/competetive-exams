@@ -17,8 +17,9 @@ import {
   MessageSquare, Users, PenTool, LayoutGrid, Maximize,
   MonitorUp, Shield, MoreVertical, MicOff, PhoneOff, Focus, UserX
 } from 'lucide-react';
-import { useLmsStore } from '../../store/index';
-import { getApiBaseUrl } from '../../utils/apiBase';
+import { useLmsStore } from "../../store/index";
+import { getApiBaseUrl } from "../../utils/apiBase";
+import { useUiStore } from "../../store/useUiStore";
 import { CollaborativeWhiteboard } from './CollaborativeWhiteboard';
 import { MeetingChat } from './MeetingChat';
 
@@ -48,7 +49,7 @@ export const ZoomMeetingLayout = () => {
   const isHost = profile.role === 'teacher';
 
   const kickParticipant = async (identity: string) => {
-    if (!confirm("Are you sure you want to kick this participant?")) return;
+    if (!(await useUiStore.getState().showConfirm("Are you sure you want to kick this participant?"))) return;
     try {
       const token = localStorage.getItem("auth_token");
       const res = await fetch(`${getApiBaseUrl()}/api/live-class/kick-participant`, {
@@ -62,16 +63,16 @@ export const ZoomMeetingLayout = () => {
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
-          alert("Participant kicked successfully.");
+          useUiStore.getState().showAlert("Participant kicked successfully.");
         } else {
-          alert("Failed to kick participant.");
+          useUiStore.getState().showAlert("Failed to kick participant.");
         }
       } else {
-        alert("Server error when kicking participant.");
+        useUiStore.getState().showAlert("Server error when kicking participant.");
       }
     } catch (e) {
       console.error(e);
-      alert("Network error: Could not reach backend.");
+      useUiStore.getState().showAlert("Network error: Could not reach backend.");
     }
   };
 
@@ -139,7 +140,7 @@ export const ZoomMeetingLayout = () => {
       } else if (topic === 'screen-share-rejected' && !isHost) {
         if (msg === localParticipant?.identity) {
           setScreenShareRequested(false);
-          alert("Your screen share request was rejected by the Teacher.");
+          useUiStore.getState().showAlert("Your screen share request was rejected by the Teacher.");
         }
       }
     };
@@ -174,14 +175,14 @@ export const ZoomMeetingLayout = () => {
             await localParticipant.publishData(payload, { reliable: true, topic: 'screen-share-approved' });
           }
         } else {
-          alert("Backend failed to grant permission. Please try again.");
+          useUiStore.getState().showAlert("Backend failed to grant permission. Please try again.");
         }
       } else {
-        alert("Server error when granting permission.");
+        useUiStore.getState().showAlert("Server error when granting permission.");
       }
     } catch (e) {
       console.error(e);
-      alert("Network error: Could not reach backend.");
+      useUiStore.getState().showAlert("Network error: Could not reach backend.");
     }
   };
 
@@ -518,7 +519,7 @@ export const ZoomMeetingLayout = () => {
               </button>
               <button 
                 onClick={() => {
-                  alert("Attendance report downloaded successfully.");
+                  useUiStore.getState().showAlert("Attendance report downloaded successfully.");
                 }}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition"
               >

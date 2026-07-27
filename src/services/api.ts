@@ -450,3 +450,99 @@ export const tutorAPI = {
     return res.json();
   },
 };
+
+// ========================================
+// CHAPTER LOCK / UNLOCK ENDPOINTS
+// ========================================
+
+export const chapterLockAPI = {
+  // Teacher: get all chapters for a subject with class-wide lock state + override count
+  getTeacherChapters: async (subjectId: string) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/teacher/chapters?subjectId=${encodeURIComponent(subjectId)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to fetch chapters");
+    return res.json() as Promise<{
+      chapters: Array<{
+        id: string;
+        title: string;
+        order: number;
+        unitId: string;
+        unitName: string;
+        isUnlocked: boolean;
+        unlockedAt: string | null;
+        unlockedBy: string | null;
+        overrideCount: number;
+      }>;
+    }>;
+  },
+
+  // Teacher: toggle class-wide lock status for a chapter
+  updateChapterLockStatus: async (chapterId: string, isUnlocked: boolean) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/teacher/chapters/${chapterId}/lock-status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ isUnlocked }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to update chapter lock status");
+    }
+    return res.json();
+  },
+
+  // Teacher: get student roster with override modes for a chapter
+  getStudentOverrides: async (chapterId: string) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/teacher/chapters/${chapterId}/student-overrides`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to fetch student overrides");
+    return res.json() as Promise<{
+      classWideDefault: boolean;
+      students: Array<{
+        studentId: string;
+        name: string;
+        email: string;
+        mode: "inherit" | "unlock" | "lock";
+        effectiveIsUnlocked: boolean;
+      }>;
+    }>;
+  },
+
+  // Teacher: set per-student override mode
+  setStudentOverride: async (chapterId: string, studentId: string, mode: "inherit" | "unlock" | "lock") => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/teacher/chapters/${chapterId}/students/${studentId}/override`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ mode }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to update student override");
+    }
+    return res.json();
+  },
+
+  // Student: get resolved effective chapter access (only sees final boolean)
+  getStudentChapterAccess: async (subjectId: string) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/student/chapters/access?subjectId=${encodeURIComponent(subjectId)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to fetch chapter access");
+    return res.json() as Promise<{
+      chapters: Array<{ id: string; title: string; order: number; isUnlocked: boolean }>;
+    }>;
+  },
+};
+

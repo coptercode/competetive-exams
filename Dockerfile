@@ -1,46 +1,65 @@
-# syntax=docker/dockerfile:1
-
-# ---- Builder ----------------------------------------------------------
-# Installs full deps (incl. devDeps needed for the Vite/tsc build), builds
-# both the frontend (dist/client) and backend (dist/server), then strips
-# devDependencies back out of node_modules before handing off to runtime.
+# ==========================================
+# STAGE 1: Build Phase
+# ==========================================
 FROM node:20-alpine AS builder
+
+# Install OpenSSL (required by Prisma on Alpine)
+RUN apk add --no-cache openssl
+
+# Set working directory
 WORKDIR /app
 
-# LiveKit URL is baked into the frontend bundle at build time (import.meta.env),
-# so it must be supplied as a build arg, not a runtime env var.
-ARG VITE_LIVEKIT_URL
-ENV VITE_LIVEKIT_URL=$VITE_LIVEKIT_URL
+# Copy package files
+COPY package.json package-lock.json* ./
 
-# Prisma's postinstall (`prisma generate`) needs the schema present before `npm ci` runs.
-COPY package.json package-lock.json ./
-COPY prisma/schema.prisma ./prisma/schema.prisma
-RUN npm ci
+# Install all dependencies (including devDependencies needed for build)
+RUN npm install
 
+# Copy Prisma schema and generate client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Copy all source files
 COPY . .
-RUN npm run build
 
-# Drop devDependencies (vite, typescript, tsx, embedded-postgres, etc.) — the
-# generated Prisma client lives under node_modules/@prisma and node_modules/.prisma,
-# both regular dependencies, so `npm prune` (no reinstall) leaves them intact.
-RUN npm prune --omit=dev
+# Build the frontend (creates dist/)
+RUN npm run build:client
 
-# ---- Runtime ------------------------------------------------------------
+# ==========================================
+# STAGE 2: Production Phase
+# ==========================================
 FROM node:20-alpine AS runner
+
+# Install OpenSSL
+RUN apk add --no-cache openssl
+
 WORKDIR /app
-ENV NODE_ENV=production
 
-COPY --from=builder /app/node_modules ./node_modules
+# Copy package files and install only production dependencies
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev
+
+# Copy Prisma schema and generated client from builder
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy built frontend
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
 
-# Local-disk fallback for uploads when MinIO is briefly unreachable — mount a
-# volume here in production so it survives container restarts (see compose file).
-RUN mkdir -p uploads
+# Copy backend source, compiled server, and scripts
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/dist-server ./dist-server
+COPY --from=builder /app/scripts ./scripts
 
+# Copy tsconfig files if needed
+COPY tsconfig.json tsconfig.node.json tsconfig.server.json ./
+
+# Expose port 3000
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --spider -q http://127.0.0.1:3000/api/health || exit 1
+# Set environment to production
+ENV NODE_ENV=production
 
-CMD ["node", "dist/server/index.js"]
+# Start the application
+CMD ["npm", "run", "start"]

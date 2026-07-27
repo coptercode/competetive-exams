@@ -4,14 +4,12 @@ import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
-function requireSelfOrStaff(req: any, res: any, next: any) {
-  if (req.auth.role === 'STUDENT' && req.auth.userId !== req.params.studentId) {
-    return res.status(403).json({ error: 'Forbidden' });
+router.get('/students/:studentId/progress/topics/:topicId', requireAuth, async (req: any, res: any) => {
+  const { studentId, topicId } = req.params;
+  if (req.auth && req.auth.role === 'STUDENT' && req.auth.userId !== studentId) {
+    return res.status(403).json({ error: 'Forbidden: Cannot access another student\'s data' });
   }
-  next();
-}
 
-router.get('/students/:studentId/progress/topics/:topicId', requireAuth, requireSelfOrStaff, async (req, res) => {
   const progress = await prisma.studentTopicProgress.findUnique({
     where: {
       studentId_topicId: {
@@ -24,7 +22,12 @@ router.get('/students/:studentId/progress/topics/:topicId', requireAuth, require
   res.json(progress ?? { isCompleted: false, watchPercent: 0, unlocked: false });
 });
 
-router.get('/students/:studentId/progress/subjects/:subjectId', requireAuth, requireSelfOrStaff, async (req, res) => {
+router.get('/students/:studentId/progress/subjects/:subjectId', requireAuth, async (req: any, res: any) => {
+  const { studentId, subjectId } = req.params;
+  if (req.auth && req.auth.role === 'STUDENT' && req.auth.userId !== studentId) {
+    return res.status(403).json({ error: 'Forbidden: Cannot access another student\'s data' });
+  }
+
   const progress = await prisma.studentSubjectProgress.findUnique({
     where: {
       studentId_subjectId: {
@@ -37,9 +40,12 @@ router.get('/students/:studentId/progress/subjects/:subjectId', requireAuth, req
   res.json(progress ?? { completedPercentage: 0, isCompleted: false, unlocked: false });
 });
 
-router.get('/students/:studentId/analytics', requireAuth, requireSelfOrStaff, async (req, res) => {
+router.get('/students/:studentId/analytics', requireAuth, async (req: any, res: any) => {
   try {
     const studentId = req.params.studentId;
+    if (req.auth && req.auth.role === 'STUDENT' && req.auth.userId !== studentId) {
+      return res.status(403).json({ error: 'Forbidden: Cannot access another student\'s data' });
+    }
 
     const analytics = await prisma.studentAnalytics.findUnique({
       where: { studentId },
@@ -146,7 +152,7 @@ router.get('/students/:studentId/analytics', requireAuth, requireSelfOrStaff, as
     res.json(responseData);
   } catch (err: any) {
     console.error("Failed to fetch student analytics:", err);
-    res.status(500).json({ error: 'Failed to fetch student analytics' });
+    res.status(500).json({ error: err.message });
   }
 });
 
