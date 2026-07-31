@@ -57,15 +57,22 @@ export const initialBoards: ExamCategory[] = [
                   {
                     id: "jee-phy-ch1-t1",
                     title: "Laws of Motion & Friction",
-                    content: "Newton's laws, impulse, momentum, static and kinetic friction equations.",
+                    content: "Newton's laws, impulse, momentum conservation, static and kinetic friction equations.",
                     duration: "25m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   },
                   {
                     id: "jee-phy-ch1-t2",
                     title: "Work, Power & Energy",
-                    content: "Work-energy theorem, conservative forces, potential energy curves.",
+                    content: "Work-energy theorem, conservative forces, potential energy curves, elastic collisions.",
                     duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "jee-phy-ch1-t3",
+                    title: "Rotational Motion & Gravitation",
+                    content: "Torque, moment of inertia, angular momentum, Kepler's laws, orbital velocity.",
+                    duration: "35m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -79,6 +86,13 @@ export const initialBoards: ExamCategory[] = [
                     title: "Electrostatics & Capacitance",
                     content: "Coulomb's law, Gauss theorem, electric potential, parallel plate capacitors.",
                     duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "jee-phy-ch2-t2",
+                    title: "Magnetic Effects of Current & EMI",
+                    content: "Biot-Savart law, Ampere's circuital law, Faraday's law of induction, Lenz's law.",
+                    duration: "40m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -97,8 +111,15 @@ export const initialBoards: ExamCategory[] = [
                   {
                     id: "jee-chem-ch1-t1",
                     title: "Mole Concept & Stoichiometry",
-                    content: "Atomic mass, molarity, molality, limiting reagent problems.",
+                    content: "Atomic mass, molarity, molality, limiting reagent numericals.",
                     duration: "20m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "jee-chem-ch1-t2",
+                    title: "Chemical Equilibrium & Thermodynamics",
+                    content: "Le Chatelier's principle, Enthalpy, Entropy, Gibbs free energy, Spontaneity.",
+                    duration: "30m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -112,6 +133,13 @@ export const initialBoards: ExamCategory[] = [
                     title: "General Organic Chemistry (GOC)",
                     content: "Inductive effect, resonance, hyperconjugation, reaction intermediates.",
                     duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "jee-chem-ch2-t2",
+                    title: "Hydrocarbons & Reaction Mechanisms",
+                    content: "Electrophilic additions, SN1 and SN2 mechanisms, aromaticity rules.",
+                    duration: "35m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -131,6 +159,26 @@ export const initialBoards: ExamCategory[] = [
                     id: "jee-math-ch1-t1",
                     title: "Limits, Continuity & Differentiability",
                     content: "L'Hopital's rule, continuity conditions, derivative rules.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "jee-math-ch1-t2",
+                    title: "Definite Integration & Area Under Curves",
+                    content: "Fundamental theorem of calculus, substitution methods, area between curves.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "jee-math-ch2",
+                title: "Algebra & Matrices",
+                topics: [
+                  {
+                    id: "jee-math-ch2-t1",
+                    title: "Matrices & Determinants",
+                    content: "Cramer's rule, inverse of matrix, adjoint, system of linear equations.",
                     duration: "30m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
@@ -192,6 +240,26 @@ export const initialBoards: ExamCategory[] = [
                     content: "Mendelian genetics, pedigree analysis, chromosomal disorders.",
                     duration: "30m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "neet-bio-t2",
+                    title: "Molecular Basis of Inheritance",
+                    content: "DNA structure, replication, transcription, translation, Lac Operon model.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "neet-bio-ch2",
+                title: "Ecology & Plant Physiology",
+                topics: [
+                  {
+                    id: "neet-bio-ch2-t1",
+                    title: "Photosynthesis & Respiration in Plants",
+                    content: "Calvin cycle, C4 pathway, Glycolysis, Krebs cycle, ATP synthesis.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
               }
@@ -209,7 +277,7 @@ export const initialBoards: ExamCategory[] = [
                   {
                     id: "neet-phy-t1",
                     title: "Refraction & Lenses",
-                    content: "Snell's law, lens formula, optical instruments.",
+                    content: "Snell's law, lens formula, optical instruments, total internal reflection.",
                     duration: "25m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
@@ -244,6 +312,26 @@ export const initialBoards: ExamCategory[] = [
                     title: "Preamble & Fundamental Rights",
                     content: "Articles 12 to 35, basic structure doctrine, landmark judicial rulings.",
                     duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "upsc-pol-t2",
+                    title: "Directive Principles & Fundamental Duties",
+                    content: "DPSP classification, Article 51A duties, enforcement mechanisms.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "upsc-pol-ch2",
+                title: "Parliament & Executive",
+                topics: [
+                  {
+                    id: "upsc-pol-ch2-t1",
+                    title: "President, Prime Minister & Cabinet",
+                    content: "Executive powers, ordinance making powers, parliamentary procedures.",
+                    duration: "45m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -321,8 +409,28 @@ export const initialBoards: ExamCategory[] = [
                   {
                     id: "tnpsc-gs-t1",
                     title: "Sangam Age to Modern Tamil Nadu",
-                    content: "Sangam literature, Dravidian movement, socio-cultural reforms.",
+                    content: "Sangam literature, Dravidian movement, socio-cultural reforms, Thirukkural ethics.",
                     duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnpsc-gs-t2",
+                    title: "Role of Tamil Nadu in Freedom Struggle",
+                    content: "Veerapandiya Kattabomman, V.O. Chidambaranar, Subramania Bharati, Velu Nachiyar.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnpsc-gs-ch2",
+                title: "Aptitude & Mental Ability",
+                topics: [
+                  {
+                    id: "tnpsc-gs-ch2-t1",
+                    title: "HCF, LCM, Percentages & Compound Interest",
+                    content: "Shortcut techniques, logical reasoning, data interpretation for Group 1 Prelims.",
+                    duration: "30m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -408,6 +516,13 @@ export const initialBoards: ExamCategory[] = [
                     title: "Pie Charts, Tables & Caselets",
                     content: "Fast DI techniques, approximation tricks, quadratic equations.",
                     duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "bank-quant-t2",
+                    title: "Number Series & Quadratic Inequalities",
+                    content: "Missing number series, pattern recognition, quadratic roots comparisons.",
+                    duration: "25m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]

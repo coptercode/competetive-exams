@@ -179,7 +179,7 @@ export const ForgotPasswordPage: React.FC = () => {
         <div onClick={() => setView("landing")} className="flex items-center gap-2 cursor-pointer group">
           <PlanetLogo className="w-8 h-8 group-hover:scale-105 transition-transform" />
           <span className="font-extrabold font-display text-sm tracking-tight text-slate-900 group-hover:text-brand-violet transition-colors">
-            Nexora Learning
+            Rohit Aspire
           </span>
         </div>
         <div className="h-4 w-px bg-slate-300" />

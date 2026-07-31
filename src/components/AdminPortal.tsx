@@ -526,6 +526,132 @@ const ChaptersAccessTab: React.FC<{ subjectId: string }> = ({ subjectId }) => {
   );
 };
 
+// ─── Pending Approvals Management Component ──────────────────────────────────
+const PendingApprovalsSection: React.FC = () => {
+  const { pendingUsers, approveUser, rejectUser } = useLmsStore();
+
+  if (pendingUsers.length === 0) {
+    return (
+      <div className="glass-glow-card box-backlight-blue p-5 rounded-[28px] border border-blue-500/20 flex items-center justify-between shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+            <CheckCircle className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+              No Pending Account Approvals
+            </h4>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              All candidate and instructor registration requests have been reviewed and approved.
+            </p>
+          </div>
+        </div>
+        <span className="text-[10px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
+          Management System Synced
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="glass-glow-card gradient-light-aurora p-6 rounded-[32px] border border-amber-500/30 shadow-2xl space-y-4">
+      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30 shadow-lg shadow-amber-500/20 animate-pulse">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                Pending Registration Approvals ({pendingUsers.length})
+              </h3>
+              <span className="text-[10px] font-black bg-amber-500 text-slate-950 px-2.5 py-0.5 rounded-full uppercase shadow-md">
+                Action Required
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 font-medium">
+              Review and approve new candidate and instructor registration requests.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {pendingUsers.map((user) => (
+          <div
+            key={user.id}
+            className="p-4 rounded-[24px] bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-lg space-y-3 relative overflow-hidden"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">{user.name}</h4>
+                  <span
+                    className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
+                      user.role === "teacher"
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                    }`}
+                  >
+                    {user.role === "teacher" ? "Instructor" : "Candidate"}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">{user.email}</p>
+              </div>
+              <span className="text-[9px] font-mono text-slate-400">{user.registeredAt}</span>
+            </div>
+
+            <div className="text-xs space-y-1 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-2xl border border-slate-200/80 dark:border-white/5">
+              {user.phoneNumber && (
+                <p className="text-slate-600 dark:text-slate-300 font-medium">
+                  <strong>Phone:</strong> {user.phoneNumber}
+                </p>
+              )}
+              {user.role === "student" ? (
+                <p className="text-slate-600 dark:text-slate-300 font-medium">
+                  <strong>Target Program:</strong> {user.targetExam || "JEE Main 2026"}
+                </p>
+              ) : (
+                <>
+                  <p className="text-slate-600 dark:text-slate-300 font-medium">
+                    <strong>Specialization:</strong> {user.subjectArea || user.specialization}
+                  </p>
+                  {user.qualification && (
+                    <p className="text-slate-600 dark:text-slate-300 font-medium">
+                      <strong>Qualification:</strong> {user.qualification}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                onClick={async () => {
+                  try {
+                    await authAPI.approveUser(user.id);
+                  } catch (e) {}
+                  approveUser(user.id);
+                }}
+                className="flex-1 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all hover:scale-105 border border-white/20"
+              >
+                <CheckCircle className="w-3.5 h-3.5" />
+                <span>Approve Account</span>
+              </button>
+              <button
+                onClick={() => rejectUser(user.id)}
+                className="px-4 py-2.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 text-xs font-extrabold transition-all hover:scale-105"
+              >
+                Decline
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // ─── component ───────────────────────────────────────────────────────────────
 export const AdminPortal: React.FC = () => {
   const { boards, addBoard, addClass, addSubject, activeView, setView, profile } = useLmsStore();
@@ -672,6 +798,13 @@ export const AdminPortal: React.FC = () => {
       setUserLastName("");
       setUserBio("");
       setUserQualification("");
+      setUserLocation("");
+      setIsCreateModalOpen(false);
+      useLmsStore.getState().addNotification(
+        "User Created",
+        `${userRole === "STUDENT" ? "Candidate" : "User"} ${userFirstName} ${userLastName} created and added to registry successfully.`,
+        "success"
+      );
       fetchUsers();
       fetchAnalytics();
     } catch (err: any) {
@@ -696,7 +829,7 @@ export const AdminPortal: React.FC = () => {
         role: "TEACHER",
         phoneNumber: teacherPhone.trim(),
         qualification: teacherSubjectArea,
-        bio: `${teacherSubjectArea} teacher at Nexora Learning`,
+        bio: `${teacherSubjectArea} instructor at Rohit Aspire`,
       };
 
       await authAPI.createUser(payload);
@@ -1042,6 +1175,135 @@ export const AdminPortal: React.FC = () => {
 
   return (
     <div className="space-y-6 font-sans text-left">
+      {/* Super Admin Workspace Header */}
+      <div className="glass-glow-card p-6 sm:p-8 rounded-3xl relative overflow-hidden bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10 dark:from-purple-950/40 dark:via-indigo-950/40 dark:to-blue-950/40 border border-purple-500/30 shadow-2xl">
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-3.5 py-1 rounded-full bg-purple-600 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-500/20">
+                Super Admin Console
+              </span>
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-800/70 px-3 py-1 rounded-full border border-slate-200 dark:border-white/10">
+                Rohit Aspire Platform Management
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white font-display tracking-tight mt-1">
+              Platform Control Studio
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+              Manage competitive exam streams, batch structures, instructor assignments, candidate registrations, and DRM protection settings.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── PENDING ACCOUNT APPROVALS BANNER / SECTION ───────────────────── */}
+      {(() => {
+        const pendingUsers = usersList.filter(
+          (u) => u.isApproved === false || u.approvalStatus === "PENDING_APPROVAL"
+        );
+
+        const handleApprove = async (id: string, name: string, role: string) => {
+          try {
+            await authAPI.approveUser(id);
+          } catch (e) {
+            // fallback store approval
+          }
+          useLmsStore.getState().approveUser(id);
+          fetchUsers();
+          useLmsStore
+            .getState()
+            .addNotification(
+              "Account Approved",
+              `${role === "STUDENT" || role === "student" ? "Candidate" : "Instructor"} ${name} approved and added to ${
+                role === "STUDENT" || role === "student" ? "Candidate Registry" : "Instructor Registry"
+              }.`,
+              "success"
+            );
+        };
+
+        if (pendingUsers.length === 0) {
+          return (
+            <div className="glass-card p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white">
+                    No Pending Account Approvals
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    All candidate and instructor registration requests have been reviewed and approved into their registries.
+                  </p>
+                </div>
+              </div>
+              <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 text-[10px] font-bold uppercase rounded-full border border-emerald-500/20">
+                Registries Synced
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="glass-card p-6 rounded-3xl border border-amber-500/30 bg-amber-500/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black uppercase text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" />
+                Pending Registrations &amp; Account Approvals ({pendingUsers.length})
+              </h3>
+              <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                Action Required
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {pendingUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-amber-500/20 flex items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${
+                          user.role === "STUDENT"
+                            ? "bg-blue-500/10 text-blue-600"
+                            : "bg-purple-500/10 text-purple-600"
+                        }`}
+                      >
+                        {user.role === "STUDENT" ? "Candidate Request" : "Instructor Request"}
+                      </span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        {user.firstName} {user.lastName}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-mono">{user.email}</p>
+                    <p className="text-[10px] text-slate-400">
+                      State/Location: {user.location || "Tamil Nadu"}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      handleApprove(
+                        user.id,
+                        `${user.firstName} ${user.lastName}`,
+                        user.role
+                      )
+                    }
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Approve &amp; Add to Registry</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── STRUCTURE BUILDER ─────────────────────────────────────────────── */}
       {activeView === "admin-structure" && (
@@ -1668,21 +1930,23 @@ export const AdminPortal: React.FC = () => {
                 <p className="text-xs">Fetching postgres users...</p>
               </div>
             ) : (() => {
-              const studentsOnly = usersList.filter((u) => u.role === "STUDENT");
+              const studentsOnly = usersList.filter((u) => (u.role === "STUDENT" || u.role === "student") && u.isApproved !== false);
               const filteredStudents = studentsOnly.filter((student) => {
-                const nameMatch = `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchQuery.toLowerCase());
+                const nameMatch = `${student.firstName || ''} ${student.lastName || ''}`.toLowerCase().includes(searchQuery.toLowerCase());
                 const emailMatch = (student.email || "").toLowerCase().includes(searchQuery.toLowerCase());
                 const locationMatch = (student.location || "").toLowerCase().includes(searchQuery.toLowerCase());
                 
                 const sub = student.studentProfile?.subscriptions?.[0];
-                const subStatus = sub?.status || "PENDING";
+                const isAccountActive = student.isApproved !== false && student.approvalStatus !== "PENDING_APPROVAL";
+                const subStatus = isAccountActive ? "ACTIVE" : (sub?.status || "PENDING");
                 
-                const gradeVal = student.studentProfile?.class?.name || "Class 12";
-                const matchesGrade = gradeFilter === "All Grades" || gradeVal === gradeFilter;
+                const gradeVal = student.studentProfile?.class?.name || student.targetExam || "JEE Main 2026 Batch";
+                const isAllBatches = !gradeFilter || gradeFilter === "All Grades" || gradeFilter === "All Batches";
+                const matchesGrade = isAllBatches || gradeVal.toLowerCase().includes(gradeFilter.toLowerCase()) || (student.targetExam && student.targetExam.toLowerCase().includes(gradeFilter.toLowerCase()));
 
-                const matchesSub = subFilter === "All Subscriptions" ||
-                  (subFilter === "Active" && subStatus === "ACTIVE") ||
-                  (subFilter === "Pending" && subStatus === "PENDING") ||
+                const matchesSub = !subFilter || subFilter === "All Subscriptions" ||
+                  (subFilter === "Active" && (subStatus === "ACTIVE" || isAccountActive)) ||
+                  (subFilter === "Pending" && subStatus === "PENDING" && !isAccountActive) ||
                   (subFilter === "Expired" && subStatus === "EXPIRED");
 
                 return (nameMatch || emailMatch || locationMatch) && matchesGrade && matchesSub;
@@ -1721,8 +1985,9 @@ export const AdminPortal: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                         {filteredStudents.map((student) => {
+                          const isAccountActive = student.isApproved !== false && student.approvalStatus !== "PENDING_APPROVAL";
                           const sub = student.studentProfile?.subscriptions?.[0];
-                          const subStatus = sub?.status || "PENDING";
+                          const subStatus = isAccountActive ? "ACTIVE" : (sub?.status || "PENDING");
                           const pay = sub?.payments?.[0];
                           const payStatus = pay?.status || "PENDING";
 
@@ -1752,25 +2017,23 @@ export const AdminPortal: React.FC = () => {
                               </td>
 
                               {/* Grade */}
-                              <td className="py-4 px-6 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                                {student.studentProfile?.class?.name || "Class 12"}
+                              <td className="py-4 px-6 text-xs text-slate-700 dark:text-slate-300 font-semibold">
+                                {student.studentProfile?.class?.name || student.targetExam || "JEE Main 2026 Batch"}
                               </td>
 
                               {/* State */}
                               <td className="py-4 px-6 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                                {student.location || "Not Specified"}
+                                {student.location || "Chennai, TN"}
                               </td>
 
                               {/* Subscription Badge */}
                               <td className="py-4 px-6">
-                                <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${
+                                <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-2.5 py-1 rounded-full border ${
                                   subStatus === "ACTIVE"
                                     ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                    : subStatus === "PENDING"
-                                    ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                                    : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                                    : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                                 }`}>
-                                  {subStatus === "ACTIVE" ? "Active" : subStatus === "PENDING" ? "Pending" : "Expired"}
+                                  {subStatus === "ACTIVE" ? "Active" : "Pending"}
                                 </span>
                               </td>
 
@@ -1877,7 +2140,7 @@ export const AdminPortal: React.FC = () => {
                 <p className="text-xs">Fetching postgres users...</p>
               </div>
             ) : (() => {
-              const teachersOnly = usersList.filter((u) => u.role === "TEACHER");
+              const teachersOnly = usersList.filter((u) => (u.role === "TEACHER" || u.role === "teacher") && u.isApproved !== false);
               const filteredTeachers = teachersOnly.filter((t) => {
                 const nameMatch = `${t.firstName} ${t.lastName}`.toLowerCase().includes(searchQuery.toLowerCase());
                 const emailMatch = (t.email || "").toLowerCase().includes(searchQuery.toLowerCase());
@@ -1929,7 +2192,7 @@ export const AdminPortal: React.FC = () => {
                                     {teacher.firstName} {teacher.lastName}
                                   </p>
                                   <span className="text-[9px] text-slate-400 block mt-0.5">
-                                    Nexora Learning Instructor
+                                    Rohit Aspire Instructor
                                   </span>
                                 </div>
                               </div>

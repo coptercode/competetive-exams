@@ -46,12 +46,14 @@ export const PlanetLogo: React.FC<{ className?: string; hideLetter?: boolean }> 
         className="drop-shadow-lg"
       />
 
-      {/* Elegant white 'N' inside the planet core */}
+      {/* Elegant white combined 'RA' monogram (Rohit Aspire) inside the planet core */}
       {!hideLetter && (
-        <path
-          d="M 38 36 L 38 64 L 43 64 L 43 44 L 57 64 L 62 64 L 62 36 L 57 36 L 57 56 L 43 36 Z"
-          fill="white"
-        />
+        <g fill="white" className="drop-shadow-sm">
+          {/* Combined R and A interlocking vector emblem */}
+          <path d="M 32 36 H 43 C 48.5 36, 50.5 38.5, 50.5 43 C 50.5 47.5, 48 49.5, 42.5 49.5 H 37 V 64 H 32 Z M 37 40.5 V 45 H 42.5 C 45 45, 46 44.2, 46 42.75 C 46 41.3, 45 40.5, 42.5 40.5 Z" />
+          <path d="M 42.5 49.5 L 50.5 64 H 45.5 L 38 49.5 Z" />
+          <path d="M 52.5 64 L 59.5 36 H 64.5 L 71.5 64 H 66 L 64.5 57 H 59.5 L 58 64 Z M 60.5 52.5 H 63.5 L 62 44.5 Z" />
+        </g>
       )}
 
       {/* Front orbital ring (in front of the planet to complete 3D overlap) */}

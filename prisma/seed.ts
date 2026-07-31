@@ -1,6 +1,6 @@
 import { PrismaClient, UserRole, QuestionType, LiveClassStatus, AttendanceStatus, NotificationType, BillingPeriod, SubscriptionStatus, PaymentStatus, PaymentGateway, SubmissionStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { initialBoards } from './boards-data';
+import { initialBoards } from './boards-data.js';
 
 const prisma = new PrismaClient();
 
@@ -356,6 +356,214 @@ async function main() {
 
   console.log('Admin seeded: admin@nexoralearning.com');
 
+  // ==========================================
+  // 5b. SEED INSTRUCTOR USERS
+  // ==========================================
+  console.log('Seeding Instructor users...');
+  const teacherUser1 = await prisma.user.upsert({
+    where: { email: 'teacher@example.com' },
+    update: {},
+    create: {
+      email: 'teacher@example.com',
+      passwordHash,
+      firstName: 'Sundaram',
+      lastName: 'Dr. R.',
+      role: UserRole.TEACHER,
+      phoneNumber: '+91 9840123456',
+      location: 'Chennai, TN',
+      qualification: 'Ph.D Physics & Competitive Exam Mentor',
+      isApproved: true,
+      approvalStatus: 'APPROVED'
+    },
+  });
+
+  await prisma.teacher.upsert({
+    where: { id: teacherUser1.id },
+    update: {},
+    create: { id: teacherUser1.id, qualification: 'Ph.D Physics', bio: 'Senior Physics & Competitive Exams Mentor' }
+  });
+
+  await prisma.userRoleJoin.upsert({
+    where: { userId_roleId: { userId: teacherUser1.id, roleId: teacherRole.id } },
+    update: {},
+    create: { userId: teacherUser1.id, roleId: teacherRole.id },
+  });
+
+  // ==========================================
+  // 5c. SEED CANDIDATE USERS & REGISTRY
+  // ==========================================
+  console.log('Seeding Candidate users into Database Registry...');
+  const defaultBoard = await prisma.board.findFirst();
+  const defaultClass = await prisma.class.findFirst();
+
+  // Candidate 1: Active
+  const studentUser1 = await prisma.user.upsert({
+    where: { email: 'student@example.com' },
+    update: {
+      isApproved: true,
+      approvalStatus: 'APPROVED'
+    },
+    create: {
+      email: 'student@example.com',
+      passwordHash,
+      firstName: 'Arun',
+      lastName: 'Kumar',
+      role: UserRole.STUDENT,
+      phoneNumber: '+91 9876543210',
+      location: 'Chennai, TN',
+      targetExam: 'TNPSC Group 1',
+      medium: 'Tamil',
+      qualification: 'B.E. Computer Science',
+      totalHoursSpent: 142.0,
+      todayHoursSpent: 8.5,
+      isApproved: true,
+      approvalStatus: 'APPROVED'
+    },
+  });
+
+  if (defaultBoard && defaultClass) {
+    await prisma.student.upsert({
+      where: { id: studentUser1.id },
+      update: {},
+      create: {
+        id: studentUser1.id,
+        boardId: defaultBoard.id,
+        classId: defaultClass.id
+      }
+    });
+  }
+
+  await prisma.userRoleJoin.upsert({
+    where: { userId_roleId: { userId: studentUser1.id, roleId: studentRole.id } },
+    update: {},
+    create: { userId: studentUser1.id, roleId: studentRole.id },
+  });
+
+  // Candidate 2: Blocked with Apology Note (Priya Sharma)
+  const studentUser2 = await prisma.user.upsert({
+    where: { email: 'priya.sharma@example.com' },
+    update: {},
+    create: {
+      email: 'priya.sharma@example.com',
+      passwordHash,
+      firstName: 'Priya',
+      lastName: 'Sharma',
+      role: UserRole.STUDENT,
+      phoneNumber: '+91 9812345678',
+      location: 'Madurai, TN',
+      targetExam: 'UPSC CSE Mains',
+      medium: 'English',
+      qualification: 'M.Sc Biotechnology',
+      totalHoursSpent: 98.4,
+      todayHoursSpent: 2.1,
+      isApproved: true,
+      approvalStatus: 'APPROVED',
+      isBlocked: true,
+      blockedReason: 'Low study activity: Less than 7.0 hours per day for 3 consecutive days.',
+      consecutiveLowActivityDays: 3,
+      apologyNote: 'Dear Admin, I apologize for missing my daily study target due to medical recovery. I request account unblocking.',
+      apologySubmittedAt: new Date(Date.now() - 86400000)
+    },
+  });
+
+  if (defaultBoard && defaultClass) {
+    await prisma.student.upsert({
+      where: { id: studentUser2.id },
+      update: {},
+      create: {
+        id: studentUser2.id,
+        boardId: defaultBoard.id,
+        classId: defaultClass.id
+      }
+    });
+  }
+
+  await prisma.userRoleJoin.upsert({
+    where: { userId_roleId: { userId: studentUser2.id, roleId: studentRole.id } },
+    update: {},
+    create: { userId: studentUser2.id, roleId: studentRole.id },
+  });
+
+  // Candidate 3: Active (Karthik Rajan)
+  const studentUser3 = await prisma.user.upsert({
+    where: { email: 'karthik.r@example.com' },
+    update: {},
+    create: {
+      email: 'karthik.r@example.com',
+      passwordHash,
+      firstName: 'Karthik',
+      lastName: 'Rajan',
+      role: UserRole.STUDENT,
+      phoneNumber: '+91 9765432109',
+      location: 'Coimbatore, TN',
+      targetExam: 'TNPSC Group 2',
+      medium: 'Bilingual',
+      qualification: 'B.Com Financial Accounting',
+      totalHoursSpent: 210.0,
+      todayHoursSpent: 7.8,
+      isApproved: true,
+      approvalStatus: 'APPROVED'
+    },
+  });
+
+  if (defaultBoard && defaultClass) {
+    await prisma.student.upsert({
+      where: { id: studentUser3.id },
+      update: {},
+      create: {
+        id: studentUser3.id,
+        boardId: defaultBoard.id,
+        classId: defaultClass.id
+      }
+    });
+  }
+
+  await prisma.userRoleJoin.upsert({
+    where: { userId_roleId: { userId: studentUser3.id, roleId: studentRole.id } },
+    update: {},
+    create: { userId: studentUser3.id, roleId: studentRole.id },
+  });
+
+  // Candidate 4: Pending Approval (Subash Kannan)
+  const studentUser4 = await prisma.user.upsert({
+    where: { email: 'subash.k@example.com' },
+    update: {},
+    create: {
+      email: 'subash.k@example.com',
+      passwordHash,
+      firstName: 'Subash',
+      lastName: 'Kannan',
+      role: UserRole.STUDENT,
+      phoneNumber: '+91 9443210987',
+      location: 'Trichy, TN',
+      targetExam: 'TNPSC Group 1',
+      medium: 'Tamil',
+      qualification: 'B.Sc Physics',
+      totalHoursSpent: 0,
+      todayHoursSpent: 0,
+      isApproved: false,
+      approvalStatus: 'PENDING_APPROVAL'
+    },
+  });
+
+  if (defaultBoard && defaultClass) {
+    await prisma.student.upsert({
+      where: { id: studentUser4.id },
+      update: {},
+      create: {
+        id: studentUser4.id,
+        boardId: defaultBoard.id,
+        classId: defaultClass.id
+      }
+    });
+  }
+
+  await prisma.userRoleJoin.upsert({
+    where: { userId_roleId: { userId: studentUser4.id, roleId: studentRole.id } },
+    update: {},
+    create: { userId: studentUser4.id, roleId: studentRole.id },
+  });
+
   // 6. SEED MOCK TESTS (Competitive Exam Mock Tests)
   // ==========================================
   console.log('Seeding Exam Programs and Mock Test Questions...');
@@ -457,9 +665,72 @@ async function main() {
     });
   }
 
+  // TNPSC Group 1 Mock Test
+  const quizTnpsc = await prisma.quiz.create({
+    data: {
+      title: 'TNPSC Group 1 Prelims General Studies Mock Test',
+      description: 'Full syllabus mock test covering Indian Polity, History, Tamil Heritage & Aptitude.',
+      topicId: topicForQuiz.id,
+      passingScore: 50.0,
+      maxAttempts: 3,
+      timeLimitMinutes: 30,
+      testType: 'Full-Length Test',
+      testCategory: 'State PSC',
+      negativeMarkingRate: 0.0,
+    },
+  });
 
-  console.log('Seeding completed successfully. Only admin@nexoralearning.com is seeded.');
-  console.log('Add teachers via Admin Portal. Students self-register and await approval.');
+  const tnpscQuestions = [
+    {
+      questionText: 'Which Article of the Indian Constitution pertains to the State Executive and Governor powers?',
+      explanation: 'Article 153 states that there shall be a Governor for each State.',
+      difficulty: 'Medium',
+      options: [
+        { optionText: 'Article 153', isCorrect: true },
+        { optionText: 'Article 356', isCorrect: false },
+        { optionText: 'Article 280', isCorrect: false },
+        { optionText: 'Article 110', isCorrect: false },
+      ],
+    },
+    {
+      questionText: 'Who founded the Dravidar Kazhagam (DK) movement in Tamil Nadu?',
+      explanation: 'Periyar E. V. Ramasamy founded Dravidar Kazhagam in 1944.',
+      difficulty: 'Easy',
+      options: [
+        { optionText: 'Periyar E. V. Ramasamy', isCorrect: true },
+        { optionText: 'C. N. Annadurai', isCorrect: false },
+        { optionText: 'K. Kamaraj', isCorrect: false },
+        { optionText: 'M. G. Ramachandran', isCorrect: false },
+      ],
+    }
+  ];
+
+  for (let i = 0; i < tnpscQuestions.length; i++) {
+    const qData = tnpscQuestions[i];
+    const question = await prisma.quizQuestion.create({
+      data: {
+        quizId: quizTnpsc.id,
+        questionText: qData.questionText,
+        explanation: qData.explanation,
+        difficulty: qData.difficulty,
+        questionType: QuestionType.MCQ,
+        marks: 2.0,
+        negativeMarks: 0.0,
+        sortOrder: i + 1,
+      },
+    });
+
+    await prisma.quizOption.createMany({
+      data: qData.options.map((opt, idx) => ({
+        questionId: question.id,
+        optionText: opt.optionText,
+        isCorrect: opt.isCorrect,
+        sortOrder: idx + 1,
+      })),
+    });
+  }
+
+  console.log('Seeding completed successfully with candidates, instructors, mock tests and academic structures.');
 }
 
 main()

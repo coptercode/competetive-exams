@@ -212,12 +212,11 @@ model Topic {
 
 model PasswordResetOtp {
   id        String   @id @default(uuid()) @db.Uuid
-  email     String
+  email     String   @unique
   otp       String
   expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@index([email])
   @@map("password_reset_otps")
 }
 
@@ -234,23 +233,41 @@ model RevokedToken {
 // ==========================================
 
 model User {
-  id           String    @id @default(uuid()) @db.Uuid
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  firstName    String    @map("first_name")
-  lastName     String    @map("last_name")
-  phoneNumber  String?   @map("phone_number")
-  location     String?   @map("location")
-  role         UserRole  @default(STUDENT)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id                String   @id @default(uuid()) @db.Uuid
+  email             String   @unique
+  passwordHash      String   @map("password_hash")
+  firstName         String   @map("first_name")
+  lastName          String   @map("last_name")
+  phoneNumber       String?  @map("phone_number")
+  location          String?  @map("location")
+  avatarUrl         String?  @map("avatar_url")
+  medium            String?  @map("medium")
+  targetExam        String?  @map("target_exam")
+  qualification     String?  @map("qualification")
+  totalHoursSpent            Float     @default(34.5) @map("total_hours_spent")
+  todayHoursSpent            Float     @default(2.8) @map("today_hours_spent")
+  isBlocked                  Boolean   @default(false) @map("is_blocked")
+  blockedReason              String?   @map("blocked_reason")
+  consecutiveLowActivityDays Int       @default(0) @map("consecutive_low_activity_days")
+  apologyNote                String?   @map("apology_note")
+  apologySubmittedAt         DateTime? @map("apology_submitted_at")
+  unblockedBy                String?   @map("unblocked_by")
+  unblockedAt                DateTime? @map("unblocked_at")
+  isApproved                 Boolean   @default(true) @map("is_approved")
+  approvalStatus             String    @default("APPROVED") @map("approval_status")
+  role                       UserRole  @default(STUDENT)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-  adminProfile     Admin?
-  teacherProfile   Teacher?
-  studentProfile   Student?
-  userRoles        UserRoleJoin[]
-  chatMessages     LiveChatMessage[]
-  userNotifications UserNotification[]
+  adminProfile         Admin?
+  teacherProfile       Teacher?
+  studentProfile       Student?
+  userRoles            UserRoleJoin[]
+  chatMessages         LiveChatMessage[]
+  userNotifications    UserNotification[]
+  dailyActivityLogs    DailyActivityLog[]
+  instructorRemarks    InstructorRemark[]
+  candidateValidations CandidateValidation[]
 
   @@map("users")
 }
@@ -899,25 +916,53 @@ model SubjectStatistics {
   @@map("subject_statistics")
 }
 
-// ==========================================
-// SECURITY & AUTHENTICATION
-// ==========================================
+model DailyActivityLog {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  date             String
+  dayName          String   @map("day_name")
+  hoursSpent       Float    @default(0.0) @map("hours_spent")
+  quizzesCompleted Int      @default(0) @map("quizzes_completed")
+  topicsCompleted  Int      @default(0) @map("topics_completed")
+  scorePercentage  Float    @default(0.0) @map("score_percentage")
+  createdAt        DateTime @default(now()) @map("created_at")
 
-model PasswordResetOTP {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  otp       String
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("password_reset_otps")
+  @@unique([userId, date])
+  @@map("daily_activity_logs")
 }
 
-model RevokedToken {
-  id        String   @id @default(uuid()) @db.Uuid
-  jti       String   @unique
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
+model InstructorRemark {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  instructorId   String?  @map("instructor_id") @db.Uuid
+  instructorName String   @map("instructor_name")
+  date           String
+  text           String
+  category       String
+  type           String   @default("positive")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  @@map("revoked_tokens")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("instructor_remarks")
 }
+
+model CandidateValidation {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  title       String
+  description String
+  isValidated Boolean  @default(false) @map("is_validated")
+  category    String
+  validatedBy String?  @map("validated_by")
+  validatedAt String?  @map("validated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("candidate_validations")
+}
+
+

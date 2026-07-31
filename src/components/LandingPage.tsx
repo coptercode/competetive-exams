@@ -153,7 +153,7 @@ export const LandingPage: React.FC = () => {
         >
           <PlanetLogo className="w-9 h-9 sm:w-12 sm:h-12 group-hover:scale-105 transition-transform" />
           <span className="font-extrabold font-display text-lg sm:text-2xl tracking-tight text-slate-900 group-hover:text-brand-violet transition-colors whitespace-nowrap">
-            Nexora Learning
+            Rohit Aspire
           </span>
         </div>
 
@@ -223,7 +223,7 @@ export const LandingPage: React.FC = () => {
             </h1>
 
             <p className="text-base sm:text-[17px] text-slate-500 mb-8 max-w-xl leading-relaxed">
-              Nexora combines high-fidelity WebRTC classrooms, personal 24/7 AI tutor guidance, and board-mapped curriculum resources into a seamless, modern workspace. Designed to help Grade 9–12 scholars achieve conceptual mastery and score higher in their final exams.
+              Rohit Aspire combines high-fidelity WebRTC classrooms, personal 24/7 AI tutor guidance, and competitive exam curriculum resources into a seamless, modern workspace. Designed to help candidates achieve conceptual mastery and rank higher in competitive exams.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-10 justify-center lg:justify-start">
@@ -277,7 +277,7 @@ export const LandingPage: React.FC = () => {
                     <svg className="w-2.5 h-2.5 text-slate-300" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
-                    <span>nexoralearning.com/workspace</span>
+                    <span>rohitaspire.com/workspace</span>
                   </div>
 
                   {/* Right side helper info / status */}
@@ -445,13 +445,13 @@ export const LandingPage: React.FC = () => {
                     <img
                       key={activeTestimonial}
                       src={test.avatar}
-                      alt={test.name}
+                      alt={test.author}
                       className="w-28 h-28 object-cover border-4 border-white shadow-md animate-fade-in-up"
                       style={{ borderRadius: "50%" }}
                     />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-base font-bold text-slate-900">{test.name}</h4>
+                    <h4 className="text-base font-bold text-slate-900">{test.author}</h4>
                     <p className="text-xs text-slate-500 font-medium leading-tight">{test.role}</p>
                   </div>
 
@@ -556,7 +556,7 @@ export const LandingPage: React.FC = () => {
               >
                 <PlanetLogo className="w-9 h-9 sm:w-10 sm:h-10 group-hover:scale-105 transition-transform" />
                 <span className="font-extrabold font-display text-lg sm:text-xl tracking-tight text-white group-hover:text-brand-violet transition-colors whitespace-nowrap">
-                  Nexora Learning
+                  Rohit Aspire
                 </span>
               </div>
               <p className="text-xs text-slate-450 leading-relaxed max-w-sm">
@@ -659,7 +659,7 @@ export const LandingPage: React.FC = () => {
 
           <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] sm:text-xs text-slate-500">
             <p>
-              © 2026 Nexora Learning Technologies Pvt. Ltd. All rights reserved.
+              © 2026 Rohit Aspire Technologies Pvt. Ltd. All rights reserved.
             </p>
             <p>
               Designed for elite scholars.

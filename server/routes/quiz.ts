@@ -569,14 +569,15 @@ router.post('/quizzes/:quizId/attempt', requireAuth, async (req, res) => {
     selectedOptionId?: string;
   }>;
 
-  const quiz = await prisma.quiz.findUnique({
-    where: { id: req.params.quizId },
+  const quizId = req.params.quizId as string;
+  const quiz = (await prisma.quiz.findUnique({
+    where: { id: quizId },
     include: {
       questions: {
         include: { options: true },
       },
     },
-  });
+  })) as any;
 
   if (!quiz) {
     return res.status(404).json({ error: 'Quiz not found' });
@@ -587,7 +588,7 @@ router.post('/quizzes/:quizId/attempt', requireAuth, async (req, res) => {
   });
 
   let score = 0;
-  const totalMarks = quiz.questions.reduce((sum, question) => sum + question.marks, 0);
+  const totalMarks = (quiz.questions || []).reduce((sum: number, question: any) => sum + question.marks, 0);
 
   const attempt = await prisma.quizAttempt.create({
     data: {
@@ -599,10 +600,10 @@ router.post('/quizzes/:quizId/attempt', requireAuth, async (req, res) => {
   });
 
   for (const response of responses) {
-    const question = quiz.questions.find((item) => item.id === response.questionId);
+    const question = (quiz.questions || []).find((item: any) => item.id === response.questionId);
     if (!question) continue;
 
-    const selectedOption = question.options.find((option) => option.id === response.selectedOptionId);
+    const selectedOption = (question.options || []).find((option: any) => option.id === response.selectedOptionId);
     const isCorrect = Boolean(selectedOption?.isCorrect);
     if (isCorrect) score += question.marks;
 
@@ -640,7 +641,7 @@ router.post('/quizzes/:quizId/attempt', requireAuth, async (req, res) => {
     quizId: quiz.id,
     title: quiz.title,
     score,
-    totalQuestions: quiz.questions.length,
+    totalQuestions: (quiz.questions || []).length,
     percentage,
     passed,
     resultId: result.id,
@@ -648,23 +649,24 @@ router.post('/quizzes/:quizId/attempt', requireAuth, async (req, res) => {
 });
 
 router.get('/students/:studentId/quiz-results', requireAuth, async (req, res) => {
-  if (req.auth!.role === 'STUDENT' && req.auth!.userId !== req.params.studentId) {
+  const reqStudentId = req.params.studentId as string;
+  if (req.auth!.role === 'STUDENT' && req.auth!.userId !== reqStudentId) {
     return res.status(403).json({ error: 'Forbidden' });
   }
-  const results = await prisma.quizResult.findMany({
-    where: { studentId: req.params.studentId },
+  const results = (await prisma.quizResult.findMany({
+    where: { studentId: reqStudentId },
     include: { quiz: true },
     orderBy: { createdAt: 'desc' },
-  });
+  })) as any[];
 
   res.json(
-    results.map((result) => ({
+    results.map((result: any) => ({
       quizId: result.quizId,
-      title: result.quiz.title,
+      title: result.quiz?.title || 'Mock Test',
       score: result.score,
       totalQuestions: 0,
       timeTakenSeconds: 0,
-      date: result.createdAt.toISOString(),
+      date: result.createdAt ? new Date(result.createdAt).toISOString() : new Date().toISOString(),
       incorrectAnswersDetails: [],
     }))
   );

@@ -107,6 +107,22 @@ export const authAPI = {
     return res.json();
   },
 
+  approveUser: async (id: string) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/auth/users/${id}/approve`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to approve user");
+    }
+    return res.json();
+  },
+
   deleteUser: async (id: string) => {
     const token = localStorage.getItem("auth_token");
     const res = await fetch(`${API_BASE_URL}/auth/users/${id}`, {
@@ -543,6 +559,125 @@ export const chapterLockAPI = {
     return res.json() as Promise<{
       chapters: Array<{ id: string; title: string; order: number; isUnlocked: boolean }>;
     }>;
+  },
+};
+
+export const profileAPI = {
+  getProfile: async () => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to fetch candidate profile");
+    return res.json();
+  },
+
+  updateProfile: async (profileData: any) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    });
+    if (!res.ok) throw new Error("Failed to update profile");
+    return res.json();
+  },
+
+  addRemark: async (remarkData: any) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/profile/remarks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(remarkData),
+    });
+    if (!res.ok) throw new Error("Failed to add remark");
+    return res.json();
+  },
+
+  toggleValidation: async (validationData: any) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/profile/validations`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(validationData),
+    });
+    if (!res.ok) throw new Error("Failed to update validation");
+    return res.json();
+  },
+
+  logHours: async (minutes: number = 1) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/profile/hours`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ minutes }),
+    });
+    if (!res.ok) throw new Error("Failed to log hours");
+    return res.json();
+  },
+
+  submitApology: async (apologyData: { userId?: string; email?: string; apologyNote: string }) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/profile/apology`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(apologyData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to submit apology note");
+    }
+    return res.json();
+  },
+
+  unblockCandidate: async (userId: string, adminName?: string) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`${API_BASE_URL}/admin/unblock-user`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId, adminName }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to unblock candidate");
+    }
+    return res.json();
+  },
+
+  uploadAvatar: async (file: File) => {
+    const token = localStorage.getItem("auth_token");
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_BASE_URL}/upload/avatar`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to upload profile photo");
+    }
+    return res.json() as Promise<{ success: boolean; avatarUrl: string }>;
   },
 };
 

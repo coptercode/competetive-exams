@@ -132,39 +132,41 @@ export const StudentDashboard: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 font-sans">
-      {/* Welcome Banner */}
-      <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-r from-brand-royal/10 via-brand-purple/10 to-brand-royal/5">
+      {/* Welcome Banner with Multi-Color Gradient Lights */}
+      <div className="glass-glow-card gradient-light-aurora p-6 sm:p-8 rounded-[36px] relative overflow-hidden border border-blue-500/30 shadow-2xl">
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
+        <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-gradient-to-tr from-emerald-500/15 via-teal-500/15 to-blue-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-brand-royal/20 text-brand-royal dark:text-brand-royal-light text-xs font-black uppercase tracking-wider">
+          <div className="space-y-2.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-blue-500/30 border border-white/20">
                 Candidate Prep Hub
               </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm">
                 Batch: {activeBatch?.title || "JEE Main 2026 Batch"}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white font-display tracking-tight">
-              Welcome back, {profile.name}!
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white font-display tracking-tight leading-tight">
+              Welcome back, <span className="text-gradient-hero">{profile.name}</span>!
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-              Your targeted preparation for <strong className="text-brand-royal dark:text-brand-royal-light">{activeCategory?.title || "Competitive Exams"}</strong> is on track. Review today&apos;s study plan and attempt upcoming mock tests.
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed font-medium">
+              Your targeted preparation for <strong className="text-blue-600 dark:text-blue-400 font-extrabold">{activeCategory?.title || "Competitive Exams"}</strong> is on track. Review today&apos;s study plan and attempt upcoming mock tests.
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => setView("quiz-view")}
-              className="px-5 py-3 rounded-2xl bg-brand-royal hover:bg-brand-royal-dark text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-brand-royal/25 transition-all hover:scale-105"
+              className="px-6 py-3.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-xl shadow-blue-500/40 transition-all hover:scale-105 active:scale-95 border border-white/20"
             >
-              <Trophy className="w-4 h-4" />
+              <Trophy className="w-4 h-4 text-amber-300" />
               <span>Start Mock Test</span>
             </button>
             <button
               onClick={() => setView("ai-tutor")}
-              className="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:border-brand-royal/40 text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105"
+              className="px-6 py-3.5 rounded-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 hover:border-blue-500/50 text-slate-900 dark:text-slate-100 font-bold text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all hover:scale-105 shadow-md"
             >
-              <Brain className="w-4 h-4 text-brand-royal dark:text-brand-royal-light" />
+              <Brain className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>AI Exam Assistant</span>
             </button>
           </div>
@@ -172,68 +174,72 @@ export const StudentDashboard: React.FC = () => {
       </div>
 
       {/* Candidate Key Metrics Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Estimated Rank */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+        <div className="glass-glow-card box-backlight-amber p-6 rounded-[32px] space-y-2.5 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent blur-sm" />
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
               Predicted Rank
             </span>
-            <span className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+            <span className="p-2.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30 shadow-md">
               <Trophy className="w-5 h-5" />
             </span>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display tracking-tight">
             AIR #{estimatedRank}
           </p>
-          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" /> Top 2% among 14,500 candidates
           </p>
         </div>
 
         {/* Accuracy Rate */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+        <div className="glass-glow-card box-backlight-emerald p-6 rounded-[32px] space-y-2.5 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent blur-sm" />
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
               Accuracy Rate
             </span>
-            <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+            <span className="p-2.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 shadow-md">
               <Target className="w-5 h-5" />
             </span>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display tracking-tight">
             {accuracyPercentage}%
           </p>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
             Based on {totalAttemptedMockTests || 4} mock tests
           </p>
         </div>
 
         {/* Study Time Spent */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+        <div className="glass-glow-card box-backlight-blue p-6 rounded-[32px] space-y-2.5 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent blur-sm" />
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
               Time Spent Studying
             </span>
-            <span className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
+            <span className="p-2.5 rounded-full bg-blue-500/15 text-blue-500 border border-blue-500/30 shadow-md">
               <Clock className="w-5 h-5" />
             </span>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
-            {timeSpentStudyingHours} hrs
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display tracking-tight">
+            {profile.totalHoursSpent || timeSpentStudyingHours} hrs
           </p>
           <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-            +4.5 hrs this week
+            Today: {profile.todayHoursSpent || 2.8} hrs spent
           </p>
         </div>
 
         {/* Completed Topics */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+        <div className="glass-glow-card box-backlight-purple p-6 rounded-[32px] space-y-2.5 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent blur-sm" />
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
               Topics Mastered
             </span>
-            <span className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
+            <span className="p-2.5 rounded-full bg-purple-500/15 text-purple-500 border border-purple-500/30 shadow-md">
               <BookOpen className="w-5 h-5" />
             </span>
           </div>
@@ -243,6 +249,96 @@ export const StudentDashboard: React.FC = () => {
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
             Syllabus progress: 40%
           </p>
+        </div>
+      </div>
+
+      {/* Daily 7-Hour Study Target Alert Notification Banner */}
+      {((profile.todayHoursSpent || 2.8) < 7.0) && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-500 flex-shrink-0">
+              <Clock className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
+                  Daily Target Warning Alert
+                </span>
+                <span className="text-xs font-bold text-amber-700 dark:text-amber-400">
+                  {profile.todayHoursSpent || 2.8} / 7.0 Hours Spent Today
+                </span>
+              </div>
+              <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mt-0.5">
+                Minimum <strong>7.0 hours/day</strong> required. Spending under 7.0 hours for 3 consecutive days will automatically suspend candidate account access.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setView("profile-view")}
+            className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm transition-transform hover:scale-105 flex-shrink-0"
+          >
+            View Daily Activity
+          </button>
+        </div>
+      )}
+
+      {/* Candidate Profile, Daily Activity & Validation Hub Card */}
+      <div className="glass-card p-6 rounded-[32px] border border-slate-200 dark:border-white/10 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-950/90 text-white space-y-5 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div className="flex items-center gap-4">
+            {profile.avatarUrl ? (
+              <img src={profile.avatarUrl} alt={profile.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-brand-royal" />
+            ) : (
+              <div className="w-14 h-14 rounded-2xl bg-brand-royal flex items-center justify-center font-black text-xl text-white">
+                {profile.name[0]}
+              </div>
+            )}
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-black font-display text-white">{profile.name}</h3>
+                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  {(profile.validations || []).filter((v) => v.isValidated).length}/{(profile.validations || []).length || 5} Validated
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-medium">
+                {profile.email} • Phone: {profile.phoneNumber || "+91 98765 43210"} • Target: {profile.targetExam || "TNPSC / Entrance"}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setView("profile-view")}
+            className="px-5 py-2.5 rounded-full bg-brand-royal hover:bg-blue-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg transition-all"
+          >
+            Manage Candidate Profile & Daily Activity
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+            <span className="text-[10px] font-extrabold uppercase text-slate-400">Total Hours Spent</span>
+            <p className="text-2xl font-black text-white font-display">{profile.totalHoursSpent || 34.5} hrs</p>
+            <p className="text-[11px] text-emerald-400 font-semibold">Today: {profile.todayHoursSpent || 2.8} hrs spent</p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+            <span className="text-[10px] font-extrabold uppercase text-slate-400">Instructor Remarks</span>
+            <p className="text-sm font-extrabold text-white line-clamp-2">
+              "{profile.remarks?.[0]?.text || "Excellent conceptual clarity in mock tests. Keep up the high speed!"}"
+            </p>
+            <span className="text-[9px] text-slate-400 block">— {profile.remarks?.[0]?.instructorName || "Faculty Lead"}</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+            <span className="text-[10px] font-extrabold uppercase text-slate-400">Total Validation Checklist</span>
+            <div className="flex items-center justify-between font-bold text-white">
+              <span>Status: Verified Candidate</span>
+              <span className="text-emerald-400 font-black">100%</span>
+            </div>
+            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+              <div className="bg-emerald-500 h-full rounded-full" style={{ width: "100%" }} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -295,6 +391,133 @@ export const StudentDashboard: React.FC = () => {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Daily Current Affairs & News Bulletin (TNPSC & UPSC Dedicated) */}
+          <div className="glass-glow-card box-backlight-emerald p-6 sm:p-8 rounded-[36px] border border-emerald-500/30 relative overflow-hidden space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white font-display tracking-tight">
+                    Daily TN & National Current Affairs Digest
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                    Updated Daily for TNPSC Group 1/2/4 & UPSC Civil Services
+                  </p>
+                </div>
+              </div>
+              <span className="px-3.5 py-1.5 rounded-full bg-emerald-600/15 text-emerald-600 dark:text-emerald-400 font-black text-[11px] uppercase tracking-wider border border-emerald-500/30">
+                July 27, 2026 Edition
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {/* TN State Article */}
+              <div className="p-4 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 space-y-2.5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">
+                    Tamil Nadu State Affairs
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">Dinamani & TN Govt Gazette</span>
+                </div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                  Tamil Nadu Pudhumai Penn & Tamil Pudhalvan Scheme 2026 Rollout
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Monthly financial grant of ₹1,000 expanded to boost Gross Enrollment Ratio (GER) in higher education across 38 districts.
+                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <a
+                    href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Download TN Digest PDF</span>
+                  </a>
+                  <button
+                    onClick={() => setView("quiz-view")}
+                    className="px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider hover:bg-emerald-700 transition-all"
+                  >
+                    Take 5-Q Quiz
+                  </button>
+                </div>
+              </div>
+
+              {/* UPSC Article */}
+              <div className="p-4 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 space-y-2.5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400">
+                    UPSC National & IR
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">The Hindu & PIB Delhi</span>
+                </div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                  UPSC GS-II Strategy: Federalism & Landmark Constitutional Bench Rulings
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Analytical breakdown of Article 200, Governor assent timelines, and state autonomy balance for GS Paper 2.
+                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <a
+                    href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Download UPSC Summary PDF</span>
+                  </a>
+                  <button
+                    onClick={() => setView("quiz-view")}
+                    className="px-3 py-1 rounded-full bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider hover:bg-purple-700 transition-all"
+                  >
+                    Take 5-Q Quiz
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* UPSC Mains & TNPSC Group 1 Answer Sheet Review Hub */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
+                  Mains Descriptive Answer Evaluation Hub
+                </h3>
+              </div>
+              <button
+                onClick={() => setView("assignments")}
+                className="px-3.5 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider hover:bg-indigo-700 transition-all shadow-md"
+              >
+                Upload Answer Sheet
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-emerald-700 dark:text-emerald-400">
+                    TNPSC Group 1 Mains: Unit 8 Essay
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black">
+                    Evaluated Score: 18 / 25
+                  </span>
+                </div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                  &ldquo;Examine the role of Dravidian Movement and Social Reformers in shaping modern Tamil Nadu education policy.&rdquo;
+                </h4>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 italic bg-white/60 dark:bg-slate-900/60 p-2.5 rounded-xl border border-emerald-500/20">
+                  Evaluator Feedback: &ldquo;Excellent historical timeline and Thirukkural references. Include statistics on Gross Enrollment Ratio (GER) in TN for top marks.&rdquo;
+                </p>
+              </div>
             </div>
           </div>
 

@@ -120,7 +120,7 @@ export const AITutor: React.FC = () => {
         } else if (textLower.includes("screw gauge") || textLower.includes("pitch") || textLower.includes("least count")) {
           reply = `### Screw Gauge Measurements\n\nA **screw gauge** is an instrument used to measure dimensions up to $0.01\\text{ mm}$ (or $0.001\\text{ cm}$), such as the thickness of a wire or thin sheet.\n\n- **Pitch:** The distance moved by the spindle per rotation of the head.\n  $$\\text{Pitch} = \\frac{\\text{Distance on Pitch Scale}}{\\text{Number of Rotations}}$$\n- **Least Count (LC):** The smallest distance that can be measured by the instrument.\n  $$\\text{Least Count} = \\frac{\\text{Pitch}}{\\text{Total divisions on Head Scale}}$$\n- **Formula for Total Reading (TR):** \n  $$\\text{TR} = \\text{PSR (Pitch Scale Reading)} + (\\text{HSC} \\times \\text{LC}) \\pm \\text{Zero Correction}$$`;
         } else if (textLower.includes("hi") || textLower.includes("hello") || textLower.includes("hey")) {
-          reply = `Hello! I am your **Nexora Learning AI Tutor**. \n\nHow can I help you master your ${boardName} syllabus today? I can explain core concepts in Mathematics, Physics, Chemistry, and Biology. \n\nFeel free to ask me questions like: \n- *What is inertia?*\n- *Explain Union and Intersection of sets.*\n- *How does a screw gauge work?*`;
+          reply = `Hello! I am your **Rohit Aspire AI Tutor**. \n\nHow can I help you master your ${boardName} syllabus today? I can explain core concepts in Mathematics, Physics, Chemistry, and Biology. \n\nFeel free to ask me questions like: \n- *What is inertia?*\n- *Explain Union and Intersection of sets.*\n- *How does a screw gauge work?*`;
         } else {
           reply = `That is a very interesting academic question!\n\nTo analyze this under the ${boardName} syllabus:\n1. **Focus on Core Concepts:** Break down the main terms and mathematical/physical rules that govern this topic.\n2. **Verify Definitions:** Always start from the fundamental equations or definitions before deriving complex applications.\n3. **Practice Problems:** Try solving related questions in your workbook to solidify your understanding.\n\n*(Note: I am running in local offline mode since the server is unreachable. You can ask me about **Inertia**, **Sets**, **Newton's Laws**, or **Screw Gauges** for specialized offline explanations!)*`;
         }
@@ -577,7 +577,7 @@ const parseMarkdownBlocks = (text: string): Block[] => {
             </div>
             <div className="text-left flex flex-col justify-center">
               <h2 className="text-sm sm:text-base font-black font-display text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                Nexora AI Tutor
+                Rohit Aspire AI Tutor
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 uppercase">
                   Active
                 </span>
@@ -811,7 +811,7 @@ const parseMarkdownBlocks = (text: string): Block[] => {
           </button>
         </form>
         <p className="text-[9px] text-slate-400 dark:text-slate-600 text-center mt-3">
-          Nexora Learning AI Tutor is optimized for school syllabi. Verify important
+          Rohit Aspire AI Tutor is optimized for competitive & government exam syllabi. Verify important
           formulas before exams.
         </p>
       </div>

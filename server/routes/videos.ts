@@ -88,7 +88,7 @@ function rewriteDashManifest(content: string, videoId: string, token: string, re
 
 // GET /api/videos/:id/playback — short-lived token + secure manifest URLs
 router.get('/videos/:id/playback', requireAuth, async (req, res) => {
-  const videoId = req.params.id;
+  const videoId = req.params.id as string;
   const access = await assertVideoAccess(videoId, req.auth!.userId, req.auth!.role);
   if (!access.ok) {
     return res.status(access.status).json({ error: access.error });

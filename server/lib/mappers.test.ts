@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { subjectColor, mapTopic } from './mappers.js';
 

@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import fs, { existsSync } from 'fs';
 import path from 'path';
 import EmbeddedPostgres from 'embedded-postgres';
 import pg from 'pg';
@@ -61,8 +61,12 @@ export async function startDatabase() {
   }
 
   if (effectiveUrl.includes('supabase.com') || effectiveUrl.includes('rds.amazonaws.com') || effectiveUrl.includes('aws')) {
-    console.warn('Remote database is unreachable, but skipping local embedded-postgres startup.');
-    return;
+    if (effectiveUrl.includes('[YOUR-PROJECT-REF]') || effectiveUrl.includes('[YOUR-PASSWORD]')) {
+      console.log('[db] Remote Supabase URL contains placeholder tokens in .env. Falling back to local PostgreSQL server for database persistence...');
+    } else {
+      console.warn('Remote database is unreachable, skipping embedded-postgres fallback.');
+      return;
+    }
   }
 
   console.log('Starting local PostgreSQL database...');
@@ -78,9 +82,25 @@ export async function startDatabase() {
     if (!existsSync(pgDir)) {
       console.log('Initializing database storage...');
       await embedded.initialise();
+    } else {
+      const pgNotifyDir = path.join(pgDir, 'pg_notify');
+      if (!existsSync(pgNotifyDir)) {
+        try { fs.mkdirSync(pgNotifyDir, { recursive: true }); } catch (e) {}
+      }
+      const pidFile = path.join(pgDir, 'postmaster.pid');
+      if (existsSync(pidFile)) {
+        try { fs.unlinkSync(pidFile); } catch (e) {}
+      }
     }
     
-    await embedded.start();
+    try {
+      await embedded.start();
+    } catch (startErr) {
+      console.log('Re-initializing clean database storage directory...');
+      try { fs.rmSync(pgDir, { recursive: true, force: true }); } catch (e) {}
+      await embedded.initialise();
+      await embedded.start();
+    }
     console.log('Local PostgreSQL database started successfully.');
 
     // Reconcile password if necessary

@@ -39,11 +39,12 @@ router.post('/videos/:videoId/progress', requireAuth, async (req, res) => {
     return res.status(403).json({ error: 'Student profile required' });
   }
 
+  const videoId = req.params.videoId as string;
   const progress = await prisma.videoWatchHistory.upsert({
     where: {
       studentId_videoId: {
         studentId: student.id,
-        videoId: req.params.videoId,
+        videoId,
       },
     },
     update: {
@@ -52,7 +53,7 @@ router.post('/videos/:videoId/progress', requireAuth, async (req, res) => {
     },
     create: {
       studentId: student.id,
-      videoId: req.params.videoId,
+      videoId,
       watchDuration: watchDuration ?? 0,
       completedPercent: completedPercent ?? 0,
     },

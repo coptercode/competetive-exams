@@ -15,7 +15,10 @@ import {
   Clock, 
   TrendingUp, 
   GraduationCap,
-  Download
+  Download,
+  Brain,
+  Trophy,
+  Sparkles,
 } from "lucide-react";
 import { academicAPI } from "./services/api";
 import { Header } from "./components/Header";
@@ -46,6 +49,7 @@ import { TeacherUploadedNotesPage } from "./components/TeacherUploadedNotesPage"
 import { GlobalModals } from "./components/GlobalModals";
 import { GlobalSearchModal } from "./components/GlobalSearchModal";
 import { QuestionBankManager } from "./components/QuestionBankManager";
+import { DigitalNotesStudio } from "./components/DigitalNotesStudio";
 import { getISTDate } from "./utils/dateUtils";
 
 function RoomJoinFallback() {
@@ -389,7 +393,7 @@ function RoomJoinFallback() {
       <div className="glass-card p-6 border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950/40 flex flex-col md:flex-row md:items-center justify-between gap-4 font-sans">
         <div className="text-left">
           <span className="text-[10px] text-brand-royal dark:text-brand-royal-light font-bold uppercase tracking-wider border border-brand-royal/20 px-2.5 py-1 inline-flex items-center gap-1">
-            {profile?.role === "teacher" ? "📅 Nexora Learning Meeting Planner" : "📺 Student live portal"}
+            {profile?.role === "teacher" ? "📅 Rohit Aspire Meeting Planner" : "📺 Candidate live portal"}
           </span>
           <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-3">
             {profile?.role === "teacher" ? "Schedule Meeting" : "Live Classes"}
@@ -892,6 +896,9 @@ function App() {
       fetchNotifs();
       fetchAssigns();
       fetchNotes();
+      if (useLmsStore.getState().auth.isAuthenticated) {
+        useLmsStore.getState().incrementHoursSpent(1);
+      }
     }, 60000);
     return () => clearInterval(interval);
   }, [profile?.id]);
@@ -1107,6 +1114,8 @@ function App() {
           return <RoomJoinFallback />;
         }
         return <SimulatedLiveMeeting roomName={liveRoomState.roomName} participantName={liveRoomState.participantName} isTeacher={liveRoomState.isTeacher} />;
+      case "digital-notes":
+        return <DigitalNotesStudio />;
       case "forgot-password":
         return <ForgotPasswordPage />;
       case "reset-password":
@@ -1144,12 +1153,36 @@ function App() {
             onClose={() => setIsSidebarOpen(false)}
           />
 
-          <div className="flex-1 flex flex-col min-h-screen max-w-full overflow-x-hidden">
+          <div className="flex-1 flex flex-col min-h-screen max-w-full overflow-x-hidden relative">
             <Header onToggleSidebar={() => setIsSidebarOpen(true)} onOpenSearch={() => setIsSearchOpen(true)} />
 
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
               {renderActiveScreen()}
             </main>
+
+            {/* Floating Stylish Quick-Action Color Buttons Widget */}
+            {activeView !== "ai-tutor" && activeView !== "webrtc-live" && (
+              <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 animate-bounce-short">
+                <button
+                  onClick={() => setView("ai-tutor")}
+                  className="group relative flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white font-extrabold text-xs shadow-2xl shadow-blue-500/40 hover:shadow-blue-500/60 hover:scale-110 active:scale-95 transition-all duration-300 border border-white/20"
+                  title="Launch AI Exam Prep Assistant"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <Brain className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
+                  <span className="hidden sm:inline font-display uppercase tracking-wider">AI Assistant</span>
+                </button>
+
+                <button
+                  onClick={() => setView("webrtc-live")}
+                  className="group relative flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white font-extrabold text-xs shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 hover:scale-110 active:scale-95 transition-all duration-300 border border-white/20"
+                  title="Join Live Classroom"
+                >
+                  <Tv className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                  <span className="hidden sm:inline font-display uppercase tracking-wider">Live Class</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : (

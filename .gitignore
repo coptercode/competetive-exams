@@ -1,14 +1,12 @@
 # Dependencies
 node_modules
+# Database
+.pgdata*
+dist-server
+
+# Build
 dist
 
-# Environment variables
-.env
-.env.*
-!.env.example
-
-# Database
-.pgdata
 
 # Logs
 *.log

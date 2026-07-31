@@ -179,6 +179,12 @@ export function mapUserProfile(user: {
   role: string;
   location?: string | null;
   phoneNumber?: string | null;
+  avatarUrl?: string | null;
+  medium?: string | null;
+  targetExam?: string | null;
+  qualification?: string | null;
+  totalHoursSpent?: number | null;
+  todayHoursSpent?: number | null;
   teacherProfile?: {
     qualification?: string | null;
     bio?: string | null;
@@ -193,6 +199,8 @@ export function mapUserProfile(user: {
   const role = user.role.toLowerCase() as 'student' | 'teacher' | 'admin';
   return {
     id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     name: `${user.firstName} ${user.lastName}`.trim(),
     username: user.email.split('@')[0],
     password: '',
@@ -210,5 +218,11 @@ export function mapUserProfile(user: {
     phoneNumber: user.phoneNumber || '',
     subjectArea: user.teacherProfile?.qualification || '',
     location: user.location || '',
+    avatarUrl: user.avatarUrl || '',
+    medium: user.medium || 'Bilingual',
+    targetExam: user.targetExam || 'TNPSC Group 1 & JEE Main 2026',
+    qualification: user.qualification || user.teacherProfile?.qualification || 'B.Tech Electrical / Class 12 Scholar',
+    totalHoursSpent: user.totalHoursSpent ?? 34.5,
+    todayHoursSpent: user.todayHoursSpent ?? 2.8,
   };
 }

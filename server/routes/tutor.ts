@@ -4,12 +4,54 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const router = Router();
 
+// Initialize Grok / xAI API
+const grokApiKey = process.env.GROK_API_KEY || process.env.XAI_API_KEY;
+const isGrokApiKeyValid = grokApiKey && grokApiKey.startsWith('xai-') && grokApiKey.trim() !== '';
+
+const queryGrokAI = async (prompt: string, history: any[] = []): Promise<string | null> => {
+  if (!isGrokApiKeyValid) return null;
+  try {
+    const formattedMessages = [
+      { role: "system", content: "You are the lead AI Tutor for Rohit Aspire, specializing in TNPSC Group 1, 2, 4, UPSC CSE, and Competitive Exam prep. Provide clear, step-by-step answers with Markdown formatting." },
+      ...history.map((h: any) => ({
+        role: h.role === "model" ? "assistant" : "user",
+        content: typeof h.parts?.[0] === "string" ? h.parts[0] : (h.parts?.[0]?.text || "")
+      })),
+      { role: "user", content: prompt }
+    ];
+
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${grokApiKey}`
+      },
+      body: JSON.stringify({
+        model: "grok-2-latest",
+        messages: formattedMessages,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      console.warn(`Grok API call returned status ${response.status}`);
+      return null;
+    }
+
+    const data: any = await response.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch (err: any) {
+    console.warn("Grok API Error:", err.message);
+    return null;
+  }
+};
+
 // Initialize Gemini API
 const apiKey = process.env.GEMINI_API_KEY;
-const isApiKeyValid = apiKey && (apiKey.startsWith('AIzaSy') || apiKey.startsWith('AQ.')) && apiKey !== 'your-gemini-api-key-here' && apiKey.trim() !== '';
-const genAI = isApiKeyValid ? new GoogleGenerativeAI(apiKey) : null;
+const isApiKeyValid = !!(apiKey && (apiKey.startsWith('AIzaSy') || apiKey.startsWith('AQ.')) && apiKey !== 'your-gemini-api-key-here' && apiKey.trim() !== '');
+const genAI = isApiKeyValid ? new GoogleGenerativeAI(apiKey!) : null;
 const tutorModels = Array.from(
-  new Set([process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter(Boolean))
+  new Set([process.env.GEMINI_MODEL, 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash'].filter(Boolean))
 );
 
 
@@ -221,18 +263,27 @@ router.post('/tutor', requireAuth, async (req, res) => {
       })
       : [];
 
+    // 1. Try Grok xAI model if GROK_API_KEY is configured
+    if (isGrokApiKeyValid) {
+      const grokResponse = await queryGrokAI(question, formattedHistory);
+      if (grokResponse) {
+        return res.json({ answer: grokResponse });
+      }
+    }
+
     let lastError: any = null;
 
-    for (const modelName of tutorModels) {
-      try {
-        const model = genAI.getGenerativeModel({
-          model: modelName as string,
-          systemInstruction: 'You are an encouraging, expert AI Personal Tutor for a student. Keep your explanations clear, structured, and easy to understand. Use Markdown formatting. If the student asks a math/science question, explain step-by-step. If they ask a coding question, write clean code with comments. Always maintain a helpful, teacher-like tone.',
-        });
+    if (genAI) {
+      for (const modelName of tutorModels) {
+        try {
+          const model = genAI.getGenerativeModel({
+            model: modelName as string,
+            systemInstruction: 'You are an encouraging, expert AI Personal Tutor for a student. Keep your explanations clear, structured, and easy to understand. Use Markdown formatting. If the student asks a math/science question, explain step-by-step. If they ask a coding question, write clean code with comments. Always maintain a helpful, teacher-like tone.',
+          });
 
-        const chat = model.startChat({
-          history: formattedHistory,
-        });
+          const chat = model.startChat({
+            history: formattedHistory,
+          });
 
         let messageContent: any = question;
         if (attachment && attachment.data && attachment.type) {
@@ -257,6 +308,7 @@ router.post('/tutor', requireAuth, async (req, res) => {
         lastError = error;
         console.warn(`Gemini model ${modelName} failed:`, error.message);
       }
+    }
     }
 
     // If all Gemini models failed, fall back to Pollinations AI

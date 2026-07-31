@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Users, Search, RefreshCw, Pencil, Trash2, ChevronDown, Lock, Unlock } from "lucide-react";
-import { authAPI } from "../../services/api";
+import { Users, Search, RefreshCw, Pencil, Trash2, ChevronDown, Lock, Unlock, CheckCircle, ShieldAlert, FileText } from "lucide-react";
+import { authAPI, profileAPI } from "../../services/api";
 import { useUiStore } from "../../store/useUiStore";
 
 interface AdminUsersProps {
@@ -21,6 +21,7 @@ export const AdminUsers: React.FC<AdminUsersProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [gradeFilter, setGradeFilter] = useState("All Grades");
   const [subFilter, setSubFilter] = useState("All Subscriptions");
+  const [actionMessage, setActionMessage] = useState("");
 
   const handleDeleteUser = async (id: string) => {
     if (!(await useUiStore.getState().showConfirm("Are you sure you want to delete this user?"))) return;
@@ -29,6 +30,20 @@ export const AdminUsers: React.FC<AdminUsersProps> = ({
       fetchUsers();
     } catch (err: any) {
       console.error("Failed to delete user.", err);
+    }
+  };
+
+  const handleUnblockUser = async (studentId: string, studentName: string) => {
+    if (!(await useUiStore.getState().showConfirm(`Approve apology note and unblock candidate ${studentName}?`))) return;
+    try {
+      await profileAPI.unblockCandidate(studentId, "Super Admin");
+      setActionMessage(`Approved apology & unblocked candidate ${studentName} successfully!`);
+      setTimeout(() => setActionMessage(""), 4000);
+      fetchUsers();
+    } catch (err: any) {
+      console.error("Failed to unblock user:", err);
+      setActionMessage("Failed to unblock candidate. Please try again.");
+      setTimeout(() => setActionMessage(""), 4000);
     }
   };
 
@@ -47,7 +62,8 @@ export const AdminUsers: React.FC<AdminUsersProps> = ({
     const matchesSub = subFilter === "All Subscriptions" ||
       (subFilter === "Active" && subStatus === "ACTIVE") ||
       (subFilter === "Pending" && subStatus === "PENDING") ||
-      (subFilter === "Expired" && subStatus === "EXPIRED");
+      (subFilter === "Expired" && subStatus === "EXPIRED") ||
+      (subFilter === "Blocked" && (student.isBlocked || student.apologyNote));
 
     return (nameMatch || emailMatch || locationMatch) && matchesGrade && matchesSub;
   });
@@ -110,6 +126,7 @@ export const AdminUsers: React.FC<AdminUsersProps> = ({
             <option value="Active">Active</option>
             <option value="Expired">Expired</option>
             <option value="Pending">Pending</option>
+            <option value="Blocked">Blocked & Apology Requests</option>
           </select>
           <ChevronDown className="absolute right-3 top-4 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
         </div>
@@ -185,23 +202,47 @@ export const AdminUsers: React.FC<AdminUsersProps> = ({
                             {student.location || "Not Specified"}
                           </td>
                           <td className="py-4 px-6">
-                            <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${
-                              subStatus === "ACTIVE"
-                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                : subStatus === "PENDING"
-                                ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                                : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                            }`}>
-                              {subStatus === "ACTIVE" ? "Active" : subStatus === "PENDING" ? "Pending" : "Expired"}
-                            </span>
+                            <div className="flex flex-col gap-1">
+                              <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full border w-fit ${
+                                student.isBlocked
+                                  ? "bg-red-500/10 text-red-600 border-red-500/20"
+                                  : subStatus === "ACTIVE"
+                                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                  : subStatus === "PENDING"
+                                  ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                                  : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                              }`}>
+                                {student.isBlocked ? "BLOCKED (7-Hr Shortfall)" : subStatus === "ACTIVE" ? "Active" : subStatus === "PENDING" ? "Pending" : "Expired"}
+                              </span>
+                              {student.apologyNote && (
+                                <div className="text-[10px] text-slate-600 dark:text-slate-300 font-medium bg-slate-100 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-white/10 max-w-xs mt-1">
+                                  <div className="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                    <FileText className="w-3 h-3" /> Candidate Apology Note:
+                                  </div>
+                                  <p className="line-clamp-2 italic text-[10px] text-slate-700 dark:text-slate-300 mt-0.5">"{student.apologyNote}"</p>
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="py-4 px-6 text-right">
-                            <button
-                              onClick={() => handleDeleteUser(student.id)}
-                              className="p-2 rounded-lg border border-transparent hover:border-red-500/20 text-slate-400 hover:text-red-500 hover:bg-red-500/5 transition-colors"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              {(student.isBlocked || student.apologyNote) && (
+                                <button
+                                  onClick={() => handleUnblockUser(student.id, `${student.firstName} ${student.lastName}`)}
+                                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-transform hover:scale-105 flex items-center gap-1.5"
+                                  title="Approve Apology & Unblock Candidate"
+                                >
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                  <span>Approve & Unblock</span>
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteUser(student.id)}
+                                className="p-2 rounded-lg border border-transparent hover:border-red-500/20 text-slate-400 hover:text-red-500 hover:bg-red-500/5 transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );

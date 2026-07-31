@@ -64,7 +64,7 @@ export const ContactSupportPage: React.FC = () => {
         >
           <PlanetLogo className="w-10 h-10 group-hover:scale-105 transition-transform" />
           <span className="font-extrabold font-display text-xl tracking-tight text-slate-900 group-hover:text-brand-violet transition-colors whitespace-nowrap">
-            Nexora Learning
+            Rohit Aspire
           </span>
         </div>
         <button

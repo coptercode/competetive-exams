@@ -731,17 +731,43 @@ router.get('/upload/videos', requireAuth, async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-//  DELETE /upload/video/:id
+//  POST /upload/avatar
+//  Upload candidate or instructor profile photo (.jpg, .jpeg, .png, .webp)
 // ─────────────────────────────────────────────
-router.delete('/upload/video/:id', requireAuth, requireAdminOrTeacher, async (req, res) => {
-  const id = req.params.id as string;
-  try {
-    await prisma.courseVideo.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete video' });
-  }
-});
+router.post(
+  '/upload/avatar',
+  requireAuth,
+  upload.single('file'),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'Image file (.jpg, .png, .webp) is required' });
+      }
+
+      await validateMagicBytes(req.file.buffer, req.file.mimetype);
+
+      const base64Data = req.file.buffer.toString('base64');
+      const avatarUrl = `data:${req.file.mimetype};base64,${base64Data}`;
+
+      const userId = (req as any).user?.userId;
+      if (userId) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { avatarUrl },
+        });
+      }
+
+      return res.status(201).json({
+        success: true,
+        avatarUrl,
+        message: 'Profile photo uploaded and persisted successfully',
+      });
+    } catch (err: any) {
+      console.error('Avatar photo upload error:', err);
+      return res.status(500).json({ error: err.message || 'Avatar upload failed' });
+    }
+  },
+);
 
 router.use((err: any, req: any, res: any, next: any) => {
   if (err instanceof multer.MulterError) {
