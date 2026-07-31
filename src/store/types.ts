@@ -201,6 +201,7 @@ export type ExamProgram = Subject;
 
 export interface Bookmark {
   id: string;
+  profileId?: string;
   topicId: string;
   topicTitle: string;
   chapterTitle: string;
@@ -222,38 +223,78 @@ export interface Assignment {
   id: string;
   title: string;
   subject: string;
+  subjectId?: string;
+  subjectTitle?: string;
   dueDate: string;
+  deadline?: Date | string;
+  rawDeadline?: string;
+  submittedAt?: string;
+  submissionFile?: string;
+  teacherName?: string;
+  className?: string;
+  studentName?: string;
   status: AssignmentStatus;
   grade?: string;
   feedback?: string;
   pdfUrl?: string;
+  fileUrl?: string;
+  description?: string;
+  points?: number;
+  maxMarks?: number;
 }
 
 export interface Question {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: number;
+  correctAnswer?: number;
+  correctAnswerIndex?: number;
   explanation: string;
   subject?: string;
-  difficulty?: "Easy" | "Medium" | "Hard";
+  difficulty?: "Easy" | "Medium" | "Hard" | string;
+  marks?: number;
+  negativeMarks?: number;
+  examCategory?: string;
+  topic?: string;
+  subtopic?: string;
+  isPYQ?: boolean;
+  pyqYear?: number;
+  source?: string;
+  tags?: string[];
+  timeLimitSeconds?: number;
 }
+
+export type QuizQuestion = Question;
 
 export interface Quiz {
   id: string;
   title: string;
-  subject: string;
-  duration: number; // in minutes
-  totalMarks: number;
+  subject?: string;
+  subjectId?: string;
+  chapterId?: string;
+  duration?: number; // in minutes
+  durationMinutes?: number;
+  totalMarks?: number;
   questions: Question[];
+  testType?: string;
+  testCategory?: string;
+  negativeMarkingRate?: number;
 }
 
 export interface QuizResult {
   quizId: string;
+  title?: string;
   score: number;
-  totalMarks: number;
-  completedAt: string;
-  answers: Record<string, number>;
+  totalMarks?: number;
+  completedAt?: string;
+  date?: string;
+  timeTakenSeconds?: number;
+  totalQuestions?: number;
+  percentile?: number;
+  rank?: number;
+  accuracyPercentage?: number;
+  answers?: Record<string, number>;
+  incorrectAnswersDetails?: any[];
 }
 
 export interface AuthState {
@@ -391,95 +432,9 @@ export interface Board {
 
 
 
-export interface Bookmark {
-  id: string;
-  topicId: string;
-  topicTitle: string;
-  chapterTitle: string;
-  subjectTitle: string;
-  note?: string;
-  timestamp: string;
-}
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  read: boolean;
-  time: string;
-}
 
-export interface Assignment {
-  id: string;
-  title: string;
-  subject: string;
-  dueDate: string;
-  deadline?: Date | string;
-  status: AssignmentStatus;
-  grade?: string;
-  feedback?: string;
-  pdfUrl?: string;
-  subjectTitle?: string;
-  teacherName?: string;
-  className?: string;
-  studentName?: string;
-  submittedAt?: string;
-  rawDeadline?: string;
-  submissionFile?: string;
-}
 
-export interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer?: number;
-  correctAnswerIndex?: number;
-  explanation: string;
-  subject?: string;
-  difficulty?: "Easy" | "Medium" | "Hard" | string;
-  marks?: number;
-  negativeMarks?: number;
-  examCategory?: string;
-  topic?: string;
-  subtopic?: string;
-  isPYQ?: boolean;
-  pyqYear?: number;
-  source?: string;
-  tags?: string[];
-  timeLimitSeconds?: number;
-}
-
-export type QuizQuestion = Question;
-
-export interface Quiz {
-  id: string;
-  title: string;
-  subject: string;
-  duration: number; // in minutes
-  durationMinutes?: number;
-  totalMarks: number;
-  questions: Question[];
-  testType?: string;
-  testCategory?: string;
-  negativeMarkingRate?: number;
-}
-
-export interface QuizResult {
-  quizId: string;
-  title?: string;
-  score: number;
-  totalMarks: number;
-  completedAt: string;
-  date?: string;
-  timeTakenSeconds?: number;
-  totalQuestions?: number;
-  percentile?: number;
-  rank?: number;
-  accuracyPercentage?: number;
-  answers: Record<string, number>;
-  incorrectAnswersDetails?: any[];
-}
 
 export interface AuthState {
   isAuthenticated: boolean;

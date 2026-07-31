@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getApiBaseUrl } from "../utils/apiBase";
-import { profileAPI } from "../services/api";
+import { profileAPI, authAPI } from "../services/api";
 import type {
   LMSStore,
   Board,
@@ -683,8 +683,7 @@ export const useLmsStore = create<LMSStore>((set, get) => ({
       const approvedUser: Profile = {
         ...targetUser,
         isApproved: true,
-        approvalStatus: "APPROVED",
-        role: targetUser.role === "student" ? "STUDENT" : targetUser.role === "teacher" ? "TEACHER" : targetUser.role,
+        role: targetUser.role,
       };
 
       // Store in approved list

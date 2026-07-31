@@ -157,11 +157,11 @@ export const SecureNotesPreview: React.FC = () => {
                 if (element && activeTopic) {
                   // We clone the element so we can force styling without affecting the UI
                   const opt = {
-                    margin:       [15, 15, 15, 15],
+                    margin:       [15, 15, 15, 15] as [number, number, number, number],
                     filename:     `${activeTopic.title.replace(/\s+/g, '_')}_Notes.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
+                    image:        { type: 'jpeg' as const, quality: 0.98 },
                     html2canvas:  { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
                     pagebreak:    { mode: 'css', avoid: 'h1, h2, h3, h4, h5, h6, p, pre, li, table, tr, blockquote' }
                   };
                   

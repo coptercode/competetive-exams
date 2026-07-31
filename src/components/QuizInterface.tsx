@@ -188,7 +188,8 @@ export const QuizInterface: React.FC = () => {
   // Sync state when activeQuiz changes
   useEffect(() => {
     if (activeQuiz) {
-      setTimeLeftSeconds(activeQuiz.durationMinutes * 60);
+      const durationMins = activeQuiz.durationMinutes || activeQuiz.duration || 10;
+      setTimeLeftSeconds(durationMins * 60);
       setCurrentQuestionIndex(0);
       setSelectedAnswers({});
       setIsSubmitted(false);
@@ -285,10 +286,11 @@ export const QuizInterface: React.FC = () => {
 
       totalMarksObtained += marksForThisQ;
 
+      const correctIdx = q.correctAnswerIndex ?? q.correctAnswer ?? 0;
       breakdown.push({
         question: q.question,
-        yourAnswer: selected !== undefined ? q.options[selected] : "Unattempted",
-        correctAnswer: q.options[q.correctAnswerIndex],
+        yourAnswer: selected !== undefined ? (q.options[selected] || "Unattempted") : "Unattempted",
+        correctAnswer: q.options[correctIdx] || "Option A",
         explanation: q.explanation || "Refer to subject theory for detailed proof.",
         isCorrect,
         marksAwarded: marksForThisQ,
@@ -297,7 +299,8 @@ export const QuizInterface: React.FC = () => {
 
     setDetailedQuestionBreakdown(breakdown);
 
-    const timeSpent = activeQuiz.durationMinutes * 60 - timeLeftSeconds;
+    const durationMins = activeQuiz.durationMinutes || activeQuiz.duration || 10;
+    const timeSpent = durationMins * 60 - timeLeftSeconds;
     const scorePct = maxPossibleMarks > 0 ? Math.max(0, Math.round((totalMarksObtained / maxPossibleMarks) * 100)) : 0;
     const percentile = Math.min(99.8, Number((92 + (scorePct * 0.075)).toFixed(1)));
     const estimatedRank = Math.max(1, Math.round(150 - scorePct * 1.3));

@@ -36,7 +36,7 @@ export const AssignmentPage: React.FC = () => {
 
   const classSubjectIds = activeClass?.subjects?.map((s) => s.id) || [];
   const classAssignments = assignments.filter((a) =>
-    classSubjectIds.includes(a.subjectId),
+    classSubjectIds.includes(a.subjectId || a.subject),
   );
 
   const [selectedAssignId, setSelectedAssignId] = useState(
@@ -160,9 +160,7 @@ export const AssignmentPage: React.FC = () => {
                   <span className="text-[9px] text-slate-600 dark:text-slate-500 font-bold uppercase">
                     Submission Due Date
                   </span>
-                  <p className="text-slate-800 dark:text-slate-200 font-semibold mt-0.5">
-                    {formatDeadlineIST(activeAssign.deadline)}
-                  </p>
+                    {formatDeadlineIST(typeof activeAssign.deadline === 'string' ? activeAssign.deadline : activeAssign.dueDate || '')}
                 </div>
               </div>
 
@@ -378,7 +376,7 @@ export const AssignmentPage: React.FC = () => {
             ) : (
               classAssignments.map((a) => {
                 const isSelected = selectedAssignId === a.id;
-                const isChem = a.subjectId.includes("chem");
+                const isChem = (a.subjectId || a.subject || '').includes("chem");
                 const subjectTextColor = isChem
                   ? "text-fuchsia-600 dark:text-fuchsia-400 font-extrabold"
                   : "text-sky-600 dark:text-sky-400 font-extrabold";
@@ -418,7 +416,7 @@ export const AssignmentPage: React.FC = () => {
                     </div>
                     <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-500 font-semibold w-full">
                       <span className={subjectTextColor}>{a.subjectTitle}</span>
-                      <span>Due: {formatDeadlineIST(a.deadline)}</span>
+                      <span>Due: {formatDeadlineIST(typeof a.deadline === 'string' ? a.deadline : a.dueDate || '')}</span>
                     </div>
                   </button>
                 );

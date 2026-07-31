@@ -2,7 +2,7 @@ import { HelpCircle, Trophy, AlertCircle, Lock } from "lucide-react";
 import { generateQuiz } from "../utils/quizGenerator";
 import React, { useState, useRef, useEffect } from "react";
 import { useLmsStore } from "../store/index";
-import type { Topic, Chapter, Subject } from "../store/types";
+import type { Topic, Chapter, Subject, Quiz } from "../store/types";
 import { getChapterContent, getSubjectType } from "../store/curriculumData";
 
 import { getApiBaseUrl } from "../utils/apiBase";
@@ -357,12 +357,15 @@ export const CourseLearningPage: React.FC = () => {
           activeTopic?.title || "Topic",
         );
         const quizId = `quiz-gen-${activeTopic.id}`;
-        const mappedFallbackQuiz = {
+        const mappedFallbackQuiz: Quiz = {
           id: quizId,
           title: `${activeTopic.title} Assessment`,
-          subjectId: activeTopic.id,
-          chapterId: activeTopic.id,
+          subject: activeSubject?.title || "Subject",
+          subjectId: activeSubject?.id || activeTopic.id,
+          chapterId: activeChapter?.id || activeTopic.id,
+          duration: 10,
           durationMinutes: 10,
+          totalMarks: fallbackQuiz.length * 4,
           questions: fallbackQuiz.map((q: any, i: number) => ({
             id: `q-${quizId}-${i}`,
             question: q.question,
@@ -372,7 +375,7 @@ export const CourseLearningPage: React.FC = () => {
           })),
         };
         const existingQuizzes = useLmsStore.getState().quizzes || [];
-        const updatedQuizzes = [
+        const updatedQuizzes: Quiz[] = [
           ...existingQuizzes.filter((q) => q.id !== mappedFallbackQuiz.id),
           mappedFallbackQuiz,
         ];
@@ -389,12 +392,15 @@ export const CourseLearningPage: React.FC = () => {
           activeTopic?.title || "Topic",
         );
         const quizId = `quiz-gen-${activeTopic.id}`;
-        const mappedFallbackQuiz = {
+        const mappedFallbackQuiz: Quiz = {
           id: quizId,
           title: `${activeTopic.title} Assessment`,
-          subjectId: activeTopic.id,
-          chapterId: activeTopic.id,
+          subject: activeSubject?.title || "Subject",
+          subjectId: activeSubject?.id || activeTopic.id,
+          chapterId: activeChapter?.id || activeTopic.id,
+          duration: 10,
           durationMinutes: 10,
+          totalMarks: fallbackQuiz.length * 4,
           questions: fallbackQuiz.map((q: any, i: number) => ({
             id: `q-${quizId}-${i}`,
             question: q.question,
@@ -404,7 +410,7 @@ export const CourseLearningPage: React.FC = () => {
           })),
         };
         const existingQuizzes = useLmsStore.getState().quizzes || [];
-        const updatedQuizzes = [
+        const updatedQuizzes: Quiz[] = [
           ...existingQuizzes.filter((q) => q.id !== mappedFallbackQuiz.id),
           mappedFallbackQuiz,
         ];

@@ -174,7 +174,7 @@ export const ParentPortal: React.FC = () => {
                   <div key={as.id} className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl text-xs">
                     <div className="space-y-1">
                       <p className="font-bold text-slate-900 dark:text-white">{as.title}</p>
-                      <p className="text-[10px] text-slate-500">Subject: {as.subjectTitle} • Deadline: {formatDeadlineIST(as.deadline)}</p>
+                      <p className="text-[10px] text-slate-500">Subject: {as.subjectTitle} • Deadline: {formatDeadlineIST(typeof as.deadline === 'string' ? as.deadline : as.dueDate || '')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold border ${
@@ -215,28 +215,33 @@ export const ParentPortal: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {quizResults.map((r, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl text-xs">
-                    <div className="space-y-1">
-                      <p className="font-bold text-slate-900 dark:text-white">{r.title}</p>
-                      <p className="text-[10px] text-slate-500">Taken on {r.date} • Spent {Math.round(r.timeTakenSeconds / 60)} mins</p>
+                {quizResults.map((r, idx) => {
+                  const timeMins = Math.round((r.timeTakenSeconds || 0) / 60);
+                  const totalQ = r.totalQuestions || 10;
+                  const pct = Math.round((r.score / totalQ) * 100);
+                  return (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl text-xs">
+                      <div className="space-y-1">
+                        <p className="font-bold text-slate-900 dark:text-white">{r.title}</p>
+                        <p className="text-[10px] text-slate-500">Taken on {r.date} • Spent {timeMins} mins</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                          Score: {r.score} / {totalQ}
+                        </span>
+                        <span className={`text-[9px] font-bold ${
+                          pct >= 80 
+                            ? "text-emerald-500" 
+                            : pct >= 50 
+                            ? "text-amber-500" 
+                            : "text-red-500"
+                        }`}>
+                          {pct}% Match
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
-                        Score: {r.score} / {r.totalQuestions}
-                      </span>
-                      <span className={`text-[9px] font-bold ${
-                        (r.score / r.totalQuestions) >= 0.8 
-                          ? "text-emerald-500" 
-                          : (r.score / r.totalQuestions) >= 0.5 
-                          ? "text-amber-500" 
-                          : "text-red-500"
-                      }`}>
-                        {Math.round((r.score / r.totalQuestions) * 100)}% Match
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
