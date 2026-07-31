@@ -2,31 +2,85 @@ import { Router } from "express";
 
 const router = Router();
 
-// In-Memory Backend Store for Digital Notes
+// In-Memory Backend Store for Digital Notes & Syllabus Summaries
 let notesDb: any[] = [
   {
     id: "note-01",
-    title: "TNPSC Unit 8: Thirukkural 39 Chapters & Governance Mind Map",
-    content: "Key Thirukkural chapters relating to Statecraft (அமைச்சு), Justice (நீதிமுறை), and Public Administration.",
+    title: "TNPSC Group 1/2: Unit 8 Thirukkural & Tamil Society Governance",
+    content: "Detailed breakdown of 39 Thirukkural chapters on Statecraft (அமைச்சு), Justice (நீதிமுறை), and Administration.",
+    fileUrl: "https://lms-files.supabase.co/storage/v1/object/public/lms-files/notes/tnpsc-exams/unit-8/thirukkural-governance.pdf",
     authorId: "instructor-001",
     authorName: "Dr. S. Ramanathan",
     authorRole: "teacher",
     targetType: "all_students",
     subject: "Unit 8: History & Culture of TN",
-    tags: ["Thirukkural", "MindMap", "TNPSC Group 1"],
+    tags: ["TNPSC", "Thirukkural", "Unit 8", "Tamil Society"],
     createdAt: "26 July 2026, 11:00 AM"
   },
   {
     id: "note-02",
-    title: "UPSC GS-II Constitutional Amendments Summary Note",
-    content: "Important constitutional amendments from 73rd/74th Panchayati Raj to 106th Nari Shakti Vandan Adhiniyam.",
-    authorId: "student-001",
-    authorName: "Kavitha Rajan",
-    authorRole: "student",
-    targetType: "personal",
-    subject: "GS Paper II: Polity",
-    tags: ["Constitutional Amendments", "Polity", "Revision"],
+    title: "UPSC CSE GS-II: Constitutional Amendments & Judicial Precedents",
+    content: "Key constitutional amendments from 73rd/74th Panchayati Raj to 106th Nari Shakti Vandan Adhiniyam.",
+    fileUrl: "https://lms-files.supabase.co/storage/v1/object/public/lms-files/notes/upsc-exams/gs-2/constitutional-amendments.pdf",
+    authorId: "instructor-002",
+    authorName: "Prof. Ananya Sen",
+    authorRole: "teacher",
+    targetType: "all_students",
+    subject: "GS Paper II: Indian Polity & Governance",
+    tags: ["UPSC", "Polity", "GS-II", "Constitution"],
     createdAt: "27 July 2026, 09:15 AM"
+  },
+  {
+    id: "note-03",
+    title: "JEE Main & Advanced: Physics High-Yield Formula Sheet & Mechanics",
+    content: "Rotational Dynamics, Moment of Inertia formulas, Work-Energy Theorems, and Wave Optics shortcuts.",
+    fileUrl: "https://lms-files.supabase.co/storage/v1/object/public/lms-files/notes/engineering/physics/jee-physics-mechanics.pdf",
+    authorId: "instructor-001",
+    authorName: "Dr. S. Ramanathan",
+    authorRole: "teacher",
+    targetType: "all_students",
+    subject: "Physics: Mechanics & Electrodynamics",
+    tags: ["JEE Main", "JEE Advanced", "Physics", "Formulas"],
+    createdAt: "28 July 2026, 10:30 AM"
+  },
+  {
+    id: "note-04",
+    title: "NEET UG Biology: Human Physiology & Genetics Core Summary",
+    content: "Comprehensive NCERT diagrams, Cardiac Cycle steps, DNA Replication mechanisms, and Mendelian Genetics ratios.",
+    fileUrl: "https://lms-files.supabase.co/storage/v1/object/public/lms-files/notes/medical/biology/neet-biology-physiology.pdf",
+    authorId: "instructor-003",
+    authorName: "Dr. Meenakshi Sundaram",
+    authorRole: "teacher",
+    targetType: "all_students",
+    subject: "Biology: Human Physiology & Genetics",
+    tags: ["NEET UG", "Biology", "NCERT", "Physiology"],
+    createdAt: "29 July 2026, 02:45 PM"
+  },
+  {
+    id: "note-05",
+    title: "Banking PO & Clerk: Quantitative Aptitude & Data Interpretation",
+    content: "Data Interpretation pie charts, Quadratic equations shortcuts, Speed Math tricks, and Profit & Loss formulas.",
+    fileUrl: "https://lms-files.supabase.co/storage/v1/object/public/lms-files/notes/banking/quant/banking-quant-di.pdf",
+    authorId: "instructor-002",
+    authorName: "Prof. Ananya Sen",
+    authorRole: "teacher",
+    targetType: "all_students",
+    subject: "Quantitative Aptitude & Reasoning",
+    tags: ["Banking", "SBI PO", "IBPS", "Quant"],
+    createdAt: "30 July 2026, 04:00 PM"
+  },
+  {
+    id: "note-06",
+    title: "SSC CGL & CHSL: General Intelligence & English Grammar Rules",
+    content: "120 Rules of English Grammar, Error Spotting patterns, Coding-Decoding tricks, and General Awareness overview.",
+    fileUrl: "https://lms-files.supabase.co/storage/v1/object/public/lms-files/notes/ssc/english/ssc-cgl-grammar-rules.pdf",
+    authorId: "instructor-001",
+    authorName: "Dr. S. Ramanathan",
+    authorRole: "teacher",
+    targetType: "all_students",
+    subject: "English Language & General Intelligence",
+    tags: ["SSC CGL", "Grammar", "Reasoning", "SSC"],
+    createdAt: "31 July 2026, 08:30 AM"
   }
 ];
 

@@ -4,8 +4,10 @@ node_modules
 .pgdata*
 dist-server
 
-# Build
+# Build & Cache
 dist
+.vite
+
 
 
 # Logs

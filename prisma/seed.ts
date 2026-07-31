@@ -287,18 +287,25 @@ async function main() {
                 }
               }
 
-              // SEED DUMMY NOTES
+              // SEED COMPETITIVE EXAM COURSE NOTES & SYLLABUS PORTIONS
               const noteCount = await prisma.courseNote.count({
                 where: { topicId: dbTopic.id },
               });
+              const sanitizeUrlKey = (str: string) => str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+              const noteStorageKey = `notes/${sanitizeUrlKey(boardData.title)}/${sanitizeUrlKey(subjectData.title)}/syllabus-note-${sanitizeUrlKey(dbTopic.name)}.pdf`;
+              const supabaseStorageUrl = `https://lms-files.supabase.co/storage/v1/object/public/lms-files/${noteStorageKey}`;
+
               if (noteCount === 0) {
                 await prisma.courseNote.create({
                   data: {
-                    title: `Comprehensive Notes: ${dbTopic.name}`,
-                    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                    title: `Syllabus & Core Notes: ${dbTopic.name}`,
+                    fileUrl: supabaseStorageUrl,
                     topicId: dbTopic.id,
                     sortOrder: 1,
+                    isRequiredForComplete: true,
                     subjectTitle: subjectData.title,
+                    uploadedByName: 'Dr. S. Ramanathan (Instructor)',
+                    uploadedByUserId: 'instructor-001',
                   },
                 });
               }
