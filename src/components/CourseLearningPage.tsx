@@ -99,7 +99,9 @@ import {
   Minimize2,
   Sun,
   Moon,
-  Youtube
+  Youtube,
+  Copy,
+  Check
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
@@ -135,6 +137,7 @@ export const CourseLearningPage: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration] = useState(1200); // 20 mins mock duration in seconds
   const [bookmarkText, setBookmarkText] = useState("");
+  const [copiedYtUrl, setCopiedYtUrl] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
@@ -594,7 +597,17 @@ export const CourseLearningPage: React.FC = () => {
             </h2>
           </div>
           
-          <div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <a
+              href={getYoutubeLinkForTopic(activeBoard?.title, activeChapter?.title, activeTopic?.title)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors shadow-lg shadow-red-600/20"
+            >
+              <Youtube className="w-4 h-4 fill-current" />
+              <span>Watch on YouTube ↗</span>
+            </a>
+
             {!(activeTopic?.isCompleted || (activeTopic && completedTopicIds.includes(activeTopic.id))) ? (
               <button
                 onClick={handleMarkAsCompleted}
@@ -617,7 +630,7 @@ export const CourseLearningPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Lower Workspace Tabs (Content explanation, Bookmarks, PDFs) */}
+        {/* Lower Workspace Tabs (Content explanation, Bookmarks, PDFs, YouTube) */}
         <div className="space-y-4">
           <div className="flex border-b border-slate-200 dark:border-white/5 gap-4">
             {[
@@ -627,29 +640,6 @@ export const CourseLearningPage: React.FC = () => {
               { id: "youtube", label: "YouTube Link", icon: Youtube },
             ].map((tab) => {
               const Icon = tab.icon;
-
-              if (tab.id === "youtube") {
-                const ytLink = getYoutubeLinkForTopic(
-                  activeBoard?.title,
-                  activeChapter?.title,
-                  activeTopic?.title
-                );
-                if (!ytLink) return null;
-                
-                return (
-                  <a
-                    key={tab.id}
-                    href={ytLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pb-3 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-all border-transparent text-slate-550 hover:text-slate-900 dark:hover:text-slate-300"
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{tab.label}</span>
-                  </a>
-                );
-              }
-
               return (
                 <button
                   key={tab.id}
@@ -894,6 +884,53 @@ export const CourseLearningPage: React.FC = () => {
                         </div>
                       ))
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab: YouTube Link */}
+            {activeTab === "youtube" && (
+              <div className="p-5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl space-y-4 text-left">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div>
+                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                      <Youtube className="w-5 h-5 text-red-500" />
+                      <span>YouTube Topic Video Pipeline</span>
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                      Direct topic video lecture link for <strong className="text-slate-800 dark:text-slate-200">{activeTopic?.title}</strong> ({activeSubject?.title})
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const ytUrl = getYoutubeLinkForTopic(activeBoard?.title, activeChapter?.title, activeTopic?.title);
+                        navigator.clipboard.writeText(ytUrl);
+                        setCopiedYtUrl(true);
+                        setTimeout(() => setCopiedYtUrl(false), 2000);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      {copiedYtUrl ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedYtUrl ? "Copied!" : "Copy URL"}</span>
+                    </button>
+
+                    <a
+                      href={getYoutubeLinkForTopic(activeBoard?.title, activeChapter?.title, activeTopic?.title)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-md shadow-red-600/20"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open on YouTube ↗</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-white dark:bg-slate-950/70 rounded-xl border border-slate-200 dark:border-white/5 font-mono text-xs text-slate-700 dark:text-slate-300 break-all flex items-center justify-between gap-3">
+                  <span>{getYoutubeLinkForTopic(activeBoard?.title, activeChapter?.title, activeTopic?.title)}</span>
                 </div>
               </div>
             )}
