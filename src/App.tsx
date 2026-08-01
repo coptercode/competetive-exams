@@ -35,6 +35,7 @@ import { AdminPortal } from "./components/AdminPortal";
 import { AITutor } from "./components/AITutor";
 import { SubmissionsPage } from "./components/SubmissionsPage";
 import { StudentGradesPage } from "./components/StudentGradesPage";
+import { RoomContainer } from "./components/LiveClass/RoomContainer";
 import { SimulatedLiveMeeting } from "./components/LiveClass/SimulatedLiveMeeting";
 import { getApiBaseUrl } from "./utils/apiBase";
 import { NotesResourcesPage } from "./components/NotesResourcesPage";
@@ -1113,7 +1114,7 @@ function App() {
         if (!liveRoomState) {
           return <RoomJoinFallback />;
         }
-        return <SimulatedLiveMeeting roomName={liveRoomState.roomName} participantName={liveRoomState.participantName} isTeacher={liveRoomState.isTeacher} />;
+        return <RoomContainer roomName={liveRoomState.roomName} participantName={liveRoomState.participantName} isTeacher={liveRoomState.isTeacher} />;
       case "digital-notes":
         return <DigitalNotesStudio />;
       case "forgot-password":
