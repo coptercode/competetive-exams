@@ -5,7 +5,7 @@ import { requireAuth } from '../middleware/auth.js';
 const router = Router();
 
 router.get('/topics/:topicId/videos', async (req, res) => {
-  const { topicId } = req.params;
+  const topicId = req.params.topicId as string;
   let videos = await prisma.courseVideo.findMany({
     where: { topicId },
     orderBy: { sortOrder: 'asc' },
@@ -40,7 +40,7 @@ router.get('/topics/:topicId/videos', async (req, res) => {
 
 // Update or set a topic's YouTube video URL
 router.post('/topics/:topicId/youtube', requireAuth, async (req, res) => {
-  const { topicId } = req.params;
+  const topicId = req.params.topicId as string;
   const { youtubeUrl, title } = req.body;
 
   if (!youtubeUrl) {
@@ -83,16 +83,18 @@ router.post('/topics/:topicId/youtube', requireAuth, async (req, res) => {
 });
 
 router.get('/topics/:topicId/notes', async (req, res) => {
+  const topicId = req.params.topicId as string;
   const notes = await prisma.courseNote.findMany({
-    where: { topicId: req.params.topicId },
+    where: { topicId },
     orderBy: { sortOrder: 'asc' },
   });
   res.json(notes);
 });
 
 router.get('/topics/:topicId/resources', async (req, res) => {
+  const topicId = req.params.topicId as string;
   const resources = await prisma.courseResource.findMany({
-    where: { topicId: req.params.topicId },
+    where: { topicId },
     orderBy: { sortOrder: 'asc' },
   });
   res.json(resources);

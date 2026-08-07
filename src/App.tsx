@@ -1100,6 +1100,7 @@ function App() {
       case "admin-structure":
       case "admin-analytics":
       case "admin-upload":
+      case "admin-mock-tests":
       case "admin-users":
       case "admin-teachers":
       case "admin-add-teacher":

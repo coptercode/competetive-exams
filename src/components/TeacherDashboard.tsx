@@ -25,6 +25,8 @@ import {
   X,
   ShieldCheck,
   MessageSquare,
+  Trophy,
+  AlertCircle,
 } from "lucide-react";
 import { getISTDate } from "../utils/dateUtils";
 
@@ -80,14 +82,158 @@ export const TeacherDashboard: React.FC = () => {
     }
   };
 
+  // Instructor Mock Test Creation State
+  const [mockTestTitle, setMockTestTitle] = useState("");
+  const [mockTestDuration, setMockTestDuration] = useState("60");
+  const [mockTestCategory, setMockTestCategory] = useState("Engineering");
+  const [mockTestStartTime, setMockTestStartTime] = useState("");
+  const [mockTestEndTime, setMockTestEndTime] = useState("");
+  const [mockTestSubmitting, setMockTestSubmitting] = useState(false);
+  const [instructorTestsStatus, setInstructorTestsStatus] = useState<any[]>([]);
+
+  const fetchInstructorMockTests = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/quizzes/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setInstructorTestsStatus(data.quizzes || []);
+      }
+    } catch (e) {
+      console.warn("Failed fetching instructor mock tests", e);
+    }
+  };
+
+  const handleAssignMockTest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mockTestTitle) return;
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+
+    setMockTestSubmitting(true);
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/quizzes/create`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: mockTestTitle,
+          timeLimitMinutes: Number(mockTestDuration) || 60,
+          testCategory: mockTestCategory,
+          testType: "Full-Length Test",
+          scheduledStartTime: mockTestStartTime ? new Date(mockTestStartTime).toISOString() : undefined,
+          scheduledEndTime: mockTestEndTime ? new Date(mockTestEndTime).toISOString() : undefined,
+        })
+      });
+      if (res.ok) {
+        alert("Mock Test assigned successfully! Submitted to Super Admin for approval before publishing to candidates.");
+        setMockTestTitle("");
+        setMockTestStartTime("");
+        setMockTestEndTime("");
+        fetchInstructorMockTests();
+      } else {
+        alert("Failed to assign mock test.");
+      }
+    } catch (err) {
+      alert("Network error assigning mock test.");
+    } finally {
+      setMockTestSubmitting(false);
+    }
+  };
+
+  // Daily Test & Task State
+  const [dailyTaskTitle, setDailyTaskTitle] = useState("");
+  const [dailyTaskDesc, setDailyTaskDesc] = useState("");
+  const [dailyTaskType, setDailyTaskType] = useState("Daily Test");
+  const [dailyTaskDueDate, setDailyTaskDueDate] = useState("");
+  const [assignTaskScope, setAssignTaskScope] = useState<"ALL" | "INDIVIDUAL">("ALL");
+  const [selectedStudentIdForTask, setSelectedStudentIdForTask] = useState<string>("");
+  const [enrolledStudentRoster, setEnrolledStudentRoster] = useState<{ id: string; name: string; email: string; batch: string }[]>([]);
+  const [dailyTaskSubmitting, setDailyTaskSubmitting] = useState(false);
+
+  const fetchStudentRoster = async () => {
+    try {
+      const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+      if (!token) return;
+      const res = await fetch(`${getApiBaseUrl()}/api/students/roster`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.students && data.students.length > 0) {
+          setEnrolledStudentRoster(data.students);
+        }
+      }
+    } catch {}
+  };
+
+  const handleCreateDailyTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dailyTaskTitle) return;
+    if (assignTaskScope === "INDIVIDUAL" && !selectedStudentIdForTask) {
+      alert("Please select an individual target candidate.");
+      return;
+    }
+    const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+    if (!token) return;
+
+    setDailyTaskSubmitting(true);
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/tasks/create`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: dailyTaskTitle,
+          description: dailyTaskDesc,
+          targetBatch: formData.classLevel,
+          studentId: assignTaskScope === "INDIVIDUAL" ? selectedStudentIdForTask : null,
+          instructorName: profile.name || "Faculty Lead",
+          dueDate: dailyTaskDueDate || "Today",
+          taskType: dailyTaskType,
+        }),
+      });
+      if (res.ok) {
+        const targetName = enrolledStudentRoster.find(s => s.id === selectedStudentIdForTask)?.name || 'selected candidate';
+        const targetText = assignTaskScope === "INDIVIDUAL"
+          ? `assigned individually to ${targetName}`
+          : `assigned to all candidates in ${formData.classLevel}`;
+        alert(`Direct Assignment Successful! ${dailyTaskType} "${dailyTaskTitle}" ${targetText}.`);
+        setDailyTaskTitle("");
+        setDailyTaskDesc("");
+        setDailyTaskDueDate("");
+        setSelectedStudentIdForTask("");
+      } else {
+        alert("Failed to assign daily task.");
+      }
+    } catch {
+      alert("Network error creating daily task.");
+    } finally {
+      setDailyTaskSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudentRoster();
+  }, []);
+
   useEffect(() => {
     fetchMeetings();
     fetchNotesCount();
     fetchAssignments();
+    fetchInstructorMockTests();
     const interval = setInterval(() => {
       fetchMeetings();
       fetchNotesCount();
       fetchAssignments();
+      fetchInstructorMockTests();
     }, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -469,9 +615,246 @@ export const TeacherDashboard: React.FC = () => {
                 type="submit"
                 className="w-full py-3 rounded-xl bg-brand-royal hover:bg-brand-royal-dark text-white font-bold uppercase tracking-wider shadow-md"
               >
-                Schedule & Notify Candidates
+                Schedule &amp; Notify Candidates
               </button>
             </form>
+          </div>
+
+          {/* Assign Daily Test & Practice Task Card (Direct Activation) */}
+          <div className="glass-card p-6 rounded-3xl border border-emerald-500/30 bg-emerald-500/5 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-black text-slate-900 dark:text-white font-display flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                Assign Daily Test &amp; Task
+              </h3>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[9px] font-black uppercase">
+                Direct Active
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Assign daily practice drills, homework tasks, or topic quizzes directly to candidates. Activates immediately on student dashboard.
+            </p>
+
+            <form onSubmit={handleCreateDailyTask} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                  Target Candidate Scope
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAssignTaskScope("ALL")}
+                    className={`py-2 px-3 rounded-xl border text-[11px] font-bold transition-all ${
+                      assignTaskScope === "ALL"
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                        : "bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10"
+                    }`}
+                  >
+                    All Candidates in Batch
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAssignTaskScope("INDIVIDUAL")}
+                    className={`py-2 px-3 rounded-xl border text-[11px] font-bold transition-all ${
+                      assignTaskScope === "INDIVIDUAL"
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                        : "bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10"
+                    }`}
+                  >
+                    Individual Student
+                  </button>
+                </div>
+              </div>
+
+              {assignTaskScope === "INDIVIDUAL" && (
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    Select Candidate
+                  </label>
+                  <select
+                    value={selectedStudentIdForTask}
+                    onChange={(e) => setSelectedStudentIdForTask(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-semibold focus:outline-none"
+                    required={assignTaskScope === "INDIVIDUAL"}
+                  >
+                    <option value="">-- Choose Candidate --</option>
+                    {enrolledStudentRoster.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({s.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                  Task / Daily Test Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Daily Practice Drill 14 - Electrostatics"
+                  value={dailyTaskTitle}
+                  onChange={(e) => setDailyTaskTitle(e.target.value)}
+                  className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    Task Type
+                  </label>
+                  <select
+                    value={dailyTaskType}
+                    onChange={(e) => setDailyTaskType(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none"
+                  >
+                    <option value="Daily Test">Daily Test</option>
+                    <option value="Practice Drill">Practice Drill</option>
+                    <option value="Revision Task">Revision Task</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    Due Date
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Today, 6:00 PM"
+                    value={dailyTaskDueDate}
+                    onChange={(e) => setDailyTaskDueDate(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={dailyTaskSubmitting}
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-wider shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{dailyTaskSubmitting ? "Assigning..." : "Assign Directly to Candidates"}</span>
+              </button>
+            </form>
+          </div>
+
+          {/* Assign Mock Test (Requires Admin Approval) Card */}
+          <div className="glass-card p-6 rounded-3xl border border-amber-500/30 bg-amber-500/5 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-black text-slate-900 dark:text-white font-display flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-500" />
+                Assign Mock Test
+              </h3>
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[9px] font-black uppercase">
+                Admin Approval Req.
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Create a batch mock test with fixed duration (30m, 1h, 1.5h, 3h). Submitted test will be reviewed &amp; approved by Super Admin.
+            </p>
+
+            <form onSubmit={handleAssignMockTest} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                  Mock Test Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. NEET 2026 Physics Diagnostic Mock Test"
+                  value={mockTestTitle}
+                  onChange={(e) => setMockTestTitle(e.target.value)}
+                  className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    Fixed Duration Interval
+                  </label>
+                  <select
+                    value={mockTestDuration}
+                    onChange={(e) => setMockTestDuration(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none"
+                  >
+                    <option value="30">30 Mins (Half Hour)</option>
+                    <option value="60">60 Mins (1 Hour)</option>
+                    <option value="90">90 Mins (1.5 Hours)</option>
+                    <option value="180">180 Mins (3 Hours)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    Exam Category
+                  </label>
+                  <select
+                    value={mockTestCategory}
+                    onChange={(e) => setMockTestCategory(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none"
+                  >
+                    <option value="Engineering">Engineering (JEE)</option>
+                    <option value="Medical">Medical (NEET)</option>
+                    <option value="Civil Services">Civil Services (UPSC)</option>
+                    <option value="TNPSC">TNPSC Group 1/2</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Start Time (Opt)</label>
+                  <input
+                    type="datetime-local"
+                    value={mockTestStartTime}
+                    onChange={(e) => setMockTestStartTime(e.target.value)}
+                    className="w-full p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">End Time (Opt)</label>
+                  <input
+                    type="datetime-local"
+                    value={mockTestEndTime}
+                    onChange={(e) => setMockTestEndTime(e.target.value)}
+                    className="w-full p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-[11px]"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={mockTestSubmitting}
+                className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black uppercase tracking-wider shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Trophy className="w-4 h-4" />
+                <span>{mockTestSubmitting ? "Submitting..." : "Assign & Submit to Admin"}</span>
+              </button>
+            </form>
+
+            {/* Instructor Mock Tests Status Feed */}
+            {instructorTestsStatus.length > 0 && (
+              <div className="pt-3 border-t border-slate-200 dark:border-white/10 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Your Created Mock Tests</span>
+                <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                  {instructorTestsStatus.slice(0, 4).map((t) => (
+                    <div key={t.id} className="p-2 rounded-xl bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 flex items-center justify-between text-[11px]">
+                      <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">{t.title}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${t.approvalStatus === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-600' : t.approvalStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600'}`}>
+                        {t.approvalStatus || 'APPROVED'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

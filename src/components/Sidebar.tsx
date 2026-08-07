@@ -55,6 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const superAdminLinks = [
     { id: "admin-analytics", label: "Super Admin Control", icon: BarChart3 },
+    { id: "admin-upload", label: "Video & Notes Management", icon: Upload },
+    { id: "admin-mock-tests", label: "Mock Test Approvals & Control", icon: Trophy },
     { id: "digital-notes", label: "Digital Notes & Canvas", icon: Edit3 },
     { id: "admin-structure", label: "Exam Categories & Batches", icon: BookOpen },
     { id: "admin-users", label: "Candidates Registry", icon: Users },

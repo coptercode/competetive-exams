@@ -22,14 +22,20 @@ import notesRoutes from './routes/notes.js';
 import profileRoutes from './routes/profile.js';
 import { runChapterLockMigration } from './lib/chapter-lock-migration.js';
 import { runCandidateProfileMigration } from './lib/candidate-profile-migration.js';
+import { runMockTestMigration } from './lib/mock-test-migration.js';
+import { ensureCompetitiveExamsSeeded } from './lib/academic-seeder.js';
+import { runChapterAccessMigration } from './lib/chapter-access-migration.js';
 
 // Start the database if it is not already running
 await startDatabase();
 
-// Apply schema migrations (safe/idempotent)
+// Apply schema migrations & dynamic database seeder (safe/idempotent)
 try {
   await runChapterLockMigration();
   await runCandidateProfileMigration();
+  await runMockTestMigration();
+  await runChapterAccessMigration();
+  await ensureCompetitiveExamsSeeded();
 } catch (err: any) {
   console.log('[db] Dynamic migrations will run on active database connection.');
 }

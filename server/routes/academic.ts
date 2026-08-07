@@ -132,4 +132,67 @@ router.get('/classes/:classId/structure', async (req, res) => {
   res.json(mapClassLevel(classLevel));
 });
 
+// POST Admin grant / revoke instructor chapter upload permission
+router.post('/admin/instructors/chapter-access', async (req: any, res: any) => {
+  try {
+    const { instructorId, chapterId, isAllowed } = req.body;
+    if (!instructorId || !chapterId) {
+      return res.status(400).json({ error: 'instructorId and chapterId are required' });
+    }
+
+    if (isAllowed) {
+      await (prisma as any).$executeRawUnsafe(`
+        INSERT INTO instructor_chapter_access (instructor_id, chapter_id)
+        VALUES ($1, $2)
+        ON CONFLICT (instructor_id, chapter_id) DO NOTHING;
+      `, instructorId, chapterId);
+    } else {
+      await (prisma as any).$executeRawUnsafe(`
+        DELETE FROM instructor_chapter_access
+        WHERE instructor_id = $1 AND chapter_id = $2;
+      `, instructorId, chapterId);
+    }
+
+    return res.json({ success: true, instructorId, chapterId, isAllowed });
+  } catch (err: any) {
+    console.error('Failed toggling instructor chapter access:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET Admin fetch instructor allowed chapter IDs
+router.get('/admin/instructors/:instructorId/chapter-access', async (req: any, res: any) => {
+  try {
+    const instructorId = req.params.instructorId;
+    const records: any[] = await (prisma as any).$queryRawUnsafe(`
+      SELECT chapter_id as "chapterId" FROM instructor_chapter_access WHERE instructor_id = $1;
+    `, instructorId).catch(() => []);
+
+    return res.json({ success: true, allowedChapterIds: records.map(r => r.chapterId) });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET Instructor fetch their own allowed chapter IDs
+router.get('/instructor/allowed-chapters', optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.auth?.userId;
+    const role = req.auth?.role;
+
+    if (!userId || role === 'ADMIN') {
+      const allChapters = await prisma.chapter.findMany({ select: { id: true } });
+      return res.json({ success: true, allowedChapterIds: allChapters.map(c => c.id), isFullAdmin: true });
+    }
+
+    const records: any[] = await (prisma as any).$queryRawUnsafe(`
+      SELECT chapter_id as "chapterId" FROM instructor_chapter_access WHERE instructor_id = $1;
+    `, userId).catch(() => []);
+
+    return res.json({ success: true, allowedChapterIds: records.map(r => r.chapterId), isFullAdmin: false });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

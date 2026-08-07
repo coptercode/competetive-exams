@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Tv,
   FileText,
+  MessageSquare,
 } from "lucide-react";
 import { getISTDate } from "../utils/dateUtils";
 import { getApiBaseUrl } from "../utils/apiBase";
@@ -73,6 +74,41 @@ export const StudentDashboard: React.FC = () => {
     activeCategory?.classes?.[0];
 
   const [dbMeetings, setDbMeetings] = useState<any[]>([]);
+  const [recentNotes, setRecentNotes] = useState<any[]>([]);
+  const [recentVideos, setRecentVideos] = useState<any[]>([]);
+  const [availableQuizzes, setAvailableQuizzes] = useState<any[]>([]);
+  const [detailedReport, setDetailedReport] = useState<any | null>(null);
+
+  const fetchDetailedReport = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token || !profile.id) return;
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/students/${profile.id}/detailed-report`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.report) setDetailedReport(data.report);
+      }
+    } catch (e) {
+      console.warn("Failed fetching student report", e);
+    }
+  };
+
+  const handleToggleTask = async (taskId: string, currentCompleted: boolean) => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+    try {
+      await fetch(`${getApiBaseUrl()}/api/tasks/${taskId}/complete`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ isCompleted: !currentCompleted }),
+      });
+      fetchDetailedReport();
+    } catch (e) {
+      console.warn("Failed to toggle task", e);
+    }
+  };
 
   useEffect(() => {
     const fetchDbMeetings = async () => {
@@ -95,10 +131,38 @@ export const StudentDashboard: React.FC = () => {
         console.warn("Failed fetching db live classes for candidate:", err);
       }
     };
+
+    const fetchMaterials = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) return;
+      fetch(`${getApiBaseUrl()}/api/upload/notes/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((d) => setRecentNotes(d.notes || []))
+        .catch(() => {});
+
+      fetch(`${getApiBaseUrl()}/api/upload/videos/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((d) => setRecentVideos(d.videos || []))
+        .catch(() => {});
+
+      fetch(`${getApiBaseUrl()}/api/quizzes/candidate/available`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((d) => setAvailableQuizzes(d.quizzes || []))
+        .catch(() => {});
+    };
+
     fetchDbMeetings();
+    fetchMaterials();
+    fetchDetailedReport();
     const interval = setInterval(fetchDbMeetings, 5000);
     return () => clearInterval(interval);
-  }, [activeBatch?.title]);
+  }, [activeBatch?.title, profile.id]);
 
   // Derived Candidate Performance Stats
   const totalAttemptedMockTests = quizResults.length;
@@ -342,10 +406,207 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Uploaded Study Notes & Recorded Video Lectures for Candidate */}
+      <div className="glass-card p-6 rounded-[32px] border border-slate-200 dark:border-white/10 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-brand-royal/10 text-brand-royal dark:text-blue-400 border border-brand-royal/20">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                Batch Video Lectures & Study Notes
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Uploaded by your faculty and program admins for {activeBatch?.title || "your batch"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setView("teacher-uploaded-notes")}
+            className="text-xs font-extrabold text-brand-royal dark:text-blue-400 hover:underline flex items-center gap-1"
+          >
+            <span>View All Materials</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Notes Card List */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-emerald-500" />
+                Latest Study Notes & PDFs ({recentNotes.length})
+              </span>
+            </div>
+            {recentNotes.length === 0 ? (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No study notes uploaded yet for your class.</p>
+            ) : (
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                {recentNotes.slice(0, 5).map((note) => (
+                  <div key={note.id} className="p-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{note.title}</p>
+                      <p className="text-[10px] text-slate-500">By {note.uploadedByName || "Faculty"} • {note.subjectTitle}</p>
+                    </div>
+                    <a
+                      href={note.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] hover:bg-emerald-500/20 whitespace-nowrap shrink-0"
+                    >
+                      Open PDF
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Videos Card List */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <Tv className="w-4 h-4 text-brand-royal" />
+                Recorded Video Lectures ({recentVideos.length})
+              </span>
+            </div>
+            {recentVideos.length === 0 ? (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No video lectures uploaded yet for your class.</p>
+            ) : (
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                {recentVideos.slice(0, 5).map((vid) => (
+                  <div key={vid.id} className="p-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{vid.title}</p>
+                      <p className="text-[10px] text-slate-500">{vid.subjectTitle} • {Math.round((vid.duration || 600) / 60)} mins</p>
+                    </div>
+                    {vid.videoUrl && vid.videoUrl.startsWith("http") ? (
+                      <a
+                        href={vid.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 rounded-lg bg-brand-royal/10 text-brand-royal dark:text-blue-400 font-bold text-[10px] hover:bg-brand-royal/20 whitespace-nowrap shrink-0"
+                      >
+                        Watch Video
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() => setView("course-view")}
+                        className="px-2.5 py-1 rounded-lg bg-brand-royal/10 text-brand-royal dark:text-blue-400 font-bold text-[10px] hover:bg-brand-royal/20 whitespace-nowrap shrink-0"
+                      >
+                        Watch Video
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Main Content Area Grid: Today's Plan & Performance Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2 Cols): Today's Study Plan & Enrolled Exam Programs */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Detailed Performance & Academic Analysis Report */}
+          {detailedReport && (
+            <div className="glass-glow-card box-backlight-purple p-6 sm:p-7 rounded-[32px] border border-purple-500/30 space-y-5 shadow-2xl">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30">
+                    <Award className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white font-display">
+                      Detailed Academic &amp; Performance Report
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                      Instructor Assessment, Daily Activity &amp; Assignment Evaluations
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3.5 py-1.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-300 text-[11px] font-black uppercase tracking-wider border border-purple-500/20">
+                  Target: {detailedReport.candidateInfo?.targetExam || 'JEE Main & TNPSC'}
+                </span>
+              </div>
+
+              {/* Grid 1: Performance Summary Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Tests Attempted</span>
+                  <p className="text-lg font-black text-slate-900 dark:text-white">{detailedReport.performanceMetrics?.totalTestsAttempted || 0}</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Accuracy Rate</span>
+                  <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{detailedReport.performanceMetrics?.accuracyRate || 90}%</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Estimated AIR</span>
+                  <p className="text-lg font-black text-amber-600 dark:text-amber-400">#{detailedReport.performanceMetrics?.estimatedAIR || 120}</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Total Study Time</span>
+                  <p className="text-lg font-black text-blue-600 dark:text-blue-400">{detailedReport.candidateInfo?.totalHoursSpent || 34.5} hrs</p>
+                </div>
+              </div>
+
+              {/* Instructor Daily Tasks & Assigned Tests */}
+              {detailedReport.assignedTasks && detailedReport.assignedTasks.length > 0 && (
+                <div className="space-y-2.5 pt-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <Target className="w-4 h-4 text-purple-500" /> Instructor Assigned Daily Tests &amp; Tasks
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {detailedReport.assignedTasks.map((t: any) => (
+                      <div key={t.id} className="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={t.isCompleted}
+                            onChange={() => handleToggleTask(t.id, t.isCompleted)}
+                            className="w-4 h-4 rounded text-purple-600 cursor-pointer"
+                          />
+                          <div>
+                            <p className={`text-xs font-bold ${t.isCompleted ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}`}>{t.title}</p>
+                            <p className="text-[10px] text-slate-500">{t.taskType} • Assigned by {t.instructorName} • Due {t.dueDate}</p>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${t.isCompleted ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}`}>
+                          {t.isCompleted ? 'Completed' : 'Pending'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Faculty Remarks & Feedback */}
+              {detailedReport.instructorRemarks && detailedReport.instructorRemarks.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <span className="text-xs font-black uppercase text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <MessageSquare className="w-4 h-4 text-blue-500" /> Faculty Reviews &amp; Recommendations
+                  </span>
+                  <div className="space-y-2">
+                    {detailedReport.instructorRemarks.slice(0, 3).map((r: any, idx: number) => (
+                      <div key={idx} className="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/5 text-xs space-y-1">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="font-extrabold text-brand-royal dark:text-blue-400">{r.instructorName || 'Faculty Mentor'}</span>
+                          <span className="text-slate-400">{r.date}</span>
+                        </div>
+                        <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">&ldquo;{r.text}&rdquo;</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Today's Study Plan Widget */}
           <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4">
             <div className="flex items-center justify-between">

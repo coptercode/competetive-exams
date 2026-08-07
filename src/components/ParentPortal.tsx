@@ -73,7 +73,7 @@ export const ParentPortal: React.FC = () => {
       {/* Welcome & Overview Header */}
       <div className="glass-card p-6 border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950/80 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
         <div className="absolute top-0 right-1/4 w-32 h-32 bg-brand-royal/10 blur-[80px] rounded-full" />
-        
+
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <div className="w-16 h-16 rounded-2xl bg-brand-royal flex items-center justify-center text-white shadow-lg shadow-brand-royal/20">
             <ShieldCheck className="w-8 h-8" />
@@ -122,7 +122,7 @@ export const ParentPortal: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Side (2 Columns): Academic Details & Timeline */}
         <div className="lg:col-span-2 space-y-6">
-          
+
           {/* Key Metrics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="glass-card p-4 border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950/40">
@@ -165,7 +165,7 @@ export const ParentPortal: React.FC = () => {
                 Total: {assignments.length}
               </span>
             </div>
-            
+
             {assignments.length === 0 ? (
               <p className="text-xs text-slate-600 dark:text-slate-500 py-6 text-center">No assignments published for this class.</p>
             ) : (
@@ -177,13 +177,12 @@ export const ParentPortal: React.FC = () => {
                       <p className="text-[10px] text-slate-500">Subject: {as.subjectTitle} • Deadline: {formatDeadlineIST(typeof as.deadline === 'string' ? as.deadline : as.dueDate || '')}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold border ${
-                        as.status === "Graded" 
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold border ${as.status === "Graded"
                           ? "bg-emerald-100 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
                           : as.status === "Submitted"
-                          ? "bg-blue-100 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/20 text-blue-700 dark:text-blue-400"
-                          : "bg-amber-100 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/20 text-amber-700 dark:text-amber-400"
-                      }`}>
+                            ? "bg-blue-100 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/20 text-blue-700 dark:text-blue-400"
+                            : "bg-amber-100 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/20 text-amber-700 dark:text-amber-400"
+                        }`}>
                         {as.status}
                       </span>
                       {as.grade && (
@@ -229,13 +228,12 @@ export const ParentPortal: React.FC = () => {
                         <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
                           Score: {r.score} / {totalQ}
                         </span>
-                        <span className={`text-[9px] font-bold ${
-                          pct >= 80 
-                            ? "text-emerald-500" 
-                            : pct >= 50 
-                            ? "text-amber-500" 
-                            : "text-red-500"
-                        }`}>
+                        <span className={`text-[9px] font-bold ${pct >= 80
+                            ? "text-emerald-500"
+                            : pct >= 50
+                              ? "text-amber-500"
+                              : "text-red-500"
+                          }`}>
                           {pct}% Match
                         </span>
                       </div>
@@ -249,7 +247,7 @@ export const ParentPortal: React.FC = () => {
 
         {/* Right Side (1 Column): Audit Log, Announcements, Message Coord */}
         <div className="space-y-6">
-          
+
           {/* Audit Log / Student Timeline */}
           <div className="glass-card p-5 border-slate-200 dark:border-white/5">
             <h3 className="text-xs font-bold text-slate-700 dark:text-slate-400 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-3 mb-4 flex items-center gap-2">
@@ -293,7 +291,7 @@ export const ParentPortal: React.FC = () => {
             <h3 className="text-xs font-bold text-slate-700 dark:text-slate-400 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-3 mb-4 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-brand-royal" /> Contact Class Coordinator
             </h3>
-            
+
             <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl mb-4">
               <div className="w-10 h-10 rounded-full bg-brand-violet/10 border border-brand-violet/20 flex items-center justify-center text-brand-violet font-bold text-sm">
                 TK

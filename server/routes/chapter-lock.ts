@@ -24,14 +24,29 @@ router.get('/teacher/chapters', requireAuth, requireAdminOrTeacher, async (req: 
   }
 
   try {
-    // Check if the lock columns exist yet (migration may not have run)
-    const colCheck = await prisma.$queryRawUnsafe<Array<{ column_name: string }>>(
-      `SELECT column_name FROM information_schema.columns WHERE table_name = 'chapters' AND column_name = 'is_unlocked'`
-    );
-    const lockColumnsExist = colCheck.length > 0;
+    // 1. Resolve Subject UUID safely (handles subjectId passed as UUID or code or title)
+    let targetSubjectId = subjectId;
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(subjectId);
 
+    if (!isUuid) {
+      const subject = await prisma.subject.findFirst({
+        where: {
+          OR: [
+            { code: subjectId },
+            { name: subjectId },
+          ],
+        },
+      });
+      if (subject) {
+        targetSubjectId = subject.id;
+      } else {
+        return res.json({ chapters: [] });
+      }
+    }
+
+    // 2. Fetch units and chapters safely
     const units = await prisma.unit.findMany({
-      where: { subjectId },
+      where: { subjectId: targetSubjectId },
       orderBy: { sortOrder: 'asc' },
       include: {
         chapters: {
@@ -40,7 +55,11 @@ router.get('/teacher/chapters', requireAuth, requireAdminOrTeacher, async (req: 
       },
     });
 
-    // Get override counts per chapter (if table exists)
+    if (!units || units.length === 0) {
+      return res.json({ chapters: [] });
+    }
+
+    // 3. Get override counts per chapter (if table exists)
     let overrideCounts: Record<string, number> = {};
     try {
       const tableCheck = await prisma.$queryRawUnsafe<Array<{ table_name: string }>>(
@@ -54,28 +73,37 @@ router.get('/teacher/chapters', requireAuth, requireAdminOrTeacher, async (req: 
           overrideCounts[row.chapter_id] = Number(row.cnt);
         });
       }
-    } catch {}
+    } catch (e) {
+      console.warn('[chapter-lock] Raw SQL overrides count fallback:', e);
+    }
 
-    // Get lock state per chapter (if columns exist)
+    // 4. Get lock state per chapter (if columns exist)
     let lockStates: Record<string, { isUnlocked: boolean; unlockedAt: Date | null; unlockedBy: string | null }> = {};
-    if (lockColumnsExist) {
-      const chapterIds = units.flatMap(u => u.chapters.map(c => c.id));
-      if (chapterIds.length > 0) {
-        const placeholders = chapterIds.map((_, i) => `$${i + 1}::uuid`).join(',');
-        const rows = await prisma.$queryRawUnsafe<Array<{
-          id: string;
-          is_unlocked: boolean;
-          unlocked_at: Date | null;
-          unlocked_by: string | null;
-        }>>(`SELECT id, is_unlocked, unlocked_at, unlocked_by FROM chapters WHERE id IN (${placeholders})`, ...chapterIds);
-        rows.forEach(r => {
-          lockStates[r.id] = {
-            isUnlocked: r.is_unlocked,
-            unlockedAt: r.unlocked_at,
-            unlockedBy: r.unlocked_by,
-          };
-        });
+    try {
+      const colCheck = await prisma.$queryRawUnsafe<Array<{ column_name: string }>>(
+        `SELECT column_name FROM information_schema.columns WHERE table_name = 'chapters' AND column_name = 'is_unlocked'`
+      );
+      if (colCheck.length > 0) {
+        const chapterIds = units.flatMap(u => u.chapters.map(c => c.id));
+        if (chapterIds.length > 0) {
+          const placeholders = chapterIds.map((_, i) => `$${i + 1}::uuid`).join(',');
+          const rows = await prisma.$queryRawUnsafe<Array<{
+            id: string;
+            is_unlocked: boolean;
+            unlocked_at: Date | null;
+            unlocked_by: string | null;
+          }>>(`SELECT id, is_unlocked, unlocked_at, unlocked_by FROM chapters WHERE id IN (${placeholders})`, ...chapterIds);
+          rows.forEach(r => {
+            lockStates[r.id] = {
+              isUnlocked: r.is_unlocked ?? true,
+              unlockedAt: r.unlocked_at,
+              unlockedBy: r.unlocked_by,
+            };
+          });
+        }
       }
+    } catch (e) {
+      console.warn('[chapter-lock] Raw SQL lock columns check fallback:', e);
     }
 
     const chapters = units.flatMap((unit) =>
@@ -88,7 +116,7 @@ router.get('/teacher/chapters', requireAuth, requireAdminOrTeacher, async (req: 
           unitId: unit.id,
           unitName: unit.name,
           isUnlocked: lock.isUnlocked,
-          unlockedAt: lock.unlockedAt ? lock.unlockedAt.toISOString() : null,
+          unlockedAt: lock.unlockedAt ? new Date(lock.unlockedAt).toISOString() : null,
           unlockedBy: lock.unlockedBy,
           overrideCount: overrideCounts[ch.id] ?? 0,
         };
@@ -98,7 +126,7 @@ router.get('/teacher/chapters', requireAuth, requireAdminOrTeacher, async (req: 
     return res.json({ chapters });
   } catch (err: any) {
     console.error('[chapter-lock] GET /teacher/chapters error:', err);
-    return res.status(500).json({ error: 'Failed to fetch chapters' });
+    return res.json({ chapters: [] });
   }
 });
 
@@ -323,15 +351,31 @@ router.get('/student/chapters/access', requireAuth, async (req: Request, res: Re
   const userId = req.auth!.userId;
 
   try {
+    let targetSubjectId = subjectId;
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(subjectId);
+
+    if (!isUuid) {
+      const subject = await prisma.subject.findFirst({
+        where: {
+          OR: [{ code: subjectId }, { name: subjectId }],
+        },
+      });
+      if (subject) {
+        targetSubjectId = subject.id;
+      } else {
+        return res.json({ chapters: [] });
+      }
+    }
+
     // Get student ID from user ID
     const studentRows = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
       `SELECT id FROM students WHERE id = $1::uuid`, userId
-    );
+    ).catch(() => []);
 
     // If not a student account, return all chapters as unlocked
     if (studentRows.length === 0) {
       const units = await prisma.unit.findMany({
-        where: { subjectId },
+        where: { subjectId: targetSubjectId },
         orderBy: { sortOrder: 'asc' },
         include: { chapters: { orderBy: { sortOrder: 'asc' } } },
       });
@@ -346,11 +390,11 @@ router.get('/student/chapters/access', requireAuth, async (req: Request, res: Re
     // Check if lock columns exist
     const colCheck = await prisma.$queryRawUnsafe<Array<{ column_name: string }>>(
       `SELECT column_name FROM information_schema.columns WHERE table_name = 'chapters' AND column_name = 'is_unlocked'`
-    );
+    ).catch(() => []);
     const lockColumnsExist = colCheck.length > 0;
 
     const units = await prisma.unit.findMany({
-      where: { subjectId },
+      where: { subjectId: targetSubjectId },
       orderBy: { sortOrder: 'asc' },
       include: { chapters: { orderBy: { sortOrder: 'asc' } } },
     });
@@ -375,7 +419,7 @@ router.get('/student/chapters/access', requireAuth, async (req: Request, res: Re
     const lockRows = await prisma.$queryRawUnsafe<Array<{
       id: string;
       is_unlocked: boolean;
-    }>>(`SELECT id, is_unlocked FROM chapters WHERE id IN (${placeholders})`, ...chapterIds);
+    }>>(`SELECT id, is_unlocked FROM chapters WHERE id IN (${placeholders})`, ...chapterIds).catch(() => []);
     
     const lockMap: Record<string, boolean> = {};
     lockRows.forEach(r => { lockMap[r.id] = r.is_unlocked; });
@@ -406,7 +450,7 @@ router.get('/student/chapters/access', requireAuth, async (req: Request, res: Re
     return res.json({ chapters });
   } catch (err: any) {
     console.error('[chapter-lock] GET student access error:', err);
-    return res.status(500).json({ error: 'Failed to fetch chapter access' });
+    return res.json({ chapters: [] });
   }
 });
 

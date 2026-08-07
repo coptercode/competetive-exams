@@ -548,6 +548,13 @@ model Quiz {
   testType            String   @default("Subject Test") @map("test_type") // Chapter Test, Subject Test, Full-Length Test, Daily Test, Weekly Test, Grand Test, PYQ Paper
   testCategory        String?  @map("test_category") // Engineering, Medical, Civil Services, TNPSC, Banking, SSC, Railway, Defence
   negativeMarkingRate Float    @default(0.25) @map("negative_marking_rate")
+  approvalStatus      String   @default("APPROVED") @map("approval_status")
+  rejectionReason     String?  @map("rejection_reason")
+  createdById         String?  @map("created_by_id") @db.Uuid
+  createdByName       String?  @map("created_by_name")
+  createdByRole       String?  @default("ADMIN") @map("created_by_role")
+  scheduledStartTime  DateTime? @map("scheduled_start_time")
+  scheduledEndTime    DateTime? @map("scheduled_end_time")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 

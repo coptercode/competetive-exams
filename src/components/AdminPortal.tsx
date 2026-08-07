@@ -52,6 +52,9 @@ import {
   Mail,
   Send,
   Brain,
+  Trophy,
+  Clock,
+  ShieldCheck,
 } from "lucide-react";
 
 const locationSuggestions = [
@@ -272,8 +275,8 @@ const ChaptersAccessTab: React.FC<{ subjectId: string }> = ({ subjectId }) => {
     setPanelSearch("");
     try {
       const data = await chapterLockAPI.getStudentOverrides(chapter.id);
-      setPanelStudents(data.students);
-      setPanelClassDefault(data.classWideDefault);
+      setPanelStudents(data.students || []);
+      setPanelClassDefault(Boolean(data.classWideDefault ?? data.classDefault ?? true));
     } catch (e: any) {
       showToast(e.message || "Failed to load students", false);
       setPanelChapter(null);
@@ -518,6 +521,457 @@ const ChaptersAccessTab: React.FC<{ subjectId: string }> = ({ subjectId }) => {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── AdminAuthHeaders Helper ────────────────────────────────────────────────
+const getAdminAuthHeaders = () => {
+  const token = localStorage.getItem("auth_token");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+// ─── AdminMockTestManager Component ──────────────────────────────────────────
+const AdminMockTestManager: React.FC = () => {
+  const [allQuizzes, setAllQuizzes] = useState<any[]>([]);
+  const [pendingQuizzes, setPendingQuizzes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"pending" | "all" | "create">("pending");
+  const [toastMsg, setToastMsg] = useState<{ text: string; ok: boolean } | null>(null);
+
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [previewQuiz, setPreviewQuiz] = useState<any | null>(null);
+
+  const [newTitle, setNewTitle] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [newSubjectId, setNewSubjectId] = useState("");
+  const [newTimeLimit, setNewTimeLimit] = useState("60");
+  const [newCustomTime, setNewCustomTime] = useState("");
+  const [newPassingScore, setNewPassingScore] = useState("40");
+  const [newTestType, setNewTestType] = useState("Full-Length Test");
+  const [newTestCategory, setNewTestCategory] = useState("Engineering");
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  const showToast = (text: string, ok: boolean) => {
+    setToastMsg({ text, ok });
+    setTimeout(() => setToastMsg(null), 4000);
+  };
+
+  const fetchQuizzes = async () => {
+    setLoading(true);
+    try {
+      const api = `${getApiBaseUrl()}/api`;
+      const [resAll, resPending] = await Promise.all([
+        fetch(`${api}/quizzes/all`, { headers: getAdminAuthHeaders() }),
+        fetch(`${api}/quizzes/pending`, { headers: getAdminAuthHeaders() }),
+      ]);
+      const dataAll = resAll.ok ? await resAll.json().catch(() => ({})) : {};
+      const dataPending = resPending.ok ? await resPending.json().catch(() => ({})) : {};
+
+      setAllQuizzes(dataAll.quizzes || []);
+      setPendingQuizzes(dataPending.quizzes || []);
+    } catch (e: any) {
+      showToast(e.message || "Failed to load mock tests", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const handleApprove = async (id: string, title: string) => {
+    try {
+      const api = `${getApiBaseUrl()}/api`;
+      const res = await fetch(`${api}/quizzes/${id}/approval`, {
+        method: "PATCH",
+        headers: getAdminAuthHeaders(),
+        body: JSON.stringify({ approvalStatus: "APPROVED" }),
+      });
+      if (res.ok) {
+        showToast(`Mock test "${title}" approved and published to candidates!`, true);
+        fetchQuizzes();
+      } else {
+        showToast("Failed to approve mock test", false);
+      }
+    } catch {
+      showToast("Network error approving mock test", false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectingId) return;
+    try {
+      const api = `${getApiBaseUrl()}/api`;
+      const res = await fetch(`${api}/quizzes/${rejectingId}/approval`, {
+        method: "PATCH",
+        headers: getAdminAuthHeaders(),
+        body: JSON.stringify({ approvalStatus: "REJECTED", rejectionReason: rejectReason }),
+      });
+      if (res.ok) {
+        showToast("Mock test declined and returned to instructor with feedback.", true);
+        setRejectingId(null);
+        setRejectReason("");
+        fetchQuizzes();
+      } else {
+        showToast("Failed to decline mock test", false);
+      }
+    } catch {
+      showToast("Network error declining mock test", false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!(await useUiStore.getState().showConfirm("Are you sure you want to delete this mock test?"))) return;
+    try {
+      const api = `${getApiBaseUrl()}/api`;
+      const res = await fetch(`${api}/quizzes/${id}`, { method: "DELETE", headers: getAdminAuthHeaders() });
+      if (res.ok) {
+        showToast("Mock test deleted successfully.", true);
+        fetchQuizzes();
+      }
+    } catch {
+      showToast("Failed to delete mock test", false);
+    }
+  };
+
+  const handleCreateMockTest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle) return showToast("Test title is required.", false);
+
+    const effectiveMinutes = newTimeLimit === "custom" ? Number(newCustomTime) || 60 : Number(newTimeLimit);
+    setCreating(true);
+
+    const payload = {
+      title: newTitle,
+      description: newDesc,
+      subjectId: newSubjectId || undefined,
+      timeLimitMinutes: effectiveMinutes,
+      passingScore: Number(newPassingScore) || 40,
+      testType: newTestType,
+      testCategory: newTestCategory,
+      scheduledStartTime: newStartTime ? new Date(newStartTime).toISOString() : undefined,
+      scheduledEndTime: newEndTime ? new Date(newEndTime).toISOString() : undefined,
+    };
+
+    try {
+      const api = `${getApiBaseUrl()}/api`;
+      const res = await fetch(`${api}/quizzes/create`, {
+        method: "POST",
+        headers: getAdminAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = res.ok ? await res.json().catch(() => ({})) : {};
+      if (res.ok) {
+        showToast(`Official Mock Test "${newTitle}" created and approved!`, true);
+        setNewTitle("");
+        setNewDesc("");
+        setNewStartTime("");
+        setNewEndTime("");
+        setActiveTab("all");
+        fetchQuizzes();
+      } else {
+        showToast(data.error || "Failed to create mock test", false);
+      }
+    } catch {
+      showToast("Failed to connect to server", false);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const formatDurationLabel = (mins: number) => {
+    if (mins === 30) return "30 Mins (Half Hour)";
+    if (mins === 60) return "60 Mins (1 Hour)";
+    if (mins === 90) return "90 Mins (1.5 Hours)";
+    if (mins === 180) return "180 Mins (3 Hours)";
+    return `${mins} Minutes`;
+  };
+
+  return (
+    <div className="space-y-6 animate-fade-in-up">
+      {/* Toast */}
+      {toastMsg && (
+        <div className={`p-4 rounded-2xl text-xs font-bold border flex items-center justify-between shadow-lg ${toastMsg.ok ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300" : "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-300"}`}>
+          <span>{toastMsg.text}</span>
+          <button onClick={() => setToastMsg(null)} className="text-xs opacity-70 hover:opacity-100">Dismiss</button>
+        </div>
+      )}
+
+      {/* Header Card */}
+      <div className="glass-glow-card p-6 rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-purple-500/10 space-y-2 shadow-2xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-md">
+                Admin Control
+              </span>
+              <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">
+                Official Mock Test Approval &amp; Time Interval Management
+              </span>
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white font-display mt-1">
+              Mock Test Approvals &amp; Exam Engine
+            </h2>
+            <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl">
+              Review instructor-submitted test papers, approve or decline tests, configure fixed time intervals (30 mins, 1 hr, 1.5 hrs, 3 hrs), and schedule exam windows for candidates.
+            </p>
+          </div>
+          <button onClick={fetchQuizzes} className="px-4 py-2 rounded-xl bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-xs font-bold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Sync Engine</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={() => setActiveTab("pending")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black border transition-all ${activeTab === "pending" ? "bg-amber-500 text-slate-950 border-amber-500 shadow-lg shadow-amber-500/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"}`}>
+          <AlertCircle className="w-4 h-4" />
+          <span>Pending Approvals ({pendingQuizzes.length})</span>
+        </button>
+        <button onClick={() => setActiveTab("all")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black border transition-all ${activeTab === "all" ? "bg-brand-royal text-white border-brand-royal shadow-lg shadow-brand-royal/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"}`}>
+          <Trophy className="w-4 h-4" />
+          <span>All Official Mock Tests ({allQuizzes.length})</span>
+        </button>
+        <button onClick={() => setActiveTab("create")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black border transition-all ${activeTab === "create" ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-600/20" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"}`}>
+          <Plus className="w-4 h-4" />
+          <span>Create Official Test</span>
+        </button>
+      </div>
+
+      {/* ── Pending Approvals Tab ── */}
+      {activeTab === "pending" && (
+        <div className="space-y-4">
+          {pendingQuizzes.length === 0 ? (
+            <div className="glass-card p-8 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">No Pending Mock Test Approvals</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                All instructor-submitted test papers have been reviewed and approved into the active candidate examination schedule.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {pendingQuizzes.map((q) => (
+                <div key={q.id} className="glass-card p-5 rounded-3xl border border-amber-500/30 bg-amber-500/5 space-y-4 shadow-xl">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-wider">
+                        Pending Admin Review
+                      </span>
+                      <h4 className="text-base font-black text-slate-900 dark:text-white mt-1.5">{q.title}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Created by Instructor: <strong>{q.createdByName || "Faculty Lead"}</strong>
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-xs font-black whitespace-nowrap">
+                      {formatDurationLabel(q.timeLimitMinutes || q.durationMinutes || 30)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-[11px] bg-white/70 dark:bg-slate-900/70 p-3 rounded-2xl border border-slate-200 dark:border-white/5">
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Category</span>
+                      <span className="font-extrabold text-slate-800 dark:text-slate-200">{q.testCategory || "Engineering"}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Questions</span>
+                      <span className="font-extrabold text-slate-800 dark:text-slate-200">{q.questions?.length || 10} Items</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Pass Score</span>
+                      <span className="font-extrabold text-slate-800 dark:text-slate-200">{q.passingScore || 40}%</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <button onClick={() => setPreviewQuiz(q)} className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200">
+                      Preview Questions
+                    </button>
+                    <button onClick={() => handleApprove(q.id, q.title)} className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-md">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Approve &amp; Publish</span>
+                    </button>
+                    <button onClick={() => setRejectingId(q.id)} className="px-3.5 py-2 rounded-xl bg-red-500/10 text-red-600 font-bold text-xs hover:bg-red-500/20 border border-red-500/20">
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── All Official Mock Tests Tab ── */}
+      {activeTab === "all" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {allQuizzes.map((q) => (
+            <div key={q.id} className="glass-card p-5 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4 shadow-lg hover:shadow-xl transition-all">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${q.approvalStatus === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : q.approvalStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-red-500/10 text-red-600 border border-red-500/20'}`}>
+                    {q.approvalStatus || 'APPROVED'}
+                  </span>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white mt-1.5 line-clamp-2">{q.title}</h4>
+                </div>
+                <button onClick={() => handleDelete(q.id)} className="p-1.5 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-[10px] uppercase font-bold">Fixed Duration:</span>
+                  <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-brand-royal" />
+                    {formatDurationLabel(q.timeLimitMinutes || q.durationMinutes || 30)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-[10px] uppercase font-bold">Total Attempts:</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{q.totalAttempts || 0} Candidates</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-[10px] uppercase font-bold">Average Score:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{q.avgScore || 78}%</span>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+                <span>By: {q.createdByName || "Admin"}</span>
+                <button onClick={() => setPreviewQuiz(q)} className="text-brand-royal dark:text-blue-400 font-bold hover:underline">
+                  Preview Paper
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Create Official Test Tab ── */}
+      {activeTab === "create" && (
+        <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-5 max-w-3xl">
+          <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
+            <Plus className="w-5 h-5 text-emerald-600" /> Publish Official Mock Test
+          </h3>
+          <form onSubmit={handleCreateMockTest} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Test Title</label>
+              <input type="text" placeholder="e.g. JEE Main 2026 Grand Mock Test 1" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} className="premium-input text-xs" required />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Description / Syllabus</label>
+              <textarea placeholder="e.g. Full Syllabus Physics &amp; Math mock test with negative marking" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} className="premium-input text-xs h-20 resize-none" />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Assigned Duration Interval</label>
+                <select value={newTimeLimit} onChange={(e) => setNewTimeLimit(e.target.value)} className="premium-input text-xs">
+                  <option value="30">30 Minutes (Half Hour)</option>
+                  <option value="60">60 Minutes (1 Hour)</option>
+                  <option value="90">90 Minutes (1.5 Hours)</option>
+                  <option value="180">180 Minutes (3 Hours)</option>
+                  <option value="custom">Custom Duration (Minutes)</option>
+                </select>
+              </div>
+
+              {newTimeLimit === "custom" && (
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Custom Minutes</label>
+                  <input type="number" min="5" max="300" placeholder="Minutes" value={newCustomTime} onChange={(e) => setNewCustomTime(e.target.value)} className="premium-input text-xs" required />
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Test Category</label>
+                <select value={newTestCategory} onChange={(e) => setNewTestCategory(e.target.value)} className="premium-input text-xs">
+                  <option value="Engineering">Engineering (JEE Main / Advanced)</option>
+                  <option value="Medical">Medical (NEET UG)</option>
+                  <option value="Civil Services">Civil Services (UPSC CSE)</option>
+                  <option value="TNPSC">TNPSC Group 1/2</option>
+                  <option value="Banking">Banking (SBI/IBPS PO)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Scheduled Start Time (Optional)</label>
+                <input type="datetime-local" value={newStartTime} onChange={(e) => setNewStartTime(e.target.value)} className="premium-input text-xs" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase">Scheduled End Time (Optional)</label>
+                <input type="datetime-local" value={newEndTime} onChange={(e) => setNewEndTime(e.target.value)} className="premium-input text-xs" />
+              </div>
+            </div>
+
+            <button type="submit" disabled={creating} className="w-full premium-btn-primary py-3 text-xs disabled:opacity-50 flex items-center justify-center gap-2">
+              {creating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              <span>{creating ? "Publishing Test…" : "Approve &amp; Publish Official Mock Test"}</span>
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Recline Modal */}
+      {rejectingId && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+            <h4 className="text-base font-black text-slate-900 dark:text-white">Decline Mock Test Request</h4>
+            <p className="text-xs text-slate-500">Provide feedback for the instructor explaining what changes or additions are required before resubmitting.</p>
+            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="e.g. Please add 5 more questions on Thermodynamics before resubmitting." className="w-full h-24 premium-input text-xs p-3 resize-none" />
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setRejectingId(null)} className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300">Cancel</button>
+              <button onClick={handleReject} className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700">Confirm Decline</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewQuiz && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3">
+              <div>
+                <h4 className="text-base font-black text-slate-900 dark:text-white">{previewQuiz.title}</h4>
+                <p className="text-xs text-slate-500">Duration: {formatDurationLabel(previewQuiz.timeLimitMinutes || 30)} • Questions: {previewQuiz.questions?.length || 0}</p>
+              </div>
+              <button onClick={() => setPreviewQuiz(null)} className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold">Close</button>
+            </div>
+            <div className="space-y-3">
+              {(previewQuiz.questions || []).map((q: any, idx: number) => (
+                <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-white/5 text-xs space-y-2">
+                  <p className="font-bold text-slate-900 dark:text-white">Q{idx + 1}. {q.question || q.questionText}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(q.options || []).map((opt: any, oIdx: number) => (
+                      <div key={oIdx} className={`p-2 rounded-lg border text-[11px] ${opt.isCorrect || oIdx === q.correctAnswerIndex ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300'}`}>
+                        {typeof opt === 'string' ? opt : (opt.optionText || opt.text)} {(opt.isCorrect || oIdx === q.correctAnswerIndex) && '✓'}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -910,6 +1364,68 @@ export const AdminPortal: React.FC = () => {
   const [newSubjectTitle, setNewSubjectTitle] = useState("");
   const [newSubjectColor, setNewSubjectColor] = useState("bg-indigo-600");
 
+  // ── instructor chapter access module ──
+  const [teacherUsers, setTeacherUsers] = useState<any[]>([]);
+  const [selectedTeacherId, setSelectedTeacherId] = useState("");
+  const [teacherAllowedChapterIds, setTeacherAllowedChapterIds] = useState<string[]>([]);
+  const [publishTargetScope, setPublishTargetScope] = useState<"ALL" | "INDIVIDUAL">("ALL");
+  const [targetStudentIdInput, setTargetStudentIdInput] = useState("");
+
+  const fetchTeacherUsers = async () => {
+    try {
+      const res = await fetch(`${API}/users`, { headers: authHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        const teachers = (data.users || []).filter((u: any) => u.role === "TEACHER");
+        setTeacherUsers(teachers);
+        if (teachers[0] && !selectedTeacherId) {
+          setSelectedTeacherId(teachers[0].id);
+        }
+      }
+    } catch {}
+  };
+
+  const fetchTeacherChapterAccess = async (teacherId: string) => {
+    if (!teacherId) return;
+    try {
+      const res = await fetch(`${API}/admin/instructors/${teacherId}/chapter-access`, { headers: authHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setTeacherAllowedChapterIds(data.allowedChapterIds || []);
+      }
+    } catch {}
+  };
+
+  const handleToggleTeacherChapterAccess = async (chapterId: string, currentAllowed: boolean) => {
+    if (!selectedTeacherId) return;
+    try {
+      const res = await fetch(`${API}/admin/instructors/chapter-access`, {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instructorId: selectedTeacherId,
+          chapterId,
+          isAllowed: !currentAllowed,
+        }),
+      });
+      if (res.ok) {
+        fetchTeacherChapterAccess(selectedTeacherId);
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (activeView === "admin-structure" || activeView === "admin-upload") {
+      fetchTeacherUsers();
+    }
+  }, [activeView]);
+
+  useEffect(() => {
+    if (selectedTeacherId) {
+      fetchTeacherChapterAccess(selectedTeacherId);
+    }
+  }, [selectedTeacherId]);
+
   // ── upload module ──
   const [uploadBoards, setUploadBoards] = useState<UploadBoard[]>([]);
   const [upBoardId, setUpBoardId] = useState("");
@@ -1087,16 +1603,30 @@ export const AdminPortal: React.FC = () => {
   };
 
   const handleDeleteNote = async (id: string) => {
+    if (!(await useUiStore.getState().showConfirm("Are you sure you want to remove this note/study material?"))) return;
     try {
-      await fetch(`${API}/upload/note/${id}`, { method: "DELETE", headers: authHeaders() });
-      setNotes((prev) => prev.filter((n) => n.id !== id));
+      const res = await fetch(`${API}/upload/note/${id}`, { method: "DELETE", headers: authHeaders() });
+      if (res.ok) {
+        setNotes((prev) => prev.filter((n) => n.id !== id));
+        showStatus("success", "Note deleted successfully!");
+      } else {
+        const d = await res.json();
+        showStatus("error", d.error || "Delete failed.");
+      }
     } catch { showStatus("error", "Delete failed."); }
   };
 
   const handleDeleteAssignment = async (id: string) => {
+    if (!(await useUiStore.getState().showConfirm("Are you sure you want to remove this assignment?"))) return;
     try {
-      await fetch(`${API}/upload/assignment/${id}`, { method: "DELETE", headers: authHeaders() });
-      setAssignments((prev) => prev.filter((a) => a.id !== id));
+      const res = await fetch(`${API}/upload/assignment/${id}`, { method: "DELETE", headers: authHeaders() });
+      if (res.ok) {
+        setAssignments((prev) => prev.filter((a) => a.id !== id));
+        showStatus("success", "Assignment deleted successfully!");
+      } else {
+        const d = await res.json();
+        showStatus("error", d.error || "Delete failed.");
+      }
     } catch { showStatus("error", "Delete failed."); }
   };
 
@@ -1135,9 +1665,16 @@ export const AdminPortal: React.FC = () => {
   };
 
   const handleDeleteVideo = async (id: string) => {
+    if (!(await useUiStore.getState().showConfirm("Are you sure you want to remove this video lecture?"))) return;
     try {
-      await fetch(`${API}/upload/video/${id}`, { method: "DELETE", headers: authHeaders() });
-      setVideos((prev) => prev.filter((v) => v.id !== id));
+      const res = await fetch(`${API}/upload/video/${id}`, { method: "DELETE", headers: authHeaders() });
+      if (res.ok) {
+        setVideos((prev) => prev.filter((v) => v.id !== id));
+        showStatus("success", "Video lecture deleted successfully!");
+      } else {
+        const d = await res.json();
+        showStatus("error", d.error || "Delete failed.");
+      }
     } catch { showStatus("error", "Delete failed."); }
   };
 
@@ -1394,6 +1931,75 @@ export const AdminPortal: React.FC = () => {
               )}
             </div>
           </div>
+            {/* Instructor Chapter Access Control Panel */}
+          <div className="lg:col-span-3 glass-card p-6 border-slate-200 dark:border-white/5 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-3">
+              <div>
+                <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-brand-royal" /> Instructor Chapter Access Control
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Grant or restrict specific chapter upload &amp; publishing permissions per individual instructor.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Select Instructor:</span>
+                <select
+                  value={selectedTeacherId}
+                  onChange={(e) => setSelectedTeacherId(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white"
+                >
+                  {teacherUsers.length === 0 ? (
+                    <option value="">No instructors registered</option>
+                  ) : (
+                    teacherUsers.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.firstName} {t.lastName} ({t.email})
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            </div>
+
+            {/* Chapter Permissions List */}
+            {activeClass?.subjects && activeClass.subjects.length > 0 ? (
+              <div className="space-y-4 pt-2">
+                {activeClass.subjects.map((sub) => (
+                  <div key={sub.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 space-y-3">
+                    <h5 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-indigo-500" /> {sub.title}
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                      {sub.chapters && sub.chapters.map((ch) => {
+                        const isAllowed = teacherAllowedChapterIds.includes(ch.id);
+                        return (
+                          <div
+                            key={ch.id}
+                            onClick={() => handleToggleTeacherChapterAccess(ch.id, isAllowed)}
+                            className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-3 text-xs ${
+                              isAllowed
+                                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold"
+                                : "bg-white/60 dark:bg-slate-900/40 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400"
+                            }`}
+                          >
+                            <span className="truncate">{ch.title}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase shrink-0 ${
+                              isAllowed ? "bg-emerald-500/20 text-emerald-600" : "bg-slate-200 dark:bg-slate-800 text-slate-500"
+                            }`}>
+                              {isAllowed ? "Permitted" : "Restricted"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 text-center py-4">Select a class &amp; subject to view constituent chapters and assign permissions.</p>
+            )}
+          </div>
         </div>
       )}
 
@@ -1466,12 +2072,10 @@ export const AdminPortal: React.FC = () => {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${uploadTab === "assignments" ? "bg-brand-royal text-white border-brand-royal shadow-md" : "bg-white dark:bg-slate-950 text-slate-600 border-slate-300 dark:border-white/10 hover:border-brand-royal/40"}`}>
               <FileText className="w-3.5 h-3.5" /> Assignments
             </button>
-            {profile?.role !== "teacher" && (
-              <button onClick={() => setUploadTab("videos")}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${uploadTab === "videos" ? "bg-brand-royal text-white border-brand-royal shadow-md" : "bg-white dark:bg-slate-950 text-slate-600 border-slate-300 dark:border-white/10 hover:border-brand-royal/40"}`}>
-                <Video className="w-3.5 h-3.5" /> Video Lectures
-              </button>
-            )}
+            <button onClick={() => setUploadTab("videos")}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${uploadTab === "videos" ? "bg-brand-royal text-white border-brand-royal shadow-md" : "bg-white dark:bg-slate-950 text-slate-600 border-slate-300 dark:border-white/10 hover:border-brand-royal/40"}`}>
+              <Video className="w-3.5 h-3.5" /> Video Lectures
+            </button>
             <button onClick={() => setUploadTab("chapters")}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${uploadTab === "chapters" ? "bg-emerald-600 text-white border-emerald-600 shadow-md" : "bg-white dark:bg-slate-950 text-slate-600 border-slate-300 dark:border-white/10 hover:border-emerald-500/40"}`}>
               <Lock className="w-3.5 h-3.5" /> Chapters Access
@@ -1668,8 +2272,8 @@ export const AdminPortal: React.FC = () => {
             </div>
           )}
 
-          {/* ── Videos Tab — hidden for teachers ─────────────────────────── */}
-          {uploadTab === "videos" && profile?.role !== "teacher" && (
+          {/* ── Videos Tab ─────────────────────────────────── */}
+          {uploadTab === "videos" && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Upload Video Form */}
@@ -1826,6 +2430,11 @@ export const AdminPortal: React.FC = () => {
             <ChaptersAccessTab subjectId={upSubjectId} />
           )}
         </div>
+      )}
+
+      {/* ── MOCK TEST MANAGEMENT & APPROVAL CONTROL ────────────────────── */}
+      {activeView === "admin-mock-tests" && (
+        <AdminMockTestManager />
       )}
 
       {/* ── ANALYTICS DASHBOARD ───────────────────────────────────────────── */}

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { mapQuizForFrontend } from '../lib/mappers.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, requireAdmin, requireAdminOrTeacher } from '../middleware/auth.js';
 import fs from 'fs';
 import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -670,6 +670,305 @@ router.get('/students/:studentId/quiz-results', requireAuth, async (req, res) =>
       incorrectAnswersDetails: [],
     }))
   );
+});
+
+// ─────────────────────────────────────────────
+// MOCK TEST MANAGEMENT & APPROVAL API ENDPOINTS
+// ─────────────────────────────────────────────
+
+// POST /api/quizzes/create - Create a mock test (Instructor -> PENDING, Admin -> APPROVED)
+router.post('/quizzes/create', requireAuth, requireAdminOrTeacher, async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      subjectId,
+      topicId,
+      timeLimitMinutes,
+      passingScore,
+      testType,
+      testCategory,
+      negativeMarkingRate,
+      scheduledStartTime,
+      scheduledEndTime,
+      questions,
+    } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+
+    // Resolve topicId if only subjectId provided
+    let targetTopicId = topicId;
+    if (!targetTopicId && subjectId) {
+      const topic = await prisma.topic.findFirst({
+        where: { chapter: { unit: { subjectId } } },
+        orderBy: { sortOrder: 'asc' },
+      });
+      if (topic) targetTopicId = topic.id;
+    }
+
+    if (!targetTopicId) {
+      const fallbackTopic = await prisma.topic.findFirst();
+      if (!fallbackTopic) {
+        return res.status(400).json({ error: 'No academic topic found in system to attach quiz' });
+      }
+      targetTopicId = fallbackTopic.id;
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: req.auth!.userId } });
+    const creatorName = user ? `${user.firstName} ${user.lastName}` : 'Faculty';
+    const isTeacher = req.auth!.role === 'TEACHER';
+    const approvalStatus = isTeacher ? 'PENDING' : 'APPROVED';
+
+    const quiz = await prisma.quiz.create({
+      data: {
+        title,
+        description: description || '',
+        topicId: targetTopicId,
+        timeLimitMinutes: Number(timeLimitMinutes) || 30,
+        passingScore: Number(passingScore) || 40,
+        testType: testType || 'Subject Test',
+        testCategory: testCategory || 'Engineering',
+        negativeMarkingRate: Number(negativeMarkingRate) || 0.25,
+        approvalStatus,
+        createdById: req.auth!.userId,
+        createdByName: creatorName,
+        createdByRole: isTeacher ? 'TEACHER' : 'ADMIN',
+        scheduledStartTime: scheduledStartTime ? new Date(scheduledStartTime) : null,
+        scheduledEndTime: scheduledEndTime ? new Date(scheduledEndTime) : null,
+      },
+    });
+
+    // Save questions & options if provided
+    if (Array.isArray(questions) && questions.length > 0) {
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const questionRecord = await prisma.quizQuestion.create({
+          data: {
+            quizId: quiz.id,
+            questionText: q.questionText || q.question || `Question ${i + 1}`,
+            questionType: q.questionType || 'MCQ',
+            marks: Number(q.marks) || 1.0,
+            negativeMarks: Number(q.negativeMarks) || 0.25,
+            explanation: q.explanation || '',
+            sortOrder: i,
+          },
+        });
+
+        const optionsList = Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'];
+        const correctIdx = Number(q.correctAnswerIndex ?? 0);
+
+        for (let j = 0; j < optionsList.length; j++) {
+          const optText = typeof optionsList[j] === 'string' ? optionsList[j] : (optionsList[j]?.text || `Option ${j + 1}`);
+          const isCorrect = typeof optionsList[j] === 'object' && optionsList[j].isCorrect !== undefined
+            ? optionsList[j].isCorrect
+            : j === correctIdx;
+
+          await prisma.quizOption.create({
+            data: {
+              questionId: questionRecord.id,
+              optionText: optText,
+              isCorrect: Boolean(isCorrect),
+              sortOrder: j,
+            },
+          });
+        }
+      }
+    }
+
+    // Send notifications
+    try {
+      if (isTeacher) {
+        // Notify admins of pending test review
+        const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
+        if (admins.length > 0) {
+          const dbNotif = await prisma.notification.create({
+            data: {
+              title: 'Mock Test Approval Required',
+              body: `Instructor ${creatorName} submitted a new mock test "${title}" (${quiz.timeLimitMinutes} mins). Review and approve.`,
+              type: 'SYSTEM',
+              data: { quizId: quiz.id },
+            },
+          });
+          await prisma.userNotification.createMany({
+            data: admins.map((a) => ({ userId: a.id, notificationId: dbNotif.id, isRead: false })),
+            skipDuplicates: true,
+          });
+        }
+      } else {
+        // Auto-approved Admin test -> notify candidates
+        const dbNotif = await prisma.notification.create({
+          data: {
+            title: 'New Mock Test Published',
+            body: `New ${quiz.testType} "${title}" (${quiz.timeLimitMinutes} mins duration) is now available!`,
+            type: 'ACADEMIC',
+            data: { quizId: quiz.id },
+          },
+        });
+        const students = await prisma.student.findMany();
+        if (students.length > 0) {
+          await prisma.userNotification.createMany({
+            data: students.map((s) => ({ userId: s.id, notificationId: dbNotif.id, isRead: false })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    } catch (notifErr) {
+      console.warn('Mock test notification error:', notifErr);
+    }
+
+    res.status(201).json({ success: true, quiz, message: isTeacher ? 'Mock Test submitted for Admin approval' : 'Mock Test published successfully' });
+  } catch (err: any) {
+    console.error('Failed to create mock test:', err);
+    res.status(500).json({ error: err.message || 'Failed to create mock test' });
+  }
+});
+
+// GET /api/quizzes/pending - List mock tests waiting for admin approval
+router.get('/quizzes/pending', requireAuth, requireAdmin, async (_req, res) => {
+  try {
+    const pendingQuizzes = await prisma.quiz.findMany({
+      where: { approvalStatus: 'PENDING' } as any,
+      include: {
+        questions: {
+          orderBy: { sortOrder: 'asc' },
+          include: { options: { orderBy: { sortOrder: 'asc' } } },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ quizzes: (pendingQuizzes as any[]).map(mapQuizForFrontend) });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch pending mock tests' });
+  }
+});
+
+// PATCH /api/quizzes/:id/approval - Admin approves or rejects an instructor mock test
+router.patch('/quizzes/:id/approval', requireAuth, requireAdmin, async (req, res) => {
+  const id = req.params.id as string;
+  const { approvalStatus, rejectionReason } = req.body as { approvalStatus: 'APPROVED' | 'REJECTED'; rejectionReason?: string };
+
+  if (!['APPROVED', 'REJECTED'].includes(approvalStatus)) {
+    return res.status(400).json({ error: 'Invalid approvalStatus' });
+  }
+
+  try {
+    const updated = await prisma.quiz.update({
+      where: { id },
+      data: {
+        approvalStatus,
+        rejectionReason: approvalStatus === 'REJECTED' ? rejectionReason || 'Needs revision' : null,
+      } as any,
+    }) as any;
+
+    // Notify instructor & candidates
+    try {
+      if (updated.createdById) {
+        await prisma.notification.create({
+          data: {
+            title: `Mock Test ${approvalStatus === 'APPROVED' ? 'Approved' : 'Declined'}`,
+            body: approvalStatus === 'APPROVED'
+              ? `Your mock test "${updated.title}" was approved by Admin and published to candidates.`
+              : `Your mock test "${updated.title}" was declined: ${rejectionReason || 'Needs adjustments'}.`,
+            type: 'ACADEMIC',
+            data: { quizId: updated.id },
+          },
+        }).then((n) =>
+          prisma.userNotification.create({
+            data: { userId: updated.createdById!, notificationId: n.id, isRead: false },
+          })
+        );
+      }
+
+      if (approvalStatus === 'APPROVED') {
+        const dbNotif = await prisma.notification.create({
+          data: {
+            title: 'New Official Mock Test Active',
+            body: `Official Mock Test "${updated.title}" (${updated.timeLimitMinutes} Mins Duration) is now active for your batch!`,
+            type: 'ACADEMIC',
+            data: { quizId: updated.id },
+          },
+        });
+        const students = await prisma.student.findMany();
+        if (students.length > 0) {
+          await prisma.userNotification.createMany({
+            data: students.map((s) => ({ userId: s.id, notificationId: dbNotif.id, isRead: false })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Failed sending approval notification:', e);
+    }
+
+    res.json({ success: true, quiz: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update quiz approval' });
+  }
+});
+
+// GET /api/quizzes/all - List all mock tests for admin/instructor overview
+router.get('/quizzes/all', requireAuth, async (req, res) => {
+  try {
+    const quizzes = (await prisma.quiz.findMany({
+      include: {
+        questions: {
+          orderBy: { sortOrder: 'asc' },
+          include: { options: { orderBy: { sortOrder: 'asc' } } },
+        },
+        attempts: { select: { id: true, score: true, passed: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    })) as any[];
+
+    const enriched = quizzes.map((q) => ({
+      ...mapQuizForFrontend(q),
+      approvalStatus: q.approvalStatus || 'APPROVED',
+      rejectionReason: q.rejectionReason,
+      createdByName: q.createdByName || 'Admin',
+      createdByRole: q.createdByRole || 'ADMIN',
+      totalAttempts: q.attempts ? q.attempts.length : 0,
+      avgScore: q.attempts && q.attempts.length > 0 ? Math.round(q.attempts.reduce((a: number, b: any) => a + b.score, 0) / q.attempts.length) : 0,
+      scheduledStartTime: q.scheduledStartTime,
+      scheduledEndTime: q.scheduledEndTime,
+    }));
+
+    res.json({ quizzes: enriched });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch quizzes' });
+  }
+});
+
+// GET /api/quizzes/candidate/available - List approved mock tests for candidate
+router.get('/quizzes/candidate/available', requireAuth, async (req, res) => {
+  try {
+    const approvedQuizzes = await prisma.quiz.findMany({
+      where: { approvalStatus: 'APPROVED' } as any,
+      include: {
+        questions: {
+          orderBy: { sortOrder: 'asc' },
+          include: { options: { orderBy: { sortOrder: 'asc' } } },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json({ quizzes: (approvedQuizzes as any[]).map(mapQuizForFrontend) });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch candidate mock tests' });
+  }
+});
+
+// DELETE /api/quizzes/:id - Delete a mock test
+router.delete('/quizzes/:id', requireAuth, requireAdminOrTeacher, async (req, res) => {
+  const id = req.params.id as string;
+  try {
+    await prisma.quiz.delete({ where: { id } });
+    res.json({ success: true, message: 'Mock test deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete mock test' });
+  }
 });
 
 export default router;

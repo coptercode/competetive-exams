@@ -200,6 +200,13 @@ router.post(
         },
       });
 
+      const { targetStudentId } = req.body as { targetStudentId?: string };
+      if (targetStudentId) {
+        await (prisma as any).$executeRawUnsafe(`
+          UPDATE course_notes SET target_student_id = $1 WHERE id = $2;
+        `, targetStudentId, note.id).catch(() => {});
+      }
+
       // Send database notifications to corresponding class students
       try {
         const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
@@ -729,6 +736,99 @@ router.get('/upload/videos', requireAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch videos' });
   }
 });
+
+// ─────────────────────────────────────────────
+//  DELETE /upload/video/:id
+// ─────────────────────────────────────────────
+router.delete('/upload/video/:id', requireAuth, requireAdminOrTeacher, async (req, res) => {
+  const id = req.params.id as string;
+  try {
+    const video = await prisma.courseVideo.findUnique({ where: { id } });
+    if (!video) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    if (video.videoUrl && !video.videoUrl.startsWith('http')) {
+      try {
+        const key = video.videoUrl.replace(/^\/uploads\//, '');
+        await deleteFromMinio(key);
+      } catch (err) {
+        console.warn('Failed to delete video file from storage:', err);
+      }
+    }
+    await prisma.courseVideo.delete({ where: { id } });
+    res.json({ success: true, message: 'Video deleted successfully' });
+  } catch (err) {
+    console.error('Failed to delete video:', err);
+    res.status(500).json({ error: 'Failed to delete video' });
+  }
+});
+
+// ─────────────────────────────────────────────
+//  GET /upload/videos/all
+//  List ALL videos for candidates or instructors
+// ─────────────────────────────────────────────
+router.get('/upload/videos/all', requireAuth, async (req, res) => {
+  try {
+    let whereClause: any = {};
+    if (req.auth?.role === 'STUDENT') {
+      const studentProfile = await prisma.student.findUnique({
+        where: { id: req.auth.userId }
+      });
+      if (studentProfile) {
+        whereClause = {
+          topic: {
+            chapter: {
+              unit: {
+                subject: {
+                  classId: studentProfile.classId,
+                  class: {
+                    boardId: studentProfile.boardId
+                  }
+                }
+              }
+            }
+          }
+        };
+      }
+    }
+
+    const videos = await prisma.courseVideo.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        topic: {
+          include: {
+            chapter: {
+              include: {
+                unit: {
+                  include: {
+                    subject: { select: { name: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const enriched = videos.map((v) => ({
+      id: v.id,
+      title: v.title,
+      videoUrl: v.videoUrl,
+      duration: v.duration,
+      drmEnabled: v.drmEnabled,
+      subjectTitle: v.topic?.chapter?.unit?.subject?.name || 'General',
+      createdAt: v.createdAt,
+    }));
+
+    res.json({ videos: enriched });
+  } catch (err) {
+    console.error('Failed to fetch all videos:', err);
+    res.status(500).json({ error: 'Failed to fetch videos' });
+  }
+});
+
 
 // ─────────────────────────────────────────────
 //  POST /upload/avatar

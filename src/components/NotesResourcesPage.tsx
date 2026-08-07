@@ -5,7 +5,7 @@ import { getBoardSyllabusPhrase } from "../utils/boardUtils";
 
 const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
   const titleLower = (subjectTitle || "").toLowerCase();
-  
+
   let imageUrl = "";
   let bgColor = "bg-white";
 
@@ -31,10 +31,10 @@ const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
   if (imageUrl) {
     return (
       <div className={`w-full aspect-[16/9] ${bgColor} relative flex items-center justify-center overflow-hidden rounded-t-xl border-b border-slate-100 dark:border-white/5 group`}>
-        <img 
-          src={imageUrl} 
-          alt={subjectTitle} 
-          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
+        <img
+          src={imageUrl}
+          alt={subjectTitle}
+          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
         />
         <span className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-white/10 text-[9px] font-extrabold text-slate-800 dark:text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1 z-10">
           <Sparkles className="w-2.5 h-2.5 text-brand-violet" />
@@ -55,7 +55,7 @@ const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
     <div className={`w-full aspect-[16/9] bg-gradient-to-br ${gradient} relative flex items-center justify-center overflow-hidden rounded-t-xl`}>
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="absolute -right-10 -bottom-10 w-28 h-28 rounded-full bg-white/10 blur-xl" />
-      
+
       <div className="relative z-10 p-3 bg-white/15 rounded-xl border border-white/25 shadow-lg">
         {icon}
       </div>
@@ -71,7 +71,7 @@ const SubjectCover: React.FC<{ subjectTitle: string }> = ({ subjectTitle }) => {
 const ChapterCover: React.FC<{ subjectTitle: string; chapterTitle: string }> = ({ subjectTitle, chapterTitle }) => {
   const sTitleLower = (subjectTitle || "").toLowerCase();
   const cTitleLower = (chapterTitle || "").toLowerCase();
-  
+
   let imageUrl = "";
   let bgColor = "bg-white";
 
@@ -97,10 +97,10 @@ const ChapterCover: React.FC<{ subjectTitle: string; chapterTitle: string }> = (
   if (imageUrl) {
     return (
       <div className={`w-full aspect-[4/3] ${bgColor} relative flex items-center justify-center overflow-hidden rounded-t-xl border-b border-slate-100 dark:border-white/5 group`}>
-        <img 
-          src={imageUrl} 
-          alt={chapterTitle} 
-          className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-105" 
+        <img
+          src={imageUrl}
+          alt={chapterTitle}
+          className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-105"
         />
         <span className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-white/10 text-[9px] font-extrabold text-slate-800 dark:text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10">
           Chapter Notes
@@ -129,7 +129,7 @@ const ChapterCover: React.FC<{ subjectTitle: string; chapterTitle: string }> = (
     <div className={`w-full aspect-[4/3] bg-gradient-to-br ${gradient} relative flex items-center justify-center overflow-hidden rounded-t-xl`}>
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="absolute -right-10 -bottom-10 w-28 h-28 rounded-full bg-white/10 blur-xl" />
-      
+
       <div className="relative z-10 p-3 bg-white/15 rounded-xl border border-white/25 shadow-lg">
         {icon}
       </div>
@@ -181,11 +181,11 @@ export const NotesResourcesPage: React.FC = () => {
   const selectedSubject = subjects.find((s) => s.id === selectedSubjectFilter);
   const chaptersOfSubject = selectedSubject && selectedSubject.chapters
     ? selectedSubject.chapters.map((chap) => ({
-        ...chap,
-        subjectId: selectedSubject.id,
-        subjectTitle: selectedSubject.title,
-        subjectColor: selectedSubject.color,
-      }))
+      ...chap,
+      subjectId: selectedSubject.id,
+      subjectTitle: selectedSubject.title,
+      subjectColor: selectedSubject.color,
+    }))
     : [];
 
   const filteredChapters = chaptersOfSubject.filter((chap) => {
@@ -266,17 +266,16 @@ export const NotesResourcesPage: React.FC = () => {
           <button
             key={mType}
             onClick={() => setSelectedMaterialType(mType)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-              selectedMaterialType === mType
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${selectedMaterialType === mType
                 ? "bg-brand-royal text-white border-brand-royal shadow-sm"
                 : "bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
-            }`}
+              }`}
           >
             {mType}
           </button>
         ))}
       </div>
-      
+
       {/* Teacher Uploaded Notes CTA */}
       <div className="bg-gradient-to-r from-brand-royal/10 to-brand-royal/5 border border-brand-royal/20 dark:border-brand-royal/15 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -322,11 +321,10 @@ export const NotesResourcesPage: React.FC = () => {
               setSelectedChapterFilter(null);
               setSearchQuery("");
             }}
-            className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${
-              selectedSubjectFilter === "all"
+            className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${selectedSubjectFilter === "all"
                 ? "bg-brand-royal border-brand-royal text-white shadow-md"
                 : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
-            }`}
+              }`}
           >
             All Subjects
           </button>
@@ -338,11 +336,10 @@ export const NotesResourcesPage: React.FC = () => {
                 setSelectedChapterFilter(null);
                 setSearchQuery("");
               }}
-              className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${
-                selectedSubjectFilter === sub.id && selectedChapterFilter === null
+              className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${selectedSubjectFilter === sub.id && selectedChapterFilter === null
                   ? "bg-brand-royal border-brand-royal text-white shadow-md"
                   : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
-              }`}
+                }`}
             >
               {sub.title}
             </button>

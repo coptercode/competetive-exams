@@ -89,6 +89,23 @@ export async function runCandidateProfileMigration() {
     `);
     console.log('[migration] candidate_validations table: OK');
 
+    // Step 5: Create daily_tasks table
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS daily_tasks (
+        id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title           TEXT NOT NULL,
+        description     TEXT,
+        target_batch    TEXT,
+        student_id      UUID REFERENCES users(id) ON DELETE CASCADE,
+        instructor_name TEXT NOT NULL DEFAULT 'Faculty Lead',
+        due_date        TEXT NOT NULL,
+        task_type       TEXT NOT NULL DEFAULT 'Daily Test',
+        is_completed    BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    console.log('[migration] daily_tasks table: OK');
+
     console.log('[migration] ✅ Candidate profile & validation database migration complete.');
   } catch (err: any) {
     console.error('[migration] ❌ Candidate profile migration failed:', err.message);
