@@ -86,6 +86,7 @@ export const TeacherDashboard: React.FC = () => {
   };
 
   // Instructor Mock Test Creation State
+  const [teacherStreamFilter, setTeacherStreamFilter] = useState<string>("ALL");
   const [mockTestTitle, setMockTestTitle] = useState("");
   const [mockTestDuration, setMockTestDuration] = useState("60");
   const [mockTestCategory, setMockTestCategory] = useState("Engineering");
@@ -521,27 +522,41 @@ export const TeacherDashboard: React.FC = () => {
 
           {/* Course Study Materials & PDFs Repository */}
           <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
                   Study Materials &amp; PDFs Repository ({allNotesList.length})
                 </h3>
               </div>
-              <button
-                onClick={() => setView("admin-upload")}
-                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload PDF</span>
-              </button>
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                <select
+                  value={teacherStreamFilter}
+                  onChange={(e) => setTeacherStreamFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white focus:outline-none shadow-sm cursor-pointer"
+                >
+                  <option value="ALL">🌐 All Portions &amp; Classes</option>
+                  <option value="TNSB">📘 TNSB (Class 9, 10, 11, 12)</option>
+                  <option value="CBSE">📙 CBSE (Class 11 &amp; 12)</option>
+                  <option value="TNPSC">🏛️ TNPSC Group 1, 2, 4, 3, 8</option>
+                  <option value="Engineering">⚛️ JEE Main &amp; Advanced</option>
+                  <option value="Medical">🩺 NEET UG</option>
+                </select>
+                <button
+                  onClick={() => setView("admin-upload")}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shrink-0"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Upload PDF</span>
+                </button>
+              </div>
             </div>
 
-            {allNotesList.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4 text-center">No study materials stored yet.</p>
+            {allNotesList.filter(n => teacherStreamFilter === "ALL" || `${n.boardName || ''} ${n.className || ''} ${n.subjectTitle || ''} ${n.title || ''}`.toLowerCase().includes(teacherStreamFilter.toLowerCase())).length === 0 ? (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No study materials stored matching filter.</p>
             ) : (
               <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                {allNotesList.slice(0, 10).map((note) => (
+                {allNotesList.filter(n => teacherStreamFilter === "ALL" || `${n.boardName || ''} ${n.className || ''} ${n.subjectTitle || ''} ${n.title || ''}`.toLowerCase().includes(teacherStreamFilter.toLowerCase())).slice(0, 15).map((note) => (
                   <div key={note.id} className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex flex-wrap items-center gap-1.5">

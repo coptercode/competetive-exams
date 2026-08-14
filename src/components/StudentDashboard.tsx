@@ -78,6 +78,19 @@ export const StudentDashboard: React.FC = () => {
   const [recentVideos, setRecentVideos] = useState<any[]>([]);
   const [availableQuizzes, setAvailableQuizzes] = useState<any[]>([]);
   const [detailedReport, setDetailedReport] = useState<any | null>(null);
+  const [streamFilter, setStreamFilter] = useState<string>("ALL");
+
+  const filteredNotes = recentNotes.filter((n) => {
+    if (streamFilter === "ALL") return true;
+    const searchStr = `${n.boardName || ''} ${n.className || ''} ${n.subjectTitle || ''} ${n.title || ''}`.toLowerCase();
+    return searchStr.includes(streamFilter.toLowerCase());
+  });
+
+  const filteredVideos = recentVideos.filter((v) => {
+    if (streamFilter === "ALL") return true;
+    const searchStr = `${v.boardName || ''} ${v.className || ''} ${v.subjectTitle || ''} ${v.title || ''}`.toLowerCase();
+    return searchStr.includes(streamFilter.toLowerCase());
+  });
 
   const fetchDetailedReport = async () => {
     const token = localStorage.getItem("auth_token");
@@ -408,27 +421,47 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Uploaded Study Notes & Recorded Video Lectures for Candidate */}
       <div className="glass-card p-6 rounded-[32px] border border-slate-200 dark:border-white/10 space-y-4 shadow-xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-brand-royal/10 text-brand-royal dark:text-blue-400 border border-brand-royal/20">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Batch Video Lectures & Study Notes
+                Exam Stream Portions &amp; Chapter Materials
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Uploaded by your faculty and program admins for {activeBatch?.title || "your batch"}
+                Filter by class level, exam stream (TNSB, CBSE, TNPSC, JEE, NEET) &amp; chapter portions
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setView("teacher-uploaded-notes")}
-            className="text-xs font-extrabold text-brand-royal dark:text-blue-400 hover:underline flex items-center gap-1"
-          >
-            <span>View All Materials</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <select
+              value={streamFilter}
+              onChange={(e) => setStreamFilter(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white focus:outline-none shadow-sm cursor-pointer"
+            >
+              <option value="ALL">🌐 All Exam Streams &amp; Class Portions</option>
+              <option value="TNSB">📘 TNSB Board (Class 9, 10, 11, 12)</option>
+              <option value="CBSE">📙 CBSE Board (Class 11 &amp; Class 12)</option>
+              <option value="TNPSC">🏛️ TNPSC Group 1, 2/2A, 4/VAO, 3 &amp; 8</option>
+              <option value="Engineering">⚛️ Engineering (JEE Main &amp; Advanced)</option>
+              <option value="Medical">🩺 Medical Entrance (NEET UG)</option>
+              <option value="Physics">⚡ Physics Portions</option>
+              <option value="Chemistry">🧪 Chemistry Portions</option>
+              <option value="Math">📐 Mathematics Portions</option>
+              <option value="Biology">🧬 Biology &amp; Botany Portions</option>
+              <option value="Tamil">📜 General Tamil &amp; History</option>
+            </select>
+            <button
+              onClick={() => setView("teacher-uploaded-notes")}
+              className="text-xs font-extrabold text-brand-royal dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0"
+            >
+              <span>View All</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -437,14 +470,14 @@ export const StudentDashboard: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-emerald-500" />
-                Latest Study Notes & PDFs ({recentNotes.length})
+                Filtered Study Notes &amp; PDFs ({filteredNotes.length})
               </span>
             </div>
-            {recentNotes.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4 text-center">No study notes uploaded yet for your class.</p>
+            {filteredNotes.length === 0 ? (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No study notes match the selected exam stream filter.</p>
             ) : (
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                {recentNotes.slice(0, 10).map((note) => (
+              <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                {filteredNotes.slice(0, 15).map((note) => (
                   <div key={note.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex flex-wrap items-center gap-1.5">
@@ -476,14 +509,14 @@ export const StudentDashboard: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                 <Tv className="w-4 h-4 text-brand-royal" />
-                Recorded Video Lectures ({recentVideos.length})
+                Filtered Video Lectures ({filteredVideos.length})
               </span>
             </div>
-            {recentVideos.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4 text-center">No video lectures uploaded yet for your class.</p>
+            {filteredVideos.length === 0 ? (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No video lectures match the selected exam stream filter.</p>
             ) : (
               <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-                {recentVideos.slice(0, 10).map((vid) => (
+                {filteredVideos.slice(0, 15).map((vid) => (
                   <div key={vid.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex flex-wrap items-center gap-1.5">
