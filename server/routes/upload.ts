@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth, requireAdmin, requireAdminOrTeacher } from '../middleware/auth.js';
 import { uploadToMinio, buildStorageKey, deleteFromMinio, minioClient, MINIO_BUCKET } from '../lib/minio.js';
+import { isSupabaseStorageEnabled, uploadToSupabaseStorage } from '../lib/supabase.js';
 import { processVideoForDrm, isFfmpegAvailable } from '../lib/drm-processor.js';
 import { prisma } from '../lib/prisma.js';
 import { ListObjectsV2Command, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -170,12 +171,20 @@ router.post(
       );
 
       let fileUrl: string;
-      try {
-        fileUrl = await uploadToMinio(key, req.file.buffer, req.file.mimetype);
-      } catch (minioErr) {
-        // Fallback: store as local reference when MinIO is not yet configured
-        console.warn('MinIO upload failed (credentials may not be set), using local path:', minioErr);
-        fileUrl = `/uploads/${key}`;
+      if (isSupabaseStorageEnabled()) {
+        try {
+          fileUrl = await uploadToSupabaseStorage(req.file.buffer, key, req.file.mimetype);
+        } catch (supaErr) {
+          console.warn('Supabase note upload failed, trying MinIO fallback:', supaErr);
+          fileUrl = await uploadToMinio(key, req.file.buffer, req.file.mimetype).catch(() => `/uploads/${key}`);
+        }
+      } else {
+        try {
+          fileUrl = await uploadToMinio(key, req.file.buffer, req.file.mimetype);
+        } catch (minioErr) {
+          console.warn('MinIO upload failed, using local path:', minioErr);
+          fileUrl = `/uploads/${key}`;
+        }
       }
 
       // Resolve uploader info
@@ -643,11 +652,20 @@ router.post(
           req.file.originalname,
         );
 
-        try {
-          fileUrl = await uploadToMinio(key, req.file.buffer, req.file.mimetype);
-        } catch (minioErr) {
-          console.warn('MinIO video upload failed, using local path:', minioErr);
-          fileUrl = `/uploads/${key}`;
+        if (isSupabaseStorageEnabled()) {
+          try {
+            fileUrl = await uploadToSupabaseStorage(req.file.buffer, key, req.file.mimetype);
+          } catch (supaErr) {
+            console.warn('Supabase video upload failed, trying MinIO fallback:', supaErr);
+            fileUrl = await uploadToMinio(key, req.file.buffer, req.file.mimetype).catch(() => `/uploads/${key}`);
+          }
+        } else {
+          try {
+            fileUrl = await uploadToMinio(key, req.file.buffer, req.file.mimetype);
+          } catch (minioErr) {
+            console.warn('MinIO video upload failed, using local path:', minioErr);
+            fileUrl = `/uploads/${key}`;
+          }
         }
       } else if (req.file && enableDrm) {
         await validateMagicBytes(req.file.buffer, req.file.mimetype);

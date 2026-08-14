@@ -37,8 +37,430 @@ export interface ExamCategory {
 
 export const initialBoards: ExamCategory[] = [
   {
+    id: "cbse-11",
+    title: "CBSE Class 11 Board & Competitive Prep",
+    code: "CBSE11",
+    classes: [
+      {
+        id: "class-11-science",
+        title: "Class 11 Science (PCM & PCB)",
+        subjects: [
+          {
+            id: "c11-physics",
+            title: "Physics Class 11",
+            color: "from-blue-600 to-indigo-700",
+            chapters: [
+              {
+                id: "c11-phy-ch1",
+                title: "Units & Measurements and Kinematics",
+                topics: [
+                  {
+                    id: "c11-phy-t1",
+                    title: "Units, Dimensions & Errors",
+                    content: "SI units, dimensional analysis, significant figures, error propagation.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-phy-t2",
+                    title: "Motion in a Straight Line & Plane",
+                    content: "Position-time graphs, velocity, acceleration, projectile motion equations.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c11-phy-ch2",
+                title: "Laws of Motion, Work Energy & Power",
+                topics: [
+                  {
+                    id: "c11-phy-t3",
+                    title: "Newton's Laws & Friction",
+                    content: "Inertia, momentum conservation, static and kinetic friction applications.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-phy-t4",
+                    title: "Work-Energy Theorem & Collisions",
+                    content: "Kinetic energy, potential energy curves, elastic and inelastic collisions.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c11-phy-ch3",
+                title: "Thermodynamics, Waves & Oscillations",
+                topics: [
+                  {
+                    id: "c11-phy-t5",
+                    title: "Thermodynamics & Kinetic Theory",
+                    content: "First and second laws of thermodynamics, heat engines, ideal gas laws.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-phy-t6",
+                    title: "Simple Harmonic Motion & Waves",
+                    content: "SHM equations, pendulum, wave propagation, Doppler effect.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "c11-chemistry",
+            title: "Chemistry Class 11",
+            color: "from-emerald-600 to-teal-700",
+            chapters: [
+              {
+                id: "c11-chem-ch1",
+                title: "Atomic Structure & Chemical Bonding",
+                topics: [
+                  {
+                    id: "c11-chem-t1",
+                    title: "Quantum Mechanical Model of Atom",
+                    content: "Bohr's model, quantum numbers, Aufbau principle, Hund's rule.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-chem-t2",
+                    title: "VSEPR Theory & Hybridization",
+                    content: "Valence shell electron pair repulsion, sp, sp2, sp3 hybridization geometry.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c11-chem-ch2",
+                title: "Organic Chemistry Principles & Hydrocarbons",
+                topics: [
+                  {
+                    id: "c11-chem-t3",
+                    title: "IUPAC Nomenclature & Isomerism",
+                    content: "IUPAC rules for functional groups, structural and stereoisomerism.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-chem-t4",
+                    title: "Alkanes, Alkenes & Aromatic Hydrocarbons",
+                    content: "Preparation methods, electrophilic additions, Friedel-Crafts reaction.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "c11-maths",
+            title: "Mathematics Class 11",
+            color: "from-purple-600 to-indigo-700",
+            chapters: [
+              {
+                id: "c11-math-ch1",
+                title: "Sets, Functions & Trigonometry",
+                topics: [
+                  {
+                    id: "c11-math-t1",
+                    title: "Sets, Relations & Functions",
+                    content: "Types of sets, domain, range, domain calculation of real functions.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-math-t2",
+                    title: "Trigonometric Equations & Formulas",
+                    content: "Compound angles, multiple angles, general solutions of trig equations.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c11-math-ch2",
+                title: "Coordinate Geometry & Limits",
+                topics: [
+                  {
+                    id: "c11-math-t3",
+                    title: "Straight Lines & Conic Sections",
+                    content: "Slope forms, distance formula, circle, parabola, ellipse equations.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-math-t4",
+                    title: "Limits & First Principle Derivative",
+                    content: "Evaluation of limits, standard limit theorems, differentiation rules.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "c11-biology",
+            title: "Biology Class 11",
+            color: "from-green-600 to-emerald-700",
+            chapters: [
+              {
+                id: "c11-bio-ch1",
+                title: "Cell Biology & Biomolecules",
+                topics: [
+                  {
+                    id: "c11-bio-t1",
+                    title: "Cell Structure & Organelles",
+                    content: "Prokaryotic vs eukaryotic cells, membrane structure, endomembrane system.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-bio-t2",
+                    title: "Enzymes & Biomolecules",
+                    content: "Proteins, carbohydrates, lipids, nucleic acids, enzyme action mechanisms.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c11-bio-ch2",
+                title: "Plant & Human Physiology",
+                topics: [
+                  {
+                    id: "c11-bio-t3",
+                    title: "Photosynthesis & Cellular Respiration",
+                    content: "Light reactions, Calvin cycle, Krebs cycle, electron transport system.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c11-bio-t4",
+                    title: "Neural Control & Chemical Coordination",
+                    content: "Nerve impulse transmission, synapse, endocrine glands & hormones.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "cbse-12",
+    title: "CBSE Class 12 Board & Competitive Prep",
+    code: "CBSE12",
+    classes: [
+      {
+        id: "class-12-science",
+        title: "Class 12 Science (PCM & PCB)",
+        subjects: [
+          {
+            id: "c12-physics",
+            title: "Physics Class 12",
+            color: "from-sky-600 to-blue-700",
+            chapters: [
+              {
+                id: "c12-phy-ch1",
+                title: "Electrostatics & Current Electricity",
+                topics: [
+                  {
+                    id: "c12-phy-t1",
+                    title: "Electric Fields & Gauss Law",
+                    content: "Coulomb's law, electric dipole, flux calculation, Gauss theorem applications.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-phy-t2",
+                    title: "Kirchhoff's Laws & Potentiometer",
+                    content: "Ohm's law, Wheatstone bridge, meter bridge, internal resistance measurement.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c12-phy-ch2",
+                title: "Optics & Semiconductor Electronics",
+                topics: [
+                  {
+                    id: "c12-phy-t3",
+                    title: "Ray & Wave Optics",
+                    content: "Refraction through prisms, Young's double slit experiment, diffraction.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-phy-t4",
+                    title: "p-n Junction Diodes & Solar Cells",
+                    content: "Intrinsic and extrinsic semiconductors, diode rectifiers, LED, Zener diode.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "c12-chemistry",
+            title: "Chemistry Class 12",
+            color: "from-rose-600 to-pink-700",
+            chapters: [
+              {
+                id: "c12-chem-ch1",
+                title: "Solutions, Electrochemistry & Kinetics",
+                topics: [
+                  {
+                    id: "c12-chem-t1",
+                    title: "Colligative Properties & Raoult's Law",
+                    content: "Vapor pressure, elevation of boiling point, osmotic pressure, van't Hoff factor.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-chem-t2",
+                    title: "Nernst Equation & Rate Laws",
+                    content: "Standard electrode potential, Kohlrausch's law, order of reaction, Arrhenius equation.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c12-chem-ch2",
+                title: "Coordination Chemistry & Organic Reactions",
+                topics: [
+                  {
+                    id: "c12-chem-t3",
+                    title: "Werner's Theory & Crystal Field Theory",
+                    content: "Ligands, IUPAC naming of complexes, CFT splitting in octahedral complexes.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-chem-t4",
+                    title: "Aldehydes, Ketones & Amines",
+                    content: "Nucleophilic addition, Aldol condensation, Cannizzaro reaction, Gabriel phthalimide synthesis.",
+                    duration: "45m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "c12-maths",
+            title: "Mathematics Class 12",
+            color: "from-indigo-600 to-violet-700",
+            chapters: [
+              {
+                id: "c12-math-ch1",
+                title: "Differential & Integral Calculus",
+                topics: [
+                  {
+                    id: "c12-math-t1",
+                    title: "Continuity, Differentiability & Derivatives",
+                    content: "Chain rule, implicit differentiation, Mean Value Theorems, maxima-minima.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-math-t2",
+                    title: "Indefinite & Definite Integrals",
+                    content: "Integration by parts, partial fractions, definite integral properties.",
+                    duration: "45m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c12-math-ch2",
+                title: "Vectors, 3D Geometry & Probability",
+                topics: [
+                  {
+                    id: "c12-math-t3",
+                    title: "Vector Algebra & 3D Lines/Planes",
+                    content: "Dot product, cross product, shortest distance between skew lines.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-math-t4",
+                    title: "Conditional Probability & Bayes Theorem",
+                    content: "Independent events, Bayes' theorem, probability distribution.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "c12-biology",
+            title: "Biology Class 12",
+            color: "from-teal-600 to-emerald-700",
+            chapters: [
+              {
+                id: "c12-bio-ch1",
+                title: "Genetics, Evolution & Molecular Biology",
+                topics: [
+                  {
+                    id: "c12-bio-t1",
+                    title: "Molecular Basis of Inheritance",
+                    content: "DNA structure, replication, transcription, translation, genetic code.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-bio-t2",
+                    title: "Human Reproduction & Reproductive Health",
+                    content: "Gametogenesis, menstrual cycle, fertilization, ART techniques.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "c12-bio-ch2",
+                title: "Biotechnology & Ecology",
+                topics: [
+                  {
+                    id: "c12-bio-t3",
+                    title: "Recombinant DNA Technology & PCR",
+                    content: "Restriction enzymes, cloning vectors, PCR amplification steps.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c12-bio-t4",
+                    title: "Organisms, Populations & Conservation",
+                    content: "Population interactions, ecological pyramids, biodiversity hotspots.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     id: "engineering",
-    title: "Engineering Entrance Exams",
+    title: "Engineering Entrance Exams (JEE Main & Advanced)",
     code: "ENGG",
     classes: [
       {
