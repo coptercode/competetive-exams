@@ -64,6 +64,8 @@ export const TeacherDashboard: React.FC = () => {
     }
   };
 
+  const [allNotesList, setAllNotesList] = useState<any[]>([]);
+
   const fetchNotesCount = async () => {
     const token = localStorage.getItem("auth_token");
     if (!token) return;
@@ -74,6 +76,7 @@ export const TeacherDashboard: React.FC = () => {
       if (res.ok) {
         const data = await res.json();
         if (data.notes) {
+          setAllNotesList(data.notes);
           setNotesCount(data.notes.length);
         }
       }
@@ -514,6 +517,55 @@ export const TeacherDashboard: React.FC = () => {
                 ))
               )}
             </div>
+          </div>
+
+          {/* Course Study Materials & PDFs Repository */}
+          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/5 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
+                  Study Materials &amp; PDFs Repository ({allNotesList.length})
+                </h3>
+              </div>
+              <button
+                onClick={() => setView("admin-upload")}
+                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>Upload PDF</span>
+              </button>
+            </div>
+
+            {allNotesList.length === 0 ? (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No study materials stored yet.</p>
+            ) : (
+              <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                {allNotesList.slice(0, 10).map((note) => (
+                  <div key={note.id} className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{note.title}</p>
+                        {note.boardName && (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase">
+                            {note.boardName.split(' ')[0]} {note.className || ''}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500">Subject: {note.subjectTitle} • Uploaded by {note.uploadedByName || "Faculty"}</p>
+                    </div>
+                    <a
+                      href={note.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] hover:bg-emerald-500/20 whitespace-nowrap shrink-0"
+                    >
+                      View PDF
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Announcements Manager */}

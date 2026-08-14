@@ -438,16 +438,13 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
       const studentProfile = await prisma.student.findUnique({
         where: { id: req.auth.userId }
       });
-      if (studentProfile) {
+      if (studentProfile && studentProfile.classId) {
         whereClause = {
           topic: {
             chapter: {
               unit: {
                 subject: {
                   classId: studentProfile.classId,
-                  class: {
-                    boardId: studentProfile.boardId
-                  }
                 }
               }
             }
@@ -456,11 +453,7 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
       }
     }
 
-    // Only show notes explicitly uploaded by a user (staff/teacher)
-    // Auto-generated curriculum notes will have uploadedByUserId as null
-    whereClause.uploadedByUserId = { not: null };
-
-    const notes = await prisma.courseNote.findMany({
+    let notes = await prisma.courseNote.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -470,7 +463,13 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
               include: {
                 unit: {
                   include: {
-                    subject: { select: { name: true } },
+                    subject: {
+                      include: {
+                        class: {
+                          include: { board: true }
+                        }
+                      }
+                    },
                   },
                 },
               },
@@ -480,11 +479,39 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
       },
     });
 
+    // Fallback: If no class-filtered notes were found, fetch all notes across subjects
+    if (notes.length === 0 && req.auth?.role === 'STUDENT') {
+      notes = await prisma.courseNote.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+        include: {
+          topic: {
+            include: {
+              chapter: {
+                include: {
+                  unit: {
+                    include: {
+                      subject: {
+                        include: {
+                          class: {
+                            include: { board: true }
+                          }
+                        }
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
     const enriched = notes.map((n) => {
       let fileUrl = n.fileUrl;
       if (fileUrl.includes('.supabase.co') && fileUrl.includes('/s3/')) {
         fileUrl = fileUrl.replace('/s3/', '/object/public/');
-        // Fix wrongly encoded slashes
         const parts = fileUrl.split('/');
         const lastPart = parts.pop();
         if (lastPart && lastPart.includes('%2F')) {
@@ -492,12 +519,17 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
           fileUrl = parts.join('/');
         }
       }
+      const boardName = n.topic?.chapter?.unit?.subject?.class?.board?.name || '';
+      const className = n.topic?.chapter?.unit?.subject?.class?.name || '';
+      const subjectName = n.subjectTitle || n.topic?.chapter?.unit?.subject?.name || 'General';
       return {
         id: n.id,
         title: n.title,
         fileUrl,
-        uploadedByName: n.uploadedByName || 'Professor',
-        subjectTitle: n.subjectTitle || n.topic?.chapter?.unit?.subject?.name || 'General',
+        uploadedByName: n.uploadedByName || 'Senior Academic Faculty',
+        subjectTitle: subjectName,
+        boardName,
+        className,
         createdAt: n.createdAt,
       };
     });
@@ -506,6 +538,115 @@ router.get('/upload/notes/all', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Failed to fetch all notes:', err);
     res.status(500).json({ error: 'Failed to fetch notes' });
+  }
+});
+
+// ─────────────────────────────────────────────
+//  GET /upload/videos/all
+//  List ALL video lectures across subjects
+// ─────────────────────────────────────────────
+router.get('/upload/videos/all', requireAuth, async (req, res) => {
+  try {
+    let whereClause: any = {};
+    if (req.auth?.role === 'STUDENT') {
+      const studentProfile = await prisma.student.findUnique({
+        where: { id: req.auth.userId }
+      });
+      if (studentProfile && studentProfile.classId) {
+        whereClause = {
+          topic: {
+            chapter: {
+              unit: {
+                subject: {
+                  classId: studentProfile.classId,
+                }
+              }
+            }
+          }
+        };
+      }
+    }
+
+    let videos = await prisma.courseVideo.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        topic: {
+          include: {
+            chapter: {
+              include: {
+                unit: {
+                  include: {
+                    subject: {
+                      include: {
+                        class: {
+                          include: { board: true }
+                        }
+                      }
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Fallback: If no class-filtered videos were found, return top videos across all subjects
+    if (videos.length === 0 && req.auth?.role === 'STUDENT') {
+      videos = await prisma.courseVideo.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+        include: {
+          topic: {
+            include: {
+              chapter: {
+                include: {
+                  unit: {
+                    include: {
+                      subject: {
+                        include: {
+                          class: {
+                            include: { board: true }
+                          }
+                        }
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    const enriched = videos.map((v) => {
+      let videoUrl = v.videoUrl;
+      if (videoUrl && videoUrl.includes('.supabase.co') && videoUrl.includes('/s3/')) {
+        videoUrl = videoUrl.replace('/s3/', '/object/public/');
+      }
+      const boardName = v.topic?.chapter?.unit?.subject?.class?.board?.name || '';
+      const className = v.topic?.chapter?.unit?.subject?.class?.name || '';
+      const subjectName = v.topic?.chapter?.unit?.subject?.name || 'General Science';
+      return {
+        id: v.id,
+        title: v.title,
+        videoUrl,
+        duration: v.duration || 1800,
+        subjectTitle: subjectName,
+        boardName,
+        className,
+        drmEnabled: v.drmEnabled,
+        createdAt: v.createdAt,
+      };
+    });
+
+    res.json({ videos: enriched });
+  } catch (err) {
+    console.error('Failed to fetch all videos:', err);
+    res.status(500).json({ error: 'Failed to fetch videos' });
   }
 });
 

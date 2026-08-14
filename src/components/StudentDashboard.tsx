@@ -444,17 +444,24 @@ export const StudentDashboard: React.FC = () => {
               <p className="text-xs text-slate-500 italic py-4 text-center">No study notes uploaded yet for your class.</p>
             ) : (
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                {recentNotes.slice(0, 5).map((note) => (
-                  <div key={note.id} className="p-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{note.title}</p>
+                {recentNotes.slice(0, 10).map((note) => (
+                  <div key={note.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{note.title}</p>
+                        {note.boardName && (
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase">
+                            {note.boardName.split(' ')[0]} {note.className || ''}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[10px] text-slate-500">By {note.uploadedByName || "Faculty"} • {note.subjectTitle}</p>
                     </div>
                     <a
                       href={note.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] hover:bg-emerald-500/20 whitespace-nowrap shrink-0"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-bold text-[10px] whitespace-nowrap shrink-0 shadow-sm"
                     >
                       Open PDF
                     </a>
@@ -475,11 +482,18 @@ export const StudentDashboard: React.FC = () => {
             {recentVideos.length === 0 ? (
               <p className="text-xs text-slate-500 italic py-4 text-center">No video lectures uploaded yet for your class.</p>
             ) : (
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                {recentVideos.slice(0, 5).map((vid) => (
-                  <div key={vid.id} className="p-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{vid.title}</p>
+              <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                {recentVideos.slice(0, 10).map((vid) => (
+                  <div key={vid.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/5 flex items-center justify-between gap-3 shadow-sm">
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{vid.title}</p>
+                        {vid.boardName && (
+                          <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-black uppercase">
+                            {vid.boardName.split(' ')[0]} {vid.className || ''}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[10px] text-slate-500">{vid.subjectTitle} • {Math.round((vid.duration || 600) / 60)} mins</p>
                     </div>
                     {vid.videoUrl && vid.videoUrl.startsWith("http") ? (
@@ -487,14 +501,14 @@ export const StudentDashboard: React.FC = () => {
                         href={vid.videoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-2.5 py-1 rounded-lg bg-brand-royal/10 text-brand-royal dark:text-blue-400 font-bold text-[10px] hover:bg-brand-royal/20 whitespace-nowrap shrink-0"
+                        className="px-3 py-1.5 rounded-lg bg-brand-royal text-white font-bold text-[10px] hover:bg-blue-700 whitespace-nowrap shrink-0 shadow-sm"
                       >
                         Watch Video
                       </a>
                     ) : (
                       <button
                         onClick={() => setView("course-view")}
-                        className="px-2.5 py-1 rounded-lg bg-brand-royal/10 text-brand-royal dark:text-blue-400 font-bold text-[10px] hover:bg-brand-royal/20 whitespace-nowrap shrink-0"
+                        className="px-3 py-1.5 rounded-lg bg-brand-royal text-white font-bold text-[10px] hover:bg-blue-700 whitespace-nowrap shrink-0 shadow-sm"
                       >
                         Watch Video
                       </button>

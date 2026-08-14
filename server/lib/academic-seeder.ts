@@ -13,14 +13,27 @@ export async function ensureCompetitiveExamsSeeded() {
     for (let bIdx = 0; bIdx < initialBoards.length; bIdx++) {
       const bData = initialBoards[bIdx];
       
-      const board = await prisma.board.upsert({
-        where: { code: bData.code || bData.id.toUpperCase() },
-        update: { name: bData.title },
-        create: {
-          name: bData.title,
-          code: bData.code || bData.id.toUpperCase(),
-        },
+      let board = await prisma.board.findFirst({
+        where: {
+          OR: [
+            { code: bData.code || bData.id.toUpperCase() },
+            { name: bData.title }
+          ]
+        }
       });
+      if (!board) {
+        board = await prisma.board.create({
+          data: {
+            name: bData.title,
+            code: bData.code || bData.id.toUpperCase(),
+          }
+        });
+      } else {
+        board = await prisma.board.update({
+          where: { id: board.id },
+          data: { name: bData.title, code: bData.code || bData.id.toUpperCase() }
+        });
+      }
 
       for (let cIdx = 0; cIdx < bData.classes.length; cIdx++) {
         const cData = bData.classes[cIdx];
