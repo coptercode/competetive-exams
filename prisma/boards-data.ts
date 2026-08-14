@@ -1292,47 +1292,127 @@ export const initialBoards: ExamCategory[] = [
   },
   {
     id: "tnpsc",
-    title: "Tamil Nadu Public Service Commission",
+    title: "Tamil Nadu Public Service Commission (TNPSC Group Exams)",
     code: "TNPSC",
     classes: [
       {
         id: "tnpsc-group-1",
-        title: "TNPSC Group 1 Officer Batch",
+        title: "TNPSC Group 1 Officer Batch (Prelims & Mains)",
         subjects: [
           {
-            id: "tnpsc-general-studies",
-            title: "General Studies & Aptitude",
+            id: "tnpsc-g1-unit8-9",
+            title: "Unit 8 & 9: History, Culture, Heritage & TN Administration",
             color: "from-cyan-600 to-blue-700",
             chapters: [
               {
-                id: "tnpsc-gs-ch1",
-                title: "Tamil Nadu History, Culture & Heritage",
+                id: "tnpsc-g1-ch1",
+                title: "Sangam Age to Modern Tamil Nadu & Archaeology",
                 topics: [
                   {
-                    id: "tnpsc-gs-t1",
-                    title: "Sangam Age to Modern Tamil Nadu",
-                    content: "Sangam literature, Dravidian movement, socio-cultural reforms, Thirukkural ethics.",
+                    id: "tnpsc-g1-t1",
+                    title: "Sangam Literature, Keezhadi & Kodumanal Excavations",
+                    content: "Sangam literature, Tamil-Brahmi script, Keezhadi archaeological findings, trade with Rome.",
                     duration: "35m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   },
                   {
-                    id: "tnpsc-gs-t2",
-                    title: "Role of Tamil Nadu in Freedom Struggle",
-                    content: "Veerapandiya Kattabomman, V.O. Chidambaranar, Subramania Bharati, Velu Nachiyar.",
+                    id: "tnpsc-g1-t2",
+                    title: "Self-Respect Movement, Justice Party & Social Reformers",
+                    content: "Periyar E.V.R., C.N. Annadurai, Kamarajar, Rettaimalai Srinivasan, M.C. Rajah, Justice Party rule 1920-1937.",
                     duration: "40m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
               },
               {
-                id: "tnpsc-gs-ch2",
-                title: "Aptitude & Mental Ability",
+                id: "tnpsc-g1-ch2",
+                title: "Thirukkural Ethics, Philosophy & Secular Governance",
                 topics: [
                   {
-                    id: "tnpsc-gs-ch2-t1",
-                    title: "HCF, LCM, Percentages & Compound Interest",
-                    content: "Shortcut techniques, logical reasoning, data interpretation for Group 1 Prelims.",
-                    duration: "30m",
+                    id: "tnpsc-g1-t3",
+                    title: "Thirukkural as a Secular Literature",
+                    content: "Relevance of Thirukkural in modern socio-politico-economic affairs & essay writing for Mains.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnpsc-g1-t4",
+                    title: "Thirukkural on Management, Statecraft & Ethics",
+                    content: "Arathupal, Porutpal, Kamathupal couplet analysis for Group 1 GS & Mains Paper II.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnpsc-g1-polity-econ",
+            title: "Indian Polity, Economy & Geography of Tamil Nadu",
+            color: "from-indigo-600 to-violet-700",
+            chapters: [
+              {
+                id: "tnpsc-g1-ch3",
+                title: "Indian Constitution & Federal Administrative System",
+                topics: [
+                  {
+                    id: "tnpsc-g1-t5",
+                    title: "Preamble, Fundamental Rights & Panchayati Raj in TN",
+                    content: "Articles 12-35, Directive Principles, 73rd & 74th Amendments, TN Panchayat Act 1994.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnpsc-g1-t6",
+                    title: "Centre-State Relations & Interstate Water Disputes",
+                    content: "Sarkaria Commission, Punchhi Commission, Rajamannar Committee report, Cauvery & Mullaperiyar.",
+                    duration: "45m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnpsc-g1-ch4",
+                title: "Tamil Nadu Economy & Welfare Schemes",
+                topics: [
+                  {
+                    id: "tnpsc-g1-t7",
+                    title: "TN Industrial Clusters, GSDP & E-Governance",
+                    content: "Automotive capital, textile hubs, SIPCOT, TNEGA initiatives, Moovalur Ramamirtham Ammiyar Scheme.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnpsc-g1-aptitude-sci",
+            title: "Aptitude, Mental Ability & General Science",
+            color: "from-amber-600 to-orange-700",
+            chapters: [
+              {
+                id: "tnpsc-g1-ch5",
+                title: "Quantitative Aptitude & Data Interpretation",
+                topics: [
+                  {
+                    id: "tnpsc-g1-t8",
+                    title: "HCF, LCM, Percentage, SI & CI Formulas",
+                    content: "Shortcut techniques, profit & loss, ratio-proportion, time & work, data interpretation.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnpsc-g1-ch6",
+                title: "General Science, Environment & Technology",
+                topics: [
+                  {
+                    id: "tnpsc-g1-t9",
+                    title: "Physics, Chemistry, Biology & Space Missions",
+                    content: "ISRO Chandrayaan, Aditya-L1, Environmental conservation, biodiversity hotspots in Western Ghats.",
+                    duration: "35m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -1343,22 +1423,49 @@ export const initialBoards: ExamCategory[] = [
       },
       {
         id: "tnpsc-group-2",
-        title: "TNPSC Group 2 / 2A Executive Batch",
+        title: "TNPSC Group 2 / 2A Executive Batch (Prelims & Mains)",
         subjects: [
           {
-            id: "tnpsc-p2-gs",
-            title: "General Tamil & General Studies",
-            color: "from-teal-600 to-green-700",
+            id: "tnpsc-g2-tamil",
+            title: "General Tamil (Podhu Tamil) & Tamil Literature",
+            color: "from-teal-600 to-emerald-700",
             chapters: [
               {
-                id: "tnpsc-p2-ch1",
-                title: "Development Administration in TN",
+                id: "tnpsc-g2-ch1",
+                title: "Podhu Tamil Ilakkanam (Grammar) & Ilakkiyam",
                 topics: [
                   {
-                    id: "tnpsc-p2-t1",
-                    title: "Human Development Indicators in TN",
-                    content: "State welfare schemes, e-governance initiatives in Tamil Nadu.",
-                    duration: "30m",
+                    id: "tnpsc-g2-t1",
+                    title: "Ettuthokai, Pathupattu & Pathinenkeelkanakku",
+                    content: "Nattrinai, Kurunthokai, Ahananuru, Purananuru, Naladiyar, Naanmanikkadikai.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnpsc-g2-t2",
+                    title: "Five Epics (Aimperum Kappiyangal) & Bhakti Literature",
+                    content: "Silappathikaram, Manimekalai, Seevaka Chinthamani, Tevaram, Divya Prabandham.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnpsc-g2-gs",
+            title: "General Studies & Development Administration",
+            color: "from-blue-600 to-cyan-700",
+            chapters: [
+              {
+                id: "tnpsc-g2-ch2",
+                title: "Development Administration & Social Welfare in TN",
+                topics: [
+                  {
+                    id: "tnpsc-g2-t3",
+                    title: "Education, Health Systems & Reservation Policy in TN",
+                    content: "69% reservation history, Anandakrishnan committee, Chief Minister's Comprehensive Health Insurance.",
+                    duration: "35m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
@@ -1372,19 +1479,111 @@ export const initialBoards: ExamCategory[] = [
         title: "TNPSC Group 4 & VAO Integrated Batch",
         subjects: [
           {
-            id: "tnpsc-g4-aptitude",
-            title: "Mental Ability & General Studies",
-            color: "from-purple-600 to-indigo-700",
+            id: "tnpsc-g4-podhutamil",
+            title: "General Tamil (Podhu Tamil Class 6 to 12 Samacheer)",
+            color: "from-rose-600 to-red-700",
             chapters: [
               {
                 id: "tnpsc-g4-ch1",
-                title: "Simplification & Percentage",
+                title: "Samacheer Kalvi Tamil Grammar & Authors",
                 topics: [
                   {
                     id: "tnpsc-g4-t1",
-                    title: "HCF, LCM & Ratio Problems",
-                    content: "Shortcuts for competitive mental ability questions.",
-                    duration: "25m",
+                    title: "Peyarcholl, Vinaicholl & Sandhi Pizhai Neekkuthal",
+                    content: "Nool-Noolasiriyar, Marabuchol, Sandhi rules, Thirukkural memorize & meaning.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnpsc-g4-vao-admin",
+            title: "VAO Village Administration & Revenue Governance",
+            color: "from-emerald-600 to-green-700",
+            chapters: [
+              {
+                id: "tnpsc-g4-ch2",
+                title: "Village Administrative Officer Duties & Land Records",
+                topics: [
+                  {
+                    id: "tnpsc-g4-t2",
+                    title: "Patta, Chitta, Adangal, FMB & Village Registers",
+                    content: "Duties of VAO, Revenue inspector, Tahsildar, birth/death certificates, community certificates.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnpsc-g4-gs-aptitude",
+            title: "General Studies & Mental Ability (SSLC Standard)",
+            color: "from-purple-600 to-indigo-700",
+            chapters: [
+              {
+                id: "tnpsc-g4-ch3",
+                title: "Mental Ability & Logical Reasoning",
+                topics: [
+                  {
+                    id: "tnpsc-g4-t3",
+                    title: "HCF, LCM, Ratio, Area, Volume & Puzzles",
+                    content: "SSLC standard maths shortcuts for Group 4 / VAO 25/25 score.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnpsc-group-3",
+        title: "TNPSC Group 3 & 3A Junior Inspector Batch",
+        subjects: [
+          {
+            id: "tnpsc-g3-cooperative",
+            title: "Cooperative Laws & General Studies",
+            color: "from-yellow-600 to-amber-700",
+            chapters: [
+              {
+                id: "tnpsc-g3-ch1",
+                title: "TN Cooperative Societies Act & Audit",
+                topics: [
+                  {
+                    id: "tnpsc-g3-t1",
+                    title: "Cooperative Banking, Credit Societies & Auditing",
+                    content: "TN Cooperative Societies Act 1983, Registrar powers, audit procedures.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnpsc-group-8",
+        title: "TNPSC Group 7B & Group 8 Executive Officer (HR & CE Dept)",
+        subjects: [
+          {
+            id: "tnpsc-g8-hrce",
+            title: "Hindu Religion, Saivam, Vaishnavam & Temple Admin",
+            color: "from-orange-600 to-red-700",
+            chapters: [
+              {
+                id: "tnpsc-g8-ch1",
+                title: "Hindu Religious Philosophy & Temple Administration",
+                topics: [
+                  {
+                    id: "tnpsc-g8-t1",
+                    title: "Saiva Siddhantham, 63 Nayanmars & 12 Alwars",
+                    content: "Tevaram, Thiruvasagam, Naalayira Divya Prabandham, Agama Sastras, HR & CE Act 1959.",
+                    duration: "40m",
                     videoUrl: "https://www.w3schools.com/html/movie.mp4"
                   }
                 ]
