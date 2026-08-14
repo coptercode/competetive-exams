@@ -37,6 +37,486 @@ export interface ExamCategory {
 
 export const initialBoards: ExamCategory[] = [
   {
+    id: "tnsb-board",
+    title: "Tamil Nadu State Board (TNSB Samacheer Kalvi Class 9 to 12)",
+    code: "TNSB",
+    classes: [
+      {
+        id: "tnsb-class-9",
+        title: "TNSB Class 9 Foundation",
+        subjects: [
+          {
+            id: "tnsb-9-science",
+            title: "Science Class 9 (Physics, Chemistry, Biology)",
+            color: "from-teal-600 to-emerald-700",
+            chapters: [
+              {
+                id: "tnsb-9-sci-ch1",
+                title: "Measurement, Motion & Matter Around Us",
+                topics: [
+                  {
+                    id: "tnsb-9-sci-t1",
+                    title: "Measuring Instruments & Motion Equations",
+                    content: "Vernier caliper, screw gauge, distance, displacement, speed-velocity curves.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-9-sci-t2",
+                    title: "Atomic Structure & Periodic Classification",
+                    content: "Thomson & Rutherford models, subatomic particles, periodic trends.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnsb-9-sci-ch2",
+                title: "Plant & Animal Tissue Organisation",
+                topics: [
+                  {
+                    id: "tnsb-9-sci-t3",
+                    title: "Meristematic & Permanent Tissues",
+                    content: "Xylem, phloem, epithelial tissue, connective tissue, organ systems.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-9-maths",
+            title: "Mathematics Class 9",
+            color: "from-blue-600 to-indigo-700",
+            chapters: [
+              {
+                id: "tnsb-9-math-ch1",
+                title: "Set Language, Algebra & Geometry",
+                topics: [
+                  {
+                    id: "tnsb-9-math-t1",
+                    title: "Set Operations & Venn Diagrams",
+                    content: "Union, intersection, complement, cardinal number of sets.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-9-math-t2",
+                    title: "Polynomials & Factorization",
+                    content: "Degree of polynomial, remainder theorem, factor theorem, algebraic identities.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-9-social",
+            title: "Social Science & Tamil Nadu History Class 9",
+            color: "from-amber-600 to-orange-700",
+            chapters: [
+              {
+                id: "tnsb-9-soc-ch1",
+                title: "Ancient Tamil Civilization & Physical Geography",
+                topics: [
+                  {
+                    id: "tnsb-9-soc-t1",
+                    title: "Sangam Age Archaeology & Inscriptions",
+                    content: "Keezhadi excavations, Kodumanal artifacts, Tamil-Brahmi script.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnsb-class-10",
+        title: "TNSB Class 10 SSLC Board & Foundation",
+        subjects: [
+          {
+            id: "tnsb-10-science",
+            title: "Science Class 10 (SSLC)",
+            color: "from-cyan-600 to-blue-700",
+            chapters: [
+              {
+                id: "tnsb-10-sci-ch1",
+                title: "Laws of Motion, Optics & Electricity",
+                topics: [
+                  {
+                    id: "tnsb-10-sci-t1",
+                    title: "Newton's Laws & Linear Momentum",
+                    content: "Action-reaction, impulse, momentum conservation, gravitational law.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "c10-phy-optics",
+                    title: "Refraction of Light & Convex/Concave Lenses",
+                    content: "Snell's law, lens formula, magnification, human eye power of accommodation.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnsb-10-sci-ch2",
+                title: "Solutions, Carbon Compounds & Plant Anatomy",
+                topics: [
+                  {
+                    id: "tnsb-10-sci-t3",
+                    title: "Types of Solutions & Concentration Terms",
+                    content: "Solubility, saturated-unsaturated solutions, mass percentage.",
+                    duration: "25m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-10-sci-t4",
+                    title: "Plant Anatomy & Internal Respiration",
+                    content: "Monocot and dicot stem anatomy, transpiration pull, ATP yield.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-10-maths",
+            title: "Mathematics Class 10 (SSLC)",
+            color: "from-indigo-600 to-violet-700",
+            chapters: [
+              {
+                id: "tnsb-10-math-ch1",
+                title: "Relations, Functions & Sequences (AP/GP)",
+                topics: [
+                  {
+                    id: "tnsb-10-math-t1",
+                    title: "Arithmetic & Geometric Progressions",
+                    content: "nth term formula, sum of n terms in AP and GP, applications.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-10-math-t2",
+                    title: "Quadratic Equations & Matrices",
+                    content: "Nature of roots, matrix addition, multiplication, transpose equations.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnsb-10-math-ch2",
+                title: "Coordinate Geometry, Trigonometry & Mensuration",
+                topics: [
+                  {
+                    id: "tnsb-10-math-t3",
+                    title: "Section Formula & Line Equation",
+                    content: "Midpoint, centroid, straight line equations, slope-intercept form.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-10-math-t4",
+                    title: "Heights & Distances & Surface Areas",
+                    content: "Trigonometric identities, angle of elevation, frustum of cone volume.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-10-social",
+            title: "Social Science & Freedom Struggle (SSLC)",
+            color: "from-red-600 to-rose-700",
+            chapters: [
+              {
+                id: "tnsb-10-soc-ch1",
+                title: "Freedom Struggle in Tamil Nadu & Constitution",
+                topics: [
+                  {
+                    id: "tnsb-10-soc-t1",
+                    title: "Poligar Rebellion & Early Uprisings",
+                    content: "Puli Thevar, Kattabomman, Maruthu Brothers, Vellore Revolt 1806.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-10-soc-t2",
+                    title: "Indian Constitution & Executive System",
+                    content: "Preamble, Fundamental Rights, Governor, Chief Minister & High Court.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnsb-class-11",
+        title: "TNSB Class 11 Higher Secondary",
+        subjects: [
+          {
+            id: "tnsb-11-physics",
+            title: "Physics Class 11 (TNSB)",
+            color: "from-blue-600 to-sky-700",
+            chapters: [
+              {
+                id: "tnsb-11-phy-ch1",
+                title: "Nature of Physical World & Kinematics",
+                topics: [
+                  {
+                    id: "tnsb-11-phy-t1",
+                    title: "Errors in Measurement & Vector Algebra",
+                    content: "Vector addition, scalar product, cross product, relative velocity.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnsb-11-phy-ch2",
+                title: "Gravitation & Properties of Matter",
+                topics: [
+                  {
+                    id: "tnsb-11-phy-t2",
+                    title: "Elasticity, Surface Tension & Viscosity",
+                    content: "Hooke's law, Young's modulus, Bernoulli's theorem, Stokes' law.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-11-chemistry",
+            title: "Chemistry Class 11 (TNSB)",
+            color: "from-emerald-600 to-teal-700",
+            chapters: [
+              {
+                id: "tnsb-11-chem-ch1",
+                title: "Basic Concepts & Quantum Mechanical Model",
+                topics: [
+                  {
+                    id: "tnsb-11-chem-t1",
+                    title: "Equivalent Mass & Redox Reactions",
+                    content: "Oxidation numbers, balancing redox equations, mole calculations.",
+                    duration: "30m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-11-maths",
+            title: "Mathematics Class 11 (TNSB)",
+            color: "from-purple-600 to-pink-700",
+            chapters: [
+              {
+                id: "tnsb-11-math-ch1",
+                title: "Matrices, Determinants & Trigonometry",
+                topics: [
+                  {
+                    id: "tnsb-11-math-t1",
+                    title: "Properties of Determinants & Inverse Matrix",
+                    content: "Elementary transformations, rank of matrix, system of equations.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-11-biology",
+            title: "Bio-Botany & Bio-Zoology Class 11 (TNSB)",
+            color: "from-green-600 to-emerald-800",
+            chapters: [
+              {
+                id: "tnsb-11-bio-ch1",
+                title: "Taxonomy, Plant Anatomy & Human Physiology",
+                topics: [
+                  {
+                    id: "tnsb-11-bio-t1",
+                    title: "Plant Kingdom & Tissue Systems",
+                    content: "Angiosperm classification, vascular bundles, secondary growth.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tnsb-class-12",
+        title: "TNSB Class 12 Higher Secondary (HSC)",
+        subjects: [
+          {
+            id: "tnsb-12-physics",
+            title: "Physics Class 12 (TNSB HSC)",
+            color: "from-sky-600 to-blue-800",
+            chapters: [
+              {
+                id: "tnsb-12-phy-ch1",
+                title: "Electrostatics, Magnetism & Wave Optics",
+                topics: [
+                  {
+                    id: "tnsb-12-phy-t1",
+                    title: "Electric Field, Dipole & Gauss Law Applications",
+                    content: "Field due to dipole, Van de Graaff generator, capacitance calculation.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-12-phy-t2",
+                    title: "Electromagnetic Induction & Alternating Current",
+                    content: "Self and mutual inductance, AC generator, transformer efficiency.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnsb-12-phy-ch2",
+                title: "Atomic, Nuclear & Semiconductor Physics",
+                topics: [
+                  {
+                    id: "tnsb-12-phy-t3",
+                    title: "Photoelectric Effect & Nuclear Fission/Fusion",
+                    content: "Einstein's photoelectric equation, mass defect, binding energy curve.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-12-phy-t4",
+                    title: "Transistors & Digital Logic Gates",
+                    content: "CE configuration, transistor as switch, AND, OR, NOT, NAND, NOR gates.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-12-chemistry",
+            title: "Chemistry Class 12 (TNSB HSC)",
+            color: "from-rose-600 to-red-700",
+            chapters: [
+              {
+                id: "tnsb-12-chem-ch1",
+                title: "Solid State, Electrochemistry & Organic Reactions",
+                topics: [
+                  {
+                    id: "tnsb-12-chem-t1",
+                    title: "Crystal Lattices & Unit Cell Density",
+                    content: "SCC, BCC, FCC packing efficiency, Schottky and Frenkel defects.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-12-chem-t2",
+                    title: "Carbonyl Compounds & Organic Nitrogen Compounds",
+                    content: "Aldol, Cannizzaro, Kolbe's reaction, Reimer-Tiemann, Hofmann degradation.",
+                    duration: "45m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-12-maths",
+            title: "Mathematics Class 12 (TNSB HSC)",
+            color: "from-indigo-600 to-violet-800",
+            chapters: [
+              {
+                id: "tnsb-12-math-ch1",
+                title: "Application of Matrices & Complex Numbers",
+                topics: [
+                  {
+                    id: "tnsb-12-math-t1",
+                    title: "Rank of Matrix & Gauss-Jordan Method",
+                    content: "Solving linear equations using matrix inversion, Cramer's rule.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-12-math-t2",
+                    title: "De Moivre's Theorem & Roots of Unity",
+                    content: "Polar form of complex number, nth roots of unity, Argand plane.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              },
+              {
+                id: "tnsb-12-math-ch2",
+                title: "Differential Calculus & Vector Geometry",
+                topics: [
+                  {
+                    id: "tnsb-12-math-t3",
+                    title: "Taylor & Maclaurin Series & Differentials",
+                    content: "Partial derivatives, Euler's theorem, linear approximation.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-12-math-t4",
+                    title: "Vector Equation of Plane & Line",
+                    content: "Parametric & non-parametric vector equations of planes.",
+                    duration: "40m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: "tnsb-12-biology",
+            title: "Bio-Botany & Bio-Zoology Class 12 (TNSB HSC)",
+            color: "from-emerald-600 to-green-800",
+            chapters: [
+              {
+                id: "tnsb-12-bio-ch1",
+                title: "Reproduction, Molecular Genetics & Human Health",
+                topics: [
+                  {
+                    id: "tnsb-12-bio-t1",
+                    title: "Asexual & Sexual Reproduction in Plants",
+                    content: "Microsporogenesis, megasporogenesis, double fertilization, apomixis.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  },
+                  {
+                    id: "tnsb-12-bio-t2",
+                    title: "Human Immunity & Vaccine Types",
+                    content: "Innate & acquired immunity, B-cells, T-cells, monoclonal antibodies.",
+                    duration: "35m",
+                    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     id: "cbse-11",
     title: "CBSE Class 11 Board & Competitive Prep",
     code: "CBSE11",
